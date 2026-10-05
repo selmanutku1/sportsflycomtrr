@@ -104,7 +104,7 @@ async function prepareCloneForPdfCapture(
 
   // Remove elements that should be hidden in print/PDF
   const ignoredNodes = clonedRoot.querySelectorAll(
-    '.print\\:hidden, [data-html2canvas-ignore="true"], [data-print-ignore]'
+    '.print\\:hidden, .pdf-export-hide, [data-html2canvas-ignore="true"], [data-print-ignore]'
   );
   ignoredNodes.forEach((node) => node.remove());
 

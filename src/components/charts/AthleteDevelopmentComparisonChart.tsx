@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -14,20 +14,12 @@ import {
 import {
   TrendingUp,
   BarChart2,
-  Download,
-  FileText,
-  FileSpreadsheet,
   CheckCircle2,
   Target,
   Users,
-  ChevronDown,
   Filter,
 } from 'lucide-react';
 import { SportsFlyLabReport } from '../../data/sportsFlyLabData';
-import {
-  downloadCriticalPerformanceCSV,
-  downloadCriticalPerformancePDF,
-} from '../../utils/criticalPerformanceExporter';
 
 export interface AthleteDevelopmentComparisonChartProps {
   report: SportsFlyLabReport;
@@ -86,20 +78,6 @@ export const AthleteDevelopmentComparisonChart: React.FC<AthleteDevelopmentCompa
 }) => {
   const [chartType, setChartType] = useState<'bar' | 'line'>(defaultChartType);
   const [filterMode, setFilterMode] = useState<'critical' | 'all'>(initialFilterMode);
-  const [showExportMenu, setShowExportMenu] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  // Close export dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowExportMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const grpAvgScore = report.groupInfo?.groupAverageScore ?? 72;
   const athleticScore = report.scoreHistory?.p3Score || 88;
@@ -140,31 +118,6 @@ export const AthleteDevelopmentComparisonChart: React.FC<AthleteDevelopmentCompa
     return rows.slice(0, 10);
   }, [report, grpAvgScore, filterMode]);
 
-  const handleExportCSV = () => {
-    try {
-      downloadCriticalPerformanceCSV(report);
-      onToast?.(`${report.athleteName} performans verileri CSV formatında indirildi.`);
-      setShowExportMenu(false);
-    } catch (err) {
-      console.error(err);
-      onToast?.('CSV indirilirken bir hata oluştu.');
-    }
-  };
-
-  const handleExportPDF = async () => {
-    try {
-      setIsExporting(true);
-      setShowExportMenu(false);
-      await downloadCriticalPerformancePDF(report, 'sportsfly-critical-performance-chart');
-      onToast?.(`${report.athleteName} kritik performans raporu PDF olarak indirildi.`);
-    } catch (err) {
-      console.error(err);
-      onToast?.('PDF indirilirken bir hata oluştu.');
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
   return (
     <div
       id="sportsfly-critical-performance-chart"
@@ -186,109 +139,11 @@ export const AthleteDevelopmentComparisonChart: React.FC<AthleteDevelopmentCompa
           </h3>
         </div>
 
-        {/* Action Controls: Filter Toggle, Chart Toggle & Rapor İndir Button */}
+        {/* Fixed Non-Variable Badge (Karne PDF için tekil ve sabit görünüm) */}
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Critical vs All Toggle */}
-          <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200">
-            <button
-              type="button"
-              onClick={() => setFilterMode('critical')}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                filterMode === 'critical'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-              title="En Kritik 4 Performans Verisine Odaklan"
-            >
-              <Filter className="w-3.5 h-3.5 text-blue-600" />
-              <span>Kritik 4 Veri</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilterMode('all')}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                filterMode === 'all'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-              title="Tüm Motorik Testleri Göster"
-            >
-              <span>Tüm Testler</span>
-            </button>
-          </div>
-
-          {/* Line vs Bar Switcher */}
-          <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200">
-            <button
-              type="button"
-              onClick={() => setChartType('bar')}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                chartType === 'bar'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-              title="Çubuk Grafikte Göster"
-            >
-              <BarChart2 className="w-3.5 h-3.5" />
-              <span>Çubuk</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setChartType('line')}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                chartType === 'line'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-              title="Çizgi Grafikte Göster"
-            >
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>Çizgi</span>
-            </button>
-          </div>
-
-          {/* Dedicated 'Rapor İndir' Button with Dropdown */}
-          <div className="relative" ref={menuRef}>
-            <button
-              type="button"
-              onClick={() => setShowExportMenu(!showExportMenu)}
-              disabled={isExporting}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
-            >
-              <Download className="w-4 h-4 text-emerald-400" />
-              <span>{isExporting ? 'Hazırlanıyor...' : 'Rapor İndir'}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-            </button>
-
-            {showExportMenu && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 p-1.5 z-40 animate-in fade-in slide-in-from-top-1">
-                <div className="px-3 py-1.5 text-[10.5px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                  İndirme Formatı Seçin
-                </div>
-                <button
-                  type="button"
-                  onClick={handleExportPDF}
-                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-                >
-                  <FileText className="w-4 h-4 text-rose-600" />
-                  <div>
-                    <div className="text-slate-900 font-bold">PDF Raporu İndir</div>
-                    <div className="text-[10px] text-slate-500 font-normal">Kritik Performans Özeti (A4)</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleExportCSV}
-                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors text-left cursor-pointer"
-                >
-                  <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-                  <div>
-                    <div className="text-slate-900 font-bold">CSV Veri Tablosu İndir</div>
-                    <div className="text-[10px] text-slate-500 font-normal">Excel Uyumlu Test Tablosu</div>
-                  </div>
-                </button>
-              </div>
-            )}
+          <div className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200/90 text-xs font-extrabold text-slate-800 flex items-center gap-2 shadow-2xs font-sans">
+            <Filter className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <span>Kritik 4 Veri Analizi</span>
           </div>
         </div>
       </div>

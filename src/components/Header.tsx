@@ -145,11 +145,11 @@ export const Header: React.FC<HeaderProps> = ({
             if (prev.some((n) => n.id === notifId)) return prev;
             const newNotif: SportsFlyNotification = {
               id: notifId,
-              title: 'Yeni Spor Okulu Başvurusu!',
-              description: `${latestItem.clubName || 'Yeni Kulüp'} (${latestItem.managerName || 'Yönetici'}) başvuru gönderdi.`,
-              time: 'Şimdi',
+              title: 'Yeni Spor Okulu Başvurusu',
+              description: `${latestItem.clubName || 'Yeni Kulüp'} (${latestItem.managerName || 'Yönetici'}) tarafından başvuru oluşturuldu.`,
+              time: 'Bugün',
               category: 'system',
-              isUnread: true,
+              isUnread: false,
             };
             const updated = [newNotif, ...prev];
             saveStoredNotifications(userProfile.role, updated);
@@ -952,17 +952,24 @@ export const Header: React.FC<HeaderProps> = ({
                 />
 
                 {/* Main Popover Container */}
-                <div className="fixed inset-x-3 top-14 max-w-sm sm:max-w-none mx-auto sm:mx-0 z-50 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[420px] bg-white dark:bg-[#111c2e] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700/80 flex flex-col max-h-[76vh] sm:max-h-[34rem] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <div className="fixed inset-x-2 top-14 max-w-sm sm:max-w-none mx-auto sm:mx-0 z-50 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[390px] bg-white dark:bg-[#111c2e] rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-700/80 flex flex-col max-h-[80vh] sm:max-h-[32rem] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                   
-                  {/* Compact Header */}
-                  <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
-                    <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">
-                      Bildirimler
-                    </span>
+                  {/* Institutional Header */}
+                  <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-slate-50/50 dark:bg-slate-900/30">
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-slate-800 dark:text-slate-100 text-xs sm:text-sm tracking-tight">
+                        Bildirim Merkezi
+                      </span>
+                      {unreadCount > 0 && (
+                        <span className="px-2 py-0.5 text-[10px] font-black rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
+                          {unreadCount} yeni
+                        </span>
+                      )}
+                    </div>
                     <button
                       onClick={handleMarkAllAsRead}
                       disabled={unreadCount === 0}
-                      className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer disabled:opacity-40"
+                      className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer disabled:opacity-40 disabled:no-underline"
                     >
                       Tümünü Oku
                     </button>
@@ -1153,50 +1160,6 @@ export const Header: React.FC<HeaderProps> = ({
                       });
                     })()}
                   </div>
-
-                  {/* Slim Footer */}
-                  <div className="px-3 py-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-[#142033]/60 flex items-center justify-between text-[11px] shrink-0">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={handleSimulateSporPuan}
-                        className="text-[10px] text-amber-600 dark:text-amber-400 font-bold hover:underline flex items-center gap-0.5 cursor-pointer"
-                        title="Örnek Sporpuan kazanım bildirimi"
-                      >
-                        <Zap className="w-2.5 h-2.5 fill-current" />
-                        <span>+Puan</span>
-                      </button>
-
-                      <button
-                        onClick={handleSimulateNotification}
-                        className="text-[10px] text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 font-medium cursor-pointer"
-                        title="Rastgele test bildirimi"
-                      >
-                        +Test
-                      </button>
-
-                      {notifications.length > 0 && (
-                        <button
-                          onClick={handleClearAllNotifications}
-                          className="text-[10px] text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
-                          title="Tümünü temizle"
-                        >
-                          Temizle
-                        </button>
-                      )}
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        setShowNotifications(false);
-                        setIsUpdatesModalOpen(true);
-                      }}
-                      className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <SportsFlyIcon className="w-3 h-3" />
-                      <span>v2.8.5 Sürüm Notları</span>
-                    </button>
-                  </div>
-
                 </div>
               </>
             )}

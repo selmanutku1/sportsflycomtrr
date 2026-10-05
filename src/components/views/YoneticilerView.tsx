@@ -374,13 +374,13 @@ export const YoneticilerView: React.FC = () => {
                 onClick={() => {
                   const exitingName = activeImpersonation.schoolName;
                   setActiveImpersonation(null);
-                  showToast(`"${exitingName}" hesabından çıkış yapıldı. Süper Admin paneline dönüldü.`, 'info');
+                  showToast(`"${exitingName}" hesabından çıkış yapıldı.`, 'info');
                 }}
                 className="px-3.5 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs"
-                title="Oturumu Sonlandır ve Admin Paneline Dön"
+                title="Oturumu Sonlandır"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Oturumu Kapat &amp; Admin Paneline Dön</span>
+                <span>Oturumu Kapat</span>
               </button>
             </div>
           </div>

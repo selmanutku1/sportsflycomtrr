@@ -618,8 +618,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     setLoginError(null);
     setShowGoogleAccountPicker(false);
     setShowUnauthorizedDomainModal(false);
-    setIsLoading(true);
-    setLoadingText('Google profili doğrulanıyor ve sisteme bağlanıyor...');
+    setIsLoading(false);
 
     const cleanEmail = (googleEmail || '').trim().toLowerCase();
     const isAdminAccount = cleanEmail === ADMIN_GOOGLE_EMAIL;
@@ -654,7 +653,8 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
   // Handle Google / Social Login — Directly prompts Google Account Chooser screen
   const handleGoogleLogin = () => {
     setLoginError(null);
-    setShowGoogleAccountPicker(true);
+    setShowGoogleAccountPicker(false);
+    handleNativeGooglePopupLogin();
   };
 
   const handleNativeGooglePopupLogin = async () => {
