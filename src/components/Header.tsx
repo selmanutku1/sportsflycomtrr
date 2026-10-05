@@ -588,29 +588,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Multi-Branch Quick Switcher */}
           <div className="relative" ref={branchMenuRef}>
-            {isGoogleRestricted ? (
-              <button
-                onClick={() => {
-                  const updated = {
-                    ...userProfile,
-                    name: 'Selman Utku',
-                    email: 'selmanutkumarmara@gmail.com',
-                    role: 'Süper Admin',
-                    title: 'SportsFly Kulüp Yöneticisi',
-                    club: 'SportsFly Kadıköy Merkez Şube',
-                    hasActivePackage: true,
-                  };
-                  saveStoredUserProfile(updated);
-                  setUserProfile(updated);
-                  onNavigate?.('anasayfa');
-                }}
-                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-2xs cursor-pointer"
-                title="Süper Admin (selmanutkumarmara@gmail.com) Görünümüne Dön"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-                <span className="hidden sm:inline">Admin Paneline Dön</span>
-              </button>
-            ) : isSuperAdmin ? (
+              {isSuperAdmin ? (
               <button
                 onClick={() => {
                   setShowBranchMenu(!showBranchMenu);
@@ -977,72 +955,17 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="fixed inset-x-3 top-14 max-w-sm sm:max-w-none mx-auto sm:mx-0 z-50 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[420px] bg-white dark:bg-[#111c2e] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700/80 flex flex-col max-h-[76vh] sm:max-h-[34rem] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                   
                   {/* Compact Header */}
-                  <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-slate-50/50 dark:bg-[#142033]/60">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                        <Bell className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="font-bold text-slate-800 dark:text-slate-100 text-xs sm:text-sm">
-                        Bildirimler
-                      </span>
-                      {unreadCount > 0 && (
-                        <span className="px-1.5 py-0.5 text-[9px] font-extrabold bg-blue-600 text-white rounded-full">
-                          {unreadCount} yeni
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={handleMarkAllAsRead}
-                        disabled={unreadCount === 0}
-                        className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer disabled:opacity-40 disabled:no-underline"
-                      >
-                        Tümünü Oku
-                      </button>
-
-                      <button
-                        onClick={() => setShowNotifications(false)}
-                        className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-md sm:hidden cursor-pointer"
-                        aria-label="Kapat"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Compact Filter Tabs with full visibility for Ödeme */}
-                  <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800/80 flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden bg-slate-50/30 dark:bg-[#142033]/30 shrink-0">
-                    {[
-                      { id: 'all', label: 'Tümü', count: notifications.length },
-                      { id: 'payment', label: '💳 Ödeme', count: notifications.filter((n) => n.category === 'payment').length },
-                      { id: 'sporpuan', label: '⭐ Sporpuan', count: notifications.filter((n) => n.category === 'sporpuan').length },
-                      { id: 'training', label: '📋 Yoklama', count: notifications.filter((n) => n.category === 'training').length },
-                      { id: 'message', label: '💬 Mesaj', count: notifications.filter((n) => n.category === 'message' || n.category === 'support').length },
-                      { id: 'unread', label: 'Okunmamış', count: unreadCount },
-                    ].map((tab) => {
-                      const isActive = notifCategoryFilter === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          onClick={() => setNotifCategoryFilter(tab.id as any)}
-                          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                            isActive
-                              ? 'bg-blue-600 text-white shadow-2xs'
-                              : 'bg-white dark:bg-[#162238] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
-                          }`}
-                        >
-                          <span>{tab.label}</span>
-                          <span
-                            className={`text-[9px] px-1.5 py-0.2 rounded-full font-bold ${
-                              isActive ? 'bg-white/25 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                            }`}
-                          >
-                            {tab.count}
-                          </span>
-                        </button>
-                      );
-                    })}
+                  <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+                    <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">
+                      Bildirimler
+                    </span>
+                    <button
+                      onClick={handleMarkAllAsRead}
+                      disabled={unreadCount === 0}
+                      className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer disabled:opacity-40"
+                    >
+                      Tümünü Oku
+                    </button>
                   </div>
 
                   {/* Scrollable Notifications List */}

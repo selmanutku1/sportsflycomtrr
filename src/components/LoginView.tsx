@@ -75,7 +75,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
 
   // Inputs
   const [countryCode, setCountryCode] = useState('+90');
-  const [phone, setPhone] = useState('532 123 45 67');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('demo@sportsfly.com');
   const [password, setPassword] = useState('••••••••');
   const [showPassword, setShowPassword] = useState(false);
@@ -481,9 +481,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     uid?: string,
     firebaseUserInstance?: User
   ) => {
-    setIsLoading(true);
-    setLoadingText('Firebase Auth ve Firestore veritabanı eşitleniyor...');
-
     const cleanEmail = (googleEmail || '').trim().toLowerCase();
     const isAdminAccount = cleanEmail === ADMIN_GOOGLE_EMAIL;
     const currentProf = getStoredUserProfile();
@@ -554,7 +551,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         `Google UID: ${actualUid}, Email: ${cleanEmail}`
       );
 
-      setIsLoading(false);
       onLoginSuccess({
         email: ADMIN_GOOGLE_EMAIL,
         name: displayName || 'Selman Utku Marmara',
@@ -603,7 +599,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
       `Google UID: ${actualUid}, Email: ${cleanEmail}`
     );
 
-    setIsLoading(false);
     onLoginSuccess({
       email: cleanEmail,
       name: displayName || 'Google Kullanıcısı',
@@ -665,8 +660,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
   const handleNativeGooglePopupLogin = async () => {
     setLoginError(null);
     setShowGoogleAccountPicker(false);
-    setIsLoading(true);
-    setLoadingText('Google penceresi açılıyor...');
 
     const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
 
@@ -687,7 +680,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     } catch (error: unknown) {
       const err = error as { code?: string; message?: string };
       console.warn('Google popup oturum açma hatası:', err);
-      setIsLoading(false);
 
       // Audit Log capture for security diagnostics
       recordSecurityAuditEvent({
@@ -1047,7 +1039,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         <button
           type="button"
           id="btn-google-login"
-          onClick={handleGoogleLogin}
+          onClick={handleNativeGooglePopupLogin}
           disabled={isLoading}
           className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm tracking-wide transition-all shadow-xs cursor-pointer mb-4 disabled:opacity-50 group"
         >
@@ -2059,12 +2051,25 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
             </div>
 
             {/* Vercel Tip Note */}
-            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200/80 text-[11px] text-amber-900 leading-relaxed flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-              <span>
-                <strong>Vercel Kullanıcıları İçin:</strong> Canlı Vercel adresiniz henüz Firebase Console'da yetkilendirilmemişse açılır pencere (popup) engellenebilir. Yukarıdaki <strong>Selman Utku Marmara</strong> kartına tıklayarak Firebase yetkisi beklemeden anında kesintisiz giriş yapabilirsiniz.
-              </span>
-            </div>
+            {!sessionStorage.getItem('dismissedVercelWarning') && (
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200/80 text-[11px] text-amber-900 leading-relaxed flex items-start gap-2 relative">
+                <button 
+                  onClick={() => {
+                    sessionStorage.setItem('dismissedVercelWarning', 'true');
+                    // Force re-render to hide (not ideal but quick fix without state refactor)
+                    setShowGoogleAccountPicker(false);
+                    setTimeout(() => setShowGoogleAccountPicker(true), 0);
+                  }}
+                  className="absolute top-1 right-1 text-amber-600 hover:text-amber-800"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <span>
+                  <strong>Vercel Kullanıcıları İçin:</strong> Canlı adresiniz Firebase'de yetkili değilse popup engellenebilir. Yukarıdaki <strong>Selman Utku Marmara</strong> kartını kullanabilirsiniz.
+                </span>
+              </div>
+            )}
 
             {/* Cancel Button */}
             <button

@@ -19,7 +19,7 @@ export const DEFAULT_NOTIFICATIONS: Record<string, SportsFlyNotification[]> = {
       title: 'Sistem Güncellemesi v3.4',
       description: 'Finansal Gelir-Gider raporlama hızı %40 artırıldı. Tüm şube hareketleri artık anlık hesaplanmaktadır.',
       time: '5 dakika önce',
-      isUnread: true,
+      isUnread: false,
     },
     {
       id: 'admin-2',
@@ -27,7 +27,7 @@ export const DEFAULT_NOTIFICATIONS: Record<string, SportsFlyNotification[]> = {
       title: 'Destek Talebi Cevaplandı',
       description: 'Destek No #1084: "QR Yoklama entegrasyonu donanım uyumluluğu" talebiniz onaylandı.',
       time: '1 saat önce',
-      isUnread: true,
+      isUnread: false,
     },
     {
       id: 'admin-3',
@@ -35,7 +35,7 @@ export const DEFAULT_NOTIFICATIONS: Record<string, SportsFlyNotification[]> = {
       title: 'Kadıköy Şubesi Aidat Girişi',
       description: 'Eylül ayı için toplam 14.500 TL yeni aidat tahsil edildi. Ödeme planları güncellendi.',
       time: '3 saat önce',
-      isUnread: true,
+      isUnread: false,
     },
     {
       id: 'admin-4',
@@ -69,7 +69,7 @@ export const DEFAULT_NOTIFICATIONS: Record<string, SportsFlyNotification[]> = {
       title: 'Mobil Yoklama Optimizasyonu',
       description: 'Zayıf internet koşullarında internetsiz (offline) yoklama alma ve QR tarayıcı algılama hızı artırıldı.',
       time: '15 dakika önce',
-      isUnread: true,
+      isUnread: false,
     },
     {
       id: 'trainer-2',
@@ -77,7 +77,7 @@ export const DEFAULT_NOTIFICATIONS: Record<string, SportsFlyNotification[]> = {
       title: 'Eğitmen Değerlendirme Güncellemesi',
       description: 'Gelişim karne şablonunuza yeni motor becerileri ve sporpuan kriterleri eklendi.',
       time: '3 saat önce',
-      isUnread: true,
+      isUnread: false,
     },
     {
       id: 'trainer-3',
@@ -85,7 +85,7 @@ export const DEFAULT_NOTIFICATIONS: Record<string, SportsFlyNotification[]> = {
       title: 'Haftalık Müfredat Hedefleri',
       description: 'Sorumlu olduğunuz grupların "Sıçrama ve Pas Koordinasyonu" antrenman kazanım değerlendirmelerini girin.',
       time: '5 saat önce',
-      isUnread: true,
+      isUnread: false,
     },
     {
       id: 'trainer-4',
@@ -119,7 +119,7 @@ export const DEFAULT_NOTIFICATIONS: Record<string, SportsFlyNotification[]> = {
       title: 'Yeni Mobil Veli Portalı',
       description: 'Geliştirilmiş mobil karne, anlık yoklama bildirimleri ve sporpuan gelişim grafikleri yayına alındı.',
       time: '10 dakika önce',
-      isUnread: true,
+      isUnread: false,
     },
     {
       id: 'parent-2',
@@ -127,7 +127,7 @@ export const DEFAULT_NOTIFICATIONS: Record<string, SportsFlyNotification[]> = {
       title: 'Eylül Ayı Aidat Ödemesi Alındı',
       description: 'Eylül ayı Basketbol branşı aidat ödemesi (3.200 TL) başarıyla tahsil edilmiştir. Makbuzunuz hazır.',
       time: '2 saat önce',
-      isUnread: true,
+      isUnread: false,
     },
     {
       id: 'parent-3',
@@ -135,7 +135,7 @@ export const DEFAULT_NOTIFICATIONS: Record<string, SportsFlyNotification[]> = {
       title: 'Antrenman Yoklama Bildirimi',
       description: 'Çocuğunuz bugün "Kadıköy Basketbol A Grubu" antrenmanına katılım sağladı (Yoklama: Katıldı).',
       time: '4 saat önce',
-      isUnread: true,
+      isUnread: false,
     },
     {
       id: 'parent-4',
