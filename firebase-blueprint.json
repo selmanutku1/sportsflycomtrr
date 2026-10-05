@@ -1,0 +1,652 @@
+{
+  "entities": {
+    "UserPublicProfile": {
+      "title": "UserPublicProfile",
+      "description": "Public non-PII user identity and role metadata for club members.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "clubName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140
+        },
+        "role": {
+          "type": "string",
+          "enum": ["kulup_yoneticisi", "egitmen", "veli", "sporcu"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "displayName", "clubName", "role", "createdAt", "updatedAt"]
+    },
+    "UserPrivatePII": {
+      "title": "UserPrivatePII",
+      "description": "Strictly isolated KVKK PII data accessible only by the document owner or verified admin.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "maskedTcKimlik": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "kvkkConsentAccepted": {
+          "type": "boolean"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["ownerId", "email", "phone", "kvkkConsentAccepted", "updatedAt"]
+    },
+    "Sporcu": {
+      "title": "Sporcu",
+      "description": "Athlete record in /sporcular/{sporcuId} with cross-references to groupId (/gruplar/{groupId}) and trainerId (/egitmenler/{trainerId}).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "code": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 160
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 32
+        },
+        "birthDate": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 24
+        },
+        "facility": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "groupId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "teamGroup": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "trainerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "trainerName": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "registrationDate": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 32
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "ownerId", "code", "name", "email", "facility", "branch", "groupId", "trainerId", "isActive", "registrationDate", "createdAt", "updatedAt"]
+    },
+    "Egitmen": {
+      "title": "Egitmen",
+      "description": "Trainer record in /egitmenler/{egitmenId}.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "code": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 160
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 32
+        },
+        "facility": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "assignedGroupIds": {
+          "type": "array"
+        },
+        "assignedGroups": {
+          "type": "array"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 140
+        },
+        "licenseLevel": {
+          "type": "string",
+          "maxLength": 140
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Aktif", "İzinli", "Ayrıldı"]
+        },
+        "experienceYears": {
+          "type": "number"
+        },
+        "rating": {
+          "type": "number"
+        },
+        "activeGroupsCount": {
+          "type": "number"
+        },
+        "activeAthletesCount": {
+          "type": "number"
+        },
+        "weeklyHours": {
+          "type": "number"
+        },
+        "hourlyRate": {
+          "type": "number"
+        },
+        "monthlySalary": {
+          "type": "number"
+        },
+        "city": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "avatarUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "ownerId", "code", "name", "email", "phone", "facility", "branch", "assignedGroupIds", "status", "createdAt", "updatedAt"]
+    },
+    "Grup": {
+      "title": "Grup",
+      "description": "Training group record in /gruplar/{grupId}.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140
+        },
+        "instructorId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "instructorName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "primaryAthleteIds": {
+          "type": "array"
+        },
+        "facility": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "category": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "ageGroup": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "memberCount": {
+          "type": "number"
+        },
+        "maxCapacity": {
+          "type": "number"
+        },
+        "monthlyFee": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Aktif", "Dolu", "Askıda"]
+        },
+        "scheduleDays": {
+          "type": "array"
+        },
+        "scheduleTime": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "scheduleLocation": {
+          "type": "string",
+          "maxLength": 140
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 600
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "ownerId", "name", "instructorId", "instructorName", "facility", "branch", "memberCount", "maxCapacity", "monthlyFee", "status", "createdAt", "updatedAt"]
+    },
+    "GrupUyesi": {
+      "title": "GrupUyesi",
+      "description": "Subcollection document in /gruplar/{grupId}/uyeler/{uyeId}.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "grupId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sporcuId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "instructorId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "code": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "birthYear": {
+          "type": "number"
+        },
+        "parentName": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "parentPhone": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "attendanceRate": {
+          "type": "number"
+        },
+        "licenseNumber": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "grupId", "sporcuId", "instructorId", "ownerId", "name", "code", "createdAt", "updatedAt"]
+    },
+    "SporOkuluBasvurusu": {
+      "title": "SporOkuluBasvurusu",
+      "description": "Sports school registration application record in /spor-okulu-basvurulari/{basvuruId}.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "clubName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140
+        },
+        "managerName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 160
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 32
+        },
+        "city": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "district": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "selectedPlan": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "athleteCount": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "status": {
+          "type": "string",
+          "enum": ["onay_bekliyor", "onaylandi", "reddedildi", "askida"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "clubName", "managerName", "email", "phone", "selectedPlan", "status", "createdAt", "updatedAt"]
+    },
+    "AthleteLabReport": {
+      "title": "AthleteLabReport",
+      "description": "SportsFly Lab 7-page athlete biometric and motor performance report card.",
+      "type": "object",
+      "properties": {
+        "reportId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "athleteCode": {
+          "type": "string",
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "athleteName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "sportBranch": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "overallScore": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["reportId", "ownerId", "athleteCode", "athleteName", "sportBranch", "overallScore", "createdAt", "updatedAt"]
+    },
+    "PaymentIntent": {
+      "title": "PaymentIntent",
+      "description": "PCI-DSS SAQ-A tokenized payment intent record. Never stores raw PAN or CVV.",
+      "type": "object",
+      "properties": {
+        "intentId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "planId": {
+          "type": "string",
+          "enum": ["baslangic-kulubu", "kulup-akademi", "pro-akademi-coklu-sube"]
+        },
+        "billingCycle": {
+          "type": "string",
+          "enum": ["aylik", "yillik"]
+        },
+        "amountTry": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string",
+          "enum": ["TRY"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["requires_3ds_authorization", "succeeded", "cancelled", "refunded"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["intentId", "ownerId", "idempotencyKey", "planId", "billingCycle", "amountTry", "currency", "status", "createdAt", "updatedAt"]
+    },
+    "GoogleUserAccessRecord": {
+      "title": "GoogleUserAccessRecord",
+      "description": "Google OAuth login users and their Admin-configured active system areas.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "clubName": { "type": "string" },
+        "phone": { "type": "string" },
+        "assignedPlan": { "type": "string" },
+        "allowedPages": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "isFullAccess": { "type": "boolean" },
+        "firstLoginAt": { "type": "string" },
+        "lastLoginAt": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "uid", "name", "email", "allowedPages", "isFullAccess"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserPublicProfile" },
+      "description": "Public user profile isolated from PII."
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": { "$ref": "#/entities/UserPrivatePII" },
+      "description": "Strict KVKK PII subcollection accessible only by the owner or verified admin."
+    },
+    "/sporcular/{sporcuId}": {
+      "schema": { "$ref": "#/entities/Sporcu" },
+      "description": "Club athletes collection."
+    },
+    "/egitmenler/{egitmenId}": {
+      "schema": { "$ref": "#/entities/Egitmen" },
+      "description": "Club trainers collection."
+    },
+    "/gruplar/{grupId}": {
+      "schema": { "$ref": "#/entities/Grup" },
+      "description": "Training groups collection."
+    },
+    "/gruplar/{grupId}/uyeler/{uyeId}": {
+      "schema": { "$ref": "#/entities/GrupUyesi" },
+      "description": "Subcollection of enrolled athletes per training group."
+    },
+    "/spor-okulu-basvurulari/{basvuruId}": {
+      "schema": { "$ref": "#/entities/SporOkuluBasvurusu" },
+      "description": "Public applications for sports school registration."
+    },
+    "/labReports/{reportId}": {
+      "schema": { "$ref": "#/entities/AthleteLabReport" },
+      "description": "SportsFly Lab biometric and motor performance reports."
+    },
+    "/paymentIntents/{intentId}": {
+      "schema": { "$ref": "#/entities/PaymentIntent" },
+      "description": "PCI-DSS SAQ-A tokenized payment intents."
+    },
+    "/googleUsers/{userId}": {
+      "schema": { "$ref": "#/entities/GoogleUserAccessRecord" },
+      "description": "Google login users and their active module permissions managed by Admin."
+    }
+  }
+}

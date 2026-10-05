@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%" fill="none">
+  <defs>
+    <!-- Top Wing Gradients -->
+    <linearGradient id="cyanFacet" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="60%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+    <linearGradient id="azureFacet" x1="0%" y1="20%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="deepBlueFacet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e40af" />
+      <stop offset="100%" stop-color="#172554" />
+    </linearGradient>
+    <linearGradient id="topWingShine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7dd3fc" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#0284c7" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Bottom Wing Gradients -->
+    <linearGradient id="pinkFacet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e" />
+      <stop offset="60%" stop-color="#e11d48" />
+      <stop offset="100%" stop-color="#be123c" />
+    </linearGradient>
+    <linearGradient id="coralFacet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb7185" />
+      <stop offset="50%" stop-color="#f43f5e" />
+      <stop offset="100%" stop-color="#ea580c" />
+    </linearGradient>
+    <linearGradient id="orangeFacet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c" />
+      <stop offset="100%" stop-color="#f97316" />
+    </linearGradient>
+    <linearGradient id="goldFacet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#facc15" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="subtleShadow" x="-10%" y="-10%" width="125%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+  </defs>
+
+  <!-- Graphic Group -->
+  <g filter="url(#subtleShadow)">
+    <!-- 1. UPPER BLUE WING (Stylized Top Ribbon of 'S') -->
+    <g id="upper-wing">
+      <!-- Facet A: Topmost aerodynamic Cyan tip -->
+      <path 
+        d="M 262 135 C 235 142 195 170 178 206 L 222 232 C 236 195 248 160 262 135 Z" 
+        fill="url(#cyanFacet)" 
+      />
+      <!-- Facet B: Outer curve / Mid Azure fold -->
+      <path 
+        d="M 178 206 C 160 236 156 268 165 292 L 216 262 L 222 232 Z" 
+        fill="url(#azureFacet)" 
+      />
+      <!-- Facet C: Inner bottom loop / Deep Blue anchor -->
+      <path 
+        d="M 165 292 C 174 314 195 325 212 320 C 228 315 242 300 246 288 C 248 280 248 268 238 250 L 216 262 Z" 
+        fill="url(#deepBlueFacet)" 
+      />
+      <!-- Facet D: Inner facet connecting seam -->
+      <path 
+        d="M 222 232 L 216 262 L 238 250 C 244 238 248 220 252 200 Z" 
+        fill="#1e40af" 
+        opacity="0.9" 
+      />
+      <!-- Top edge glossy highlight -->
+      <path 
+        d="M 262 135 C 242 142 208 165 190 196 C 196 182 225 152 262 135 Z" 
+        fill="url(#topWingShine)" 
+      />
+      <!-- Geometric fold crease lines -->
+      <line x1="178" y1="206" x2="246" y2="288" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" stroke-linecap="round" />
+      <line x1="222" y1="232" x2="165" y2="292" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.25" stroke-linecap="round" />
+    </g>
+
+    <!-- 2. LOWER WARM WING (Stylized Bottom Ribbon of 'S', point-symmetric) -->
+    <g id="lower-wing">
+      <!-- Facet A: Center / Top-right Pink/Magenta fold -->
+      <path 
+        d="M 238 365 C 265 358 305 330 322 294 L 278 268 C 264 305 252 340 238 365 Z" 
+        fill="url(#goldFacet)" 
+      />
+      <!-- Facet B: Mid Coral/Orange fold -->
+      <path 
+        d="M 322 294 C 340 264 344 232 335 208 L 284 238 L 278 268 Z" 
+        fill="url(#orangeFacet)" 
+      />
+      <!-- Facet C: Outer loop / Crimson Rose fold -->
+      <path 
+        d="M 335 208 C 326 186 305 175 288 180 C 272 185 258 200 254 212 C 252 220 252 232 262 250 L 284 238 Z" 
+        fill="url(#pinkFacet)" 
+      />
+      <!-- Facet D: Inner facet connecting seam -->
+      <path 
+        d="M 278 268 L 284 238 L 262 250 C 256 262 252 280 248 300 Z" 
+        fill="#be123c" 
+        opacity="0.9" 
+      />
+      <!-- Bottom edge warm shine -->
+      <path 
+        d="M 238 365 C 258 358 292 335 310 304 C 304 318 275 348 238 365 Z" 
+        fill="#fde047" 
+        opacity="0.5" 
+      />
+      <!-- Geometric fold crease lines -->
+      <line x1="322" y1="294" x2="254" y2="212" stroke="#ffffff" stroke-width="2" stroke-opacity="0.3" stroke-linecap="round" />
+      <line x1="278" y1="268" x2="335" y2="208" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.25" stroke-linecap="round" />
+    </g>
+  </g>
+</svg>

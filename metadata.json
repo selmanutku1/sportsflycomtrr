@@ -1,0 +1,8 @@
+{
+  "name": "SportsFly Lab — Atletik Performans & Sporcu Karne Platformu",
+  "description": "SportsFly Lab: Spor okulları ve kulüpler için bilimsel performans ölçümü, somatotip, PHV büyüme takibi ve yapay zeka destekli sporcu karnesi yönetim altyapısı.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
