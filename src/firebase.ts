@@ -64,7 +64,21 @@ export function handleFirestoreError(
     operationType,
     path,
   };
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
+
+  // Enhanced Diagnostic Logging
+  console.error('[Diagnostic] Firestore Operation Failed: ', {
+    operationType,
+    path,
+    error: errInfo.error,
+    isCorsError: errInfo.error.includes('CORS') || errInfo.error.includes('fetch'),
+    isPermissionError: errInfo.error.includes('permission'),
+    firebaseConfigUsed: {
+      databaseId: (app as any).options?.databaseId || 'default',
+      projectId: (app as any).options?.projectId,
+    },
+    fullDetails: errInfo
+  });
+
   throw new Error(JSON.stringify(errInfo));
 }
 

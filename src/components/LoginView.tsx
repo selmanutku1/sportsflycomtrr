@@ -54,6 +54,7 @@ import {
   sanitizeInputString,
   detectInjectionAttempt,
   recordSecurityAuditEvent,
+  getSecurityAuditEvents,
   secureFetch,
   secureStorageSet,
 } from '../utils/securityCore';
@@ -688,6 +689,15 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
       console.warn('Google popup oturum açma hatası:', err);
       setIsLoading(false);
 
+      // Audit Log capture for security diagnostics
+      recordSecurityAuditEvent({
+        category: 'AUTH',
+        severity: 'WARNING',
+        action: 'GOOGLE_LOGIN_FAILURE',
+        actor: 'Firebase Auth Engine',
+        details: `Code: ${err?.code || 'unknown'}, Msg: ${err?.message || 'none'}, Host: ${currentHost}`,
+      });
+
       if (err?.code === 'auth/unauthorized-domain') {
         setUnauthorizedDomainHost(currentHost);
         setShowUnauthorizedDomainModal(true);
@@ -921,6 +931,16 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 </button>
               </div>
             )}
+            <button
+              onClick={() => {
+                const logs = getSecurityAuditEvents();
+                console.table(logs);
+                alert('Güvenlik logları konsola (F12) yazdırıldı. Detaylar için konsolu kontrol edin.');
+              }}
+              className="mt-2 text-[10px] font-bold text-slate-500 underline cursor-pointer"
+            >
+              Güvenlik Loglarını Konsola Yazdır
+            </button>
           </div>
         )}
 

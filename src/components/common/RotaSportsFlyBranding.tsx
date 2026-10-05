@@ -32,7 +32,7 @@ export const RotaSportsFlyHeaderBadge: React.FC<RotaSportsFlyHeaderBadgeProps> =
       <div className="flex items-center gap-2">
         <div className="w-8 h-8 rounded-full overflow-hidden bg-white p-0.5 border border-cyan-400/60 shadow-xs flex items-center justify-center shrink-0">
           <img
-            src={ROTA_PERFORMANS_LOGO_DATA_URL}
+            src="/rota-performans-logo.png"
             alt="Rota Performans Logo"
             className="w-full h-full object-contain"
           />
@@ -137,7 +137,7 @@ export const RotaSportsFlyFooterBadge: React.FC<RotaSportsFlyFooterBadgeProps> =
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full overflow-hidden bg-white p-0.5 border border-cyan-400 shadow-2xs shrink-0 flex items-center justify-center">
             <img
-              src={ROTA_PERFORMANS_LOGO_DATA_URL}
+              src="/rota-performans-logo.png"
               alt="Rota Performans"
               className="w-full h-full object-contain"
             />
