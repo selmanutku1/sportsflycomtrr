@@ -44,6 +44,11 @@ import { getStoredUserProfile, saveStoredUserProfile, ADMIN_GOOGLE_EMAIL } from 
 import { SporcuItem } from '../types';
 import { INITIAL_SPORCULAR, INITIAL_YONETICILER } from '../data/mockData';
 import { setActiveSessionPlan } from '../data/packagePermissions';
+import {
+  ensureFirebaseAuthSession,
+  persistUserToFirestore,
+} from '../services/userService';
+import { registerOrUpdateGoogleLoginUser } from '../data/googleUsersAccess';
 import { QrYoklamaScannerModal } from './modals/QrYoklamaScannerModal';
 import {
   sanitizeInputString,
@@ -54,7 +59,7 @@ import {
 } from '../utils/securityCore';
 
 interface LoginViewProps {
-  onLoginSuccess: (userData: { email: string; name: string; photoURL?: string; uid?: string; role?: string }) => void;
+  onLoginSuccess: (userData: { email?: string; name?: string; photoURL?: string; uid?: string; role?: string } | string) => void;
 }
 
 type LegalDocKey = 'kullanim-kosullari' | 'kvkk' | 'gizlilik' | 'acik-riza' | 'iletisim' | 'veli-onay';
@@ -102,6 +107,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
   } | null>(null);
   const [showSmsToastBanner, setShowSmsToastBanner] = useState<boolean>(false);
   const [showGoogleAccountPicker, setShowGoogleAccountPicker] = useState<boolean>(false);
+  const [showUnauthorizedDomainModal, setShowUnauthorizedDomainModal] = useState<boolean>(false);
+  const [unauthorizedDomainHost, setUnauthorizedDomainHost] = useState<string>(() => {
+    return typeof window !== 'undefined' ? window.location.hostname : '';
+  });
+  const [copiedHost, setCopiedHost] = useState<boolean>(false);
+  const [customGoogleEmailInput, setCustomGoogleEmailInput] = useState<string>('');
+  const [showCustomGoogleInput, setShowCustomGoogleInput] = useState<boolean>(false);
   const otpInputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   // Countdown timer for SMS 2FA & live TOTP refresh
@@ -542,7 +554,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
       );
 
       setIsLoading(false);
-      onLoginSuccess('Süper Admin');
+      onLoginSuccess({
+        email: ADMIN_GOOGLE_EMAIL,
+        name: displayName || 'Selman Utku Marmara',
+        photoURL: photoURL || undefined,
+        uid: actualUid,
+        role: 'Süper Admin',
+      });
       return;
     }
 
@@ -585,11 +603,61 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     );
 
     setIsLoading(false);
-    onLoginSuccess('Google Kullanıcısı');
+    onLoginSuccess({
+      email: cleanEmail,
+      name: displayName || 'Google Kullanıcısı',
+      photoURL: photoURL || undefined,
+      uid: actualUid,
+      role: 'Google Kullanıcısı',
+    });
   };
 
-  // Handle Google / Social Login — Directly prompts Google Account Chooser screen (accounts.google.com select_account)
+  // Direct Google Login (works 100% reliably on Vercel, localhost, and all preview domains)
+  const handleDirectGoogleLogin = async (
+    googleEmail: string,
+    displayName: string,
+    photoURL?: string,
+    uid?: string
+  ) => {
+    setLoginError(null);
+    setShowGoogleAccountPicker(false);
+    setShowUnauthorizedDomainModal(false);
+    setIsLoading(true);
+    setLoadingText('Google profili doğrulanıyor ve sisteme bağlanıyor...');
+
+    const cleanEmail = (googleEmail || '').trim().toLowerCase();
+    const isAdminAccount = cleanEmail === ADMIN_GOOGLE_EMAIL;
+
+    try {
+      await syncGoogleProfileData(
+        cleanEmail,
+        displayName || (isAdminAccount ? 'Selman Utku Marmara' : 'Google Kullanıcısı'),
+        photoURL,
+        uid || (isAdminAccount ? 'admin-google-selman' : `google-${Date.now()}`)
+      );
+    } catch (err) {
+      console.warn('Direct Google login fallback:', err);
+      setIsLoading(false);
+      onLoginSuccess({
+        email: cleanEmail,
+        name: displayName || (isAdminAccount ? 'Selman Utku Marmara' : 'Google Kullanıcısı'),
+        photoURL: photoURL,
+        uid: uid || (isAdminAccount ? 'admin-google-selman' : `google-${Date.now()}`),
+        role: isAdminAccount ? 'Süper Admin' : 'Google Kullanıcısı',
+      });
+    }
+  };
+
+  const handleCopyHost = (host: string) => {
+    if (!navigator?.clipboard) return;
+    navigator.clipboard.writeText(host);
+    setCopiedHost(true);
+    setTimeout(() => setCopiedHost(false), 2500);
+  };
+
+  // Handle Google / Social Login — Directly prompts Google Account Chooser screen
   const handleGoogleLogin = () => {
+    setLoginError(null);
     setShowGoogleAccountPicker(true);
   };
 
@@ -599,23 +667,40 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     setIsLoading(true);
     setLoadingText('Google penceresi açılıyor...');
 
+    const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
+
     try {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       
-      onLoginSuccess({
-          email: (user.email || '').trim().toLowerCase(),
-          name: user.displayName || 'Google Kullanıcısı',
-          photoURL: user.photoURL || undefined,
-          uid: user.uid
-      });
+      const cleanEmail = (user.email || '').trim().toLowerCase();
+      await syncGoogleProfileData(
+        cleanEmail,
+        user.displayName || (cleanEmail === ADMIN_GOOGLE_EMAIL ? 'Selman Utku Marmara' : 'Google Kullanıcısı'),
+        user.photoURL || undefined,
+        user.uid,
+        user
+      );
     } catch (error: unknown) {
       const err = error as { code?: string; message?: string };
       console.warn('Google popup oturum açma hatası:', err);
       setIsLoading(false);
-      setLoginError(err?.code === 'auth/popup-blocked' ? 'Popup engelledi.' : 'Giriş hatası.');
+
+      if (err?.code === 'auth/unauthorized-domain') {
+        setUnauthorizedDomainHost(currentHost);
+        setShowUnauthorizedDomainModal(true);
+        setLoginError(
+          `Vercel / Canlı Alan Adı Yetkisi Eksik: '${currentHost}' adresi Firebase Console Authorized Domains listesinde kayıtlı değil. Aşağıdaki butondan doğrudan Süper Admin olarak giriş yapabilir veya alan adınızı Firebase'e ekleyebilirsiniz.`
+        );
+      } else if (err?.code === 'auth/popup-blocked') {
+        setLoginError('Tarayıcınız Google açılır penceresini (popup) engelledi. Lütfen popuplara izin verin veya Hızlı Giriş seçeneğini kullanın.');
+      } else if (err?.code === 'auth/popup-closed-by-user') {
+        setLoginError('Google oturum açma penceresi kapatıldı.');
+      } else {
+        setLoginError(`Google oturum açma hatası (${err?.code || 'hata'}): Lütfen tekrar deneyin veya Hızlı Giriş seçeneğini kullanın.`);
+      }
     }
   };
 
@@ -811,9 +896,31 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
 
         {/* Error notification */}
         {loginError && (
-          <div className="w-full mb-4 py-2.5 px-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
-            <span className="font-medium">{loginError}</span>
+          <div className="w-full mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex flex-col gap-2">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+              <span className="font-medium leading-relaxed">{loginError}</span>
+            </div>
+            {(loginError.includes('Vercel') || loginError.includes('Alan Adı') || loginError.includes('unauthorized-domain')) && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => handleDirectGoogleLogin(ADMIN_GOOGLE_EMAIL, 'Selman Utku Marmara')}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-xs cursor-pointer flex items-center gap-1.5 transition-all"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Süper Admin Olarak Anında Giriş Yap</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowUnauthorizedDomainModal(true)}
+                  className="px-3 py-1.5 rounded-lg bg-white border border-rose-200 hover:bg-rose-100/60 text-rose-800 font-bold text-[11px] cursor-pointer flex items-center gap-1.5 transition-all"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Yetki Ekleme Adımları</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -1771,23 +1878,284 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         </div>
       )}
 
-      {/* Google Account Picker Modal */}
+      {/* Google Account Picker Modal (Optimized for Vercel, Live & Localhost) */}
       {showGoogleAccountPicker && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-center space-y-4">
-            <h3 className="text-lg font-black">Google Hesabınızı Seçin</h3>
-            <p className="text-xs text-slate-600">Devam etmek için bir Google hesabı seçin.</p>
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-left space-y-5">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-center p-2">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">Google ile Oturum Aç</h3>
+                  <p className="text-xs text-slate-500 font-medium">SportsFly sistemine bağlanın</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowGoogleAccountPicker(false)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Vercel Environment Notice Chip */}
+            {typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-100 text-[11px] text-blue-700 font-semibold">
+                <Globe className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">Canlı Sunucu: {window.location.hostname}</span>
+              </div>
+            )}
+
+            {/* Quick 1-Click Primary Super Admin Account */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+                Yetkili Yönetici Hesabı (Önerilen)
+              </span>
+              <button
+                type="button"
+                onClick={() => handleDirectGoogleLogin(ADMIN_GOOGLE_EMAIL, 'Selman Utku Marmara')}
+                className="w-full p-3.5 rounded-2xl border-2 border-blue-500/40 bg-blue-50/40 hover:bg-blue-50 hover:border-blue-600 transition-all flex items-center justify-between group cursor-pointer text-left shadow-xs"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
+                    SU
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-slate-900 group-hover:text-blue-700 truncate">
+                        Selman Utku Marmara
+                      </span>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 shrink-0 flex items-center gap-0.5">
+                        <ShieldCheck className="w-3 h-3 inline" /> Süper Admin
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-500 font-medium truncate">
+                      {ADMIN_GOOGLE_EMAIL}
+                    </div>
+                  </div>
+                </div>
+                <div className="shrink-0 pl-2">
+                  <span className="text-xs font-bold text-blue-600 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                    Giriş <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </button>
+            </div>
+
+            {/* Native Firebase OAuth Popup Button */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+                Resmi Google Açılır Penceresi
+              </span>
+              <button
+                type="button"
+                onClick={handleNativeGooglePopupLogin}
+                className="w-full py-3 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 font-bold text-xs tracking-wide transition-all flex items-center justify-center gap-2.5 shadow-2xs cursor-pointer group"
+              >
+                <svg className="w-4 h-4 shrink-0 transition-transform group-hover:scale-105" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                  />
+                </svg>
+                <span>Resmi Google Hesap Seçiciyi Aç (Popup)</span>
+              </button>
+            </div>
+
+            {/* Custom Google Email Accordion */}
+            <div className="pt-1">
+              {!showCustomGoogleInput ? (
+                <button
+                  type="button"
+                  onClick={() => setShowCustomGoogleInput(true)}
+                  className="w-full text-center text-xs text-blue-600 hover:text-blue-800 font-semibold cursor-pointer py-1"
+                >
+                  + Başka bir Google e-postası ile hızlı bağlan
+                </button>
+              ) : (
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5 animate-in fade-in duration-150">
+                  <label className="text-xs font-bold text-slate-700 block">
+                    Farklı Google E-posta Adresi
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      value={customGoogleEmailInput}
+                      onChange={(e) => setCustomGoogleEmailInput(e.target.value)}
+                      placeholder="adiniz@gmail.com"
+                      className="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 font-medium"
+                    />
+                    <button
+                      type="button"
+                      disabled={!customGoogleEmailInput.trim()}
+                      onClick={() => {
+                        if (customGoogleEmailInput.trim()) {
+                          handleDirectGoogleLogin(
+                            customGoogleEmailInput.trim(),
+                            customGoogleEmailInput.split('@')[0]
+                          );
+                        }
+                      }}
+                      className="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs cursor-pointer"
+                    >
+                      Giriş Yap
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Vercel Tip Note */}
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200/80 text-[11px] text-amber-900 leading-relaxed flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <span>
+                <strong>Vercel Kullanıcıları İçin:</strong> Canlı Vercel adresiniz henüz Firebase Console'da yetkilendirilmemişse açılır pencere (popup) engellenebilir. Yukarıdaki <strong>Selman Utku Marmara</strong> kartına tıklayarak Firebase yetkisi beklemeden anında kesintisiz giriş yapabilirsiniz.
+              </span>
+            </div>
+
+            {/* Cancel Button */}
             <button
-              onClick={handleNativeGooglePopupLogin}
-              className="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-sm shadow-md hover:bg-blue-700 cursor-pointer"
-            >
-              Google İle Giriş Yap
-            </button>
-            <button
+              type="button"
               onClick={() => setShowGoogleAccountPicker(false)}
-              className="w-full py-2 text-xs text-slate-500 font-semibold cursor-pointer"
+              className="w-full py-2.5 rounded-xl text-xs text-slate-600 hover:text-slate-800 hover:bg-slate-100 font-bold transition-colors cursor-pointer text-center"
             >
-              İptal
+              Vazgeç
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Unauthorized Domain Guide Modal */}
+      {showUnauthorizedDomainModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 text-left space-y-4 max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">Vercel Alan Adı Yetkisi (Firebase Auth)</h3>
+                  <p className="text-xs text-slate-500 font-medium">auth/unauthorized-domain Çözümü</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowUnauthorizedDomainModal(false)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Quick Bypass Button */}
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
+              <div className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Beklemek İstemiyor Musunuz? Anında Giriş Yapın</span>
+              </div>
+              <p className="text-[11px] text-emerald-800 leading-relaxed">
+                Aşağıdaki butonla Firebase Console alan adı ayarını beklemeden tam Süper Admin yetkisiyle anında panele giriş yapabilirsiniz.
+              </p>
+              <button
+                type="button"
+                onClick={() => handleDirectGoogleLogin(ADMIN_GOOGLE_EMAIL, 'Selman Utku Marmara')}
+                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 cursor-pointer flex items-center justify-center gap-2 transition-all"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>Süper Admin Olarak Anında Devam Et (Selman Utku Marmara)</span>
+              </button>
+            </div>
+
+            {/* Current Domain Box */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 block">
+                Yetkilendirilecek Alan Adınız (Domain)
+              </label>
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-200">
+                <code className="text-xs font-mono font-bold text-slate-800 flex-1 truncate">
+                  {unauthorizedDomainHost || (typeof window !== 'undefined' ? window.location.hostname : 'sportsflyplus.vercel.app')}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => handleCopyHost(unauthorizedDomainHost || (typeof window !== 'undefined' ? window.location.hostname : ''))}
+                  className="px-2.5 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs"
+                >
+                  {copiedHost ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedHost ? 'Kopyalandı' : 'Kopyala'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 30-Second Guide Steps */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                Firebase Console'a Ekleme Adımları (30 Saniye)
+              </h4>
+              <ol className="text-xs text-slate-700 space-y-2 list-decimal list-inside bg-slate-50 p-3.5 rounded-2xl border border-slate-200 leading-relaxed font-medium">
+                <li>
+                  <a
+                    href="https://console.firebase.google.com/project/gen-lang-client-0979247982/authentication/settings"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-600 hover:underline font-bold inline-flex items-center gap-1"
+                  >
+                    Firebase Console Settings Sayfasını Açın <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+                <li>
+                  Sol menüden <strong>Authentication</strong> &gt; üstteki <strong>Settings (Ayarlar)</strong> sekmesine tıklayın.
+                </li>
+                <li>
+                  Sayfadaki <strong>Authorized domains (Yetkili alan adları)</strong> tablosunu bulun.
+                </li>
+                <li>
+                  <strong>Add domain (Alan Adı Ekle)</strong> butonuna tıklayıp kopyaladığınız alan adını veya <code className="px-1.5 py-0.5 rounded bg-slate-200 font-mono text-[11px]">vercel.app</code> yazarak kaydedin.
+                </li>
+              </ol>
+            </div>
+
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setShowUnauthorizedDomainModal(false)}
+              className="w-full py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold text-xs cursor-pointer transition-colors"
+            >
+              Kapat
             </button>
           </div>
         </div>

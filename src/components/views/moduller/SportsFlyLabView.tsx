@@ -51,6 +51,11 @@ import {
 } from 'lucide-react';
 import { SportsFlyVectorMark } from '../../SportsFlyLogo';
 import {
+  RotaSportsFlyHeaderBadge,
+  RotaSportsFlyFooterBadge,
+} from '../../common/RotaSportsFlyBranding';
+import { ROTA_PERFORMANS_LOGO_DATA_URL } from '../../../assets/rotaPerformansLogoDataUrl';
+import {
   SportsFlyLabPerformanceCharts,
   SportsFlyLabKarnePage5RadarContent,
   SportsFlyLabKarnePage6LineContent,
@@ -105,8 +110,9 @@ interface SportsFlyLabViewProps {
 
 const PAGE_TITLES = [
   { page: 1, short: '1. Beden', full: '1. Beden Kompozisyonu Değerlendirmesi (Beden Sağlığı)' },
-  { page: 2, short: '2. Motor & Radar', full: '2. Motor Performans Değerlendirmesi & Yüzdelik Radar Grafiği' },
-  { page: 3, short: '3. Karşılaştırma', full: '3. Karşılaştırma & Gelişim Analizi (Grup Ortalaması, İdeal Değer & Sporcu)' },
+  { page: 2, short: '2. Motor', full: '2. Motor Performans Değerlendirmesi' },
+  { page: 3, short: '3. Karşılaştırma', full: '3. Kritik Performans & Gelişim Analizi' },
+  { page: 4, short: '4. Gelişim Rehberi', full: '4. Veli & Antrenör Kapsamlı Gelişim Rehberi' },
 ];
 
 export type KarneTemplateId =
@@ -1179,22 +1185,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
     setViewMode('all');
     setPdfZoom(100);
 
-    const pageIds = showBodyMapInfographic
-      ? [
-          'sportsfly-lab-page-bodymap',
-          'sportsfly-lab-page-1',
-          'sportsfly-lab-page-2',
-          'sportsfly-lab-page-radar',
-          'sportsfly-lab-page-3',
-          'sportsfly-lab-page-5',
-        ]
-      : [
-          'sportsfly-lab-page-1',
-          'sportsfly-lab-page-2',
-          'sportsfly-lab-page-radar',
-          'sportsfly-lab-page-3',
-          'sportsfly-lab-page-5',
-        ];
+    const pageIds = [
+      'sportsfly-lab-page-bodymap',
+      'sportsfly-lab-page-1',
+      'sportsfly-lab-page-2',
+      'sportsfly-lab-page-3',
+      'sportsfly-lab-page-5',
+    ];
 
     try {
       const combinedBuilder = exportMode === 'combined' ? new BatchA4PdfBuilder() : null;
@@ -1329,22 +1326,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
         pageIds = ['sportsfly-lab-coach-club-page'];
         fileName = `SportsFly_Antrenor_ve_Kulup_Karnesi_${safeName}.pdf`;
       } else {
-        pageIds = showBodyMapInfographic
-          ? [
-              'sportsfly-lab-page-bodymap',
-              'sportsfly-lab-page-1',
-              'sportsfly-lab-page-2',
-              'sportsfly-lab-page-radar',
-              'sportsfly-lab-page-3',
-              'sportsfly-lab-page-5',
-            ]
-          : [
-              'sportsfly-lab-page-1',
-              'sportsfly-lab-page-2',
-              'sportsfly-lab-page-radar',
-              'sportsfly-lab-page-3',
-              'sportsfly-lab-page-5',
-            ];
+        pageIds = [
+          'sportsfly-lab-page-bodymap',
+          'sportsfly-lab-page-1',
+          'sportsfly-lab-page-2',
+          'sportsfly-lab-page-3',
+          'sportsfly-lab-page-5',
+        ];
         fileName = `SportsFly_Lab_Tum_Karne_${safeName}.pdf`;
       }
 
@@ -1370,11 +1358,20 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
   // Trigger clean A4 Print / Browser PDF Output using @media print styles
   const handlePrintA4 = () => {
+    setActiveLabTab('studio');
     setViewMode('all');
     setPdfZoom(100);
+    setIsPdfPreviewMode(true);
+    notify('A4 Yazdırma diyaloğu hazırlanıyor...');
+
     setTimeout(() => {
-      window.print();
-    }, 180);
+      try {
+        window.print();
+      } catch (err) {
+        console.warn('window.print çağrısı uyarısı:', err);
+        notify('Tarayıcı yazdırma penceresi açılamadı. "Tüm Karneyi İndir" butonuyla temiz A4 PDF dosyasını kaydedebilirsiniz.');
+      }
+    }, 250);
   };
 
   // Open Web A4 PDF Preview Mode
@@ -1382,8 +1379,17 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
     const nextState = !isPdfPreviewMode;
     setIsPdfPreviewMode(nextState);
     if (nextState) {
+      setActiveLabTab('studio');
       setViewMode('all');
-      notify('Karne A4 PDF görüntüleme ve yazdırma moduna alındı.');
+      notify('Karne A4 PDF görüntüleme moduna alındı (5 Sayfa A4 Baskı Düzeni).');
+      setTimeout(() => {
+        const target = document.getElementById('sportsfly-lab-preview-bar') || document.getElementById('sportsfly-lab-print-area');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } else {
+      notify('Normal çalışma görünümüne dönüldü.');
     }
   };
 
@@ -1473,30 +1479,31 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
       : activePaletteObj.accentHex,
   ];
 
-  const totalReportPages = showBodyMapInfographic ? 8 : 7;
-  const pageOffset = showBodyMapInfographic ? 1 : 0;
+  const totalReportPages = 5;
+  const pageOffset = 1;
 
-  // Render Transparent SportsFly Lab Background Watermark on every A4 Page
+  // Render Transparent Rota Performans Background Watermark on every A4 Page
   const renderPageWatermark = () => (
     <div
-      className="absolute inset-0 pointer-events-none select-none flex flex-col items-center justify-center overflow-hidden z-20"
+      className="absolute inset-0 pointer-events-none select-none flex flex-col items-center justify-center overflow-hidden z-0"
       aria-hidden="true"
     >
       <div className="flex flex-col items-center justify-center opacity-[0.065] -rotate-12">
         <div
-          className="w-[400px] h-[400px] sm:w-[460px] sm:h-[460px] rounded-full border-[6px] border-dashed flex flex-col items-center justify-center p-10"
+          className="w-[400px] h-[400px] sm:w-[460px] sm:h-[460px] rounded-full border-[5px] border-dashed flex flex-col items-center justify-center p-8"
           style={{ borderColor: effectivePrimaryHex }}
         >
-          <SportsFlyVectorMark className="w-[260px] h-[260px] sm:w-[300px] sm:h-[300px]" />
+          <img
+            src={ROTA_PERFORMANS_LOGO_DATA_URL}
+            alt="Rota Performans Logo"
+            className="w-[260px] h-[260px] sm:w-[300px] sm:h-[300px] object-contain"
+          />
           <div className="mt-2 text-center">
             <div
-              className="text-3xl font-black tracking-tight uppercase"
+              className="text-2xl sm:text-3xl font-black tracking-tight uppercase"
               style={{ color: effectivePrimaryHex }}
             >
-              SportsFly <span style={{ color: effectiveSecondaryHex }}>LAB</span>
-            </div>
-            <div className="text-[11px] font-mono font-bold tracking-[0.28em] text-slate-800 uppercase mt-0.5">
-              ATHLETIC PERFORMANCE LAB
+              ROTA <span style={{ color: effectiveSecondaryHex }}>PERFORMANS</span>
             </div>
           </div>
         </div>
@@ -1630,61 +1637,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             </div>
           </div>
 
-          {/* Right: Minimal SportsFly Lab Co-Branding Badge & Page Indicator */}
-          <div
-            className={`flex items-center justify-between sm:justify-end print:justify-end gap-3 px-3 py-2 rounded-xl border shrink-0 ${
-              isDarkHeaderTpl
-                ? 'bg-white/10 border-white/20 text-white'
-                : 'bg-white border-slate-200/90 text-slate-900'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <SportsFlyVectorMark className="w-7 h-7" />
-              <div>
-                <div className="flex items-center gap-1">
-                  <span
-                    className={`text-xs font-black tracking-tight ${
-                      isDarkHeaderTpl ? 'text-white' : 'text-slate-900'
-                    }`}
-                  >
-                    SportsFly
-                  </span>
-                  <span
-                    className="text-[10px] font-black tracking-widest uppercase"
-                    style={{
-                      color: isDarkHeaderTpl ? effectiveSecondaryHex : '#0284c7',
-                    }}
-                  >
-                    LAB
-                  </span>
-                </div>
-                <div
-                  className={`text-[8.5px] font-mono font-semibold tracking-wider uppercase ${
-                    isDarkHeaderTpl ? 'text-white/70' : 'text-slate-400'
-                  }`}
-                >
-                  ATHLETIC PERFORMANCE LAB
-                </div>
-              </div>
-            </div>
-            <div className={`h-7 w-px ${isDarkHeaderTpl ? 'bg-white/20' : 'bg-slate-200'}`} />
-            <div className="text-right font-mono">
-              <div
-                className={`text-[9px] font-bold uppercase ${
-                  isDarkHeaderTpl ? 'text-white/70' : 'text-slate-400'
-                }`}
-              >
-                KARNE SAYFA
-              </div>
-              <div
-                className={`text-xs font-black ${
-                  isDarkHeaderTpl ? 'text-white' : 'text-slate-900'
-                }`}
-              >
-                0{pageNo + pageOffset} / 0{totalReportPages}
-              </div>
-            </div>
-          </div>
+          {/* Right: Dual Branding - Rota Performans (Karne Analiz Firması) & Powered by SportsFly LAB (Karne Altyapı Sağlayıcısı) */}
+          <RotaSportsFlyHeaderBadge
+            isDark={isDarkHeaderTpl}
+            pageNo={pageNo + pageOffset}
+            totalReportPages={totalReportPages}
+            effectiveSecondaryHex={effectiveSecondaryHex}
+          />
         </div>
 
         {/* SECOND ROW: Section Title & Athlete Biometric Strip */}
@@ -1744,45 +1703,12 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
       className={`mt-4 pt-3 a4-avoid-break relative z-10 ${activeTemplate.footerBorderClass}`}
       style={{ borderTopColor: effectivePrimaryHex }}
     >
-      <div className="flex flex-col sm:flex-row print:flex-row sm:items-center print:items-center justify-between gap-2.5 bg-slate-50/90 px-3.5 py-2.5 rounded-xl border border-slate-200">
-        {/* Left: SportsFly Logo + SportsFly Lab Brand Identity */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-white border border-slate-200/90 flex items-center justify-center shrink-0 shadow-2xs">
-            <SportsFlyVectorMark className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-black tracking-tight text-slate-900">
-                SportsFly <span style={{ color: effectivePrimaryHex }}>LAB</span>
-              </span>
-              <span className="text-slate-300">·</span>
-              <span className="text-[9.5px] font-mono font-bold text-slate-500 uppercase tracking-wider">
-                ATLETİK PERFORMANS &amp; BİYOMEKANİK ANALİZ SİSTEMİ
-              </span>
-            </div>
-            <div className="text-[9.5px] text-slate-400 leading-tight">
-              Spor okulları için bilimsel performans ölçümü, somatotip, PHV büyüme ve yapay zeka destekli karne altyapısı
-            </div>
-          </div>
-        </div>
-
-        {/* Right: School Verification & Page Number */}
-        <div className="flex items-center justify-between sm:justify-end print:justify-end gap-3 text-[10px] shrink-0">
-          <div className="text-right hidden sm:block print:block">
-            <div className="font-bold text-slate-700 uppercase tracking-tight">{effectiveClubName}</div>
-          </div>
-          <div className="h-6 w-px bg-slate-200 hidden sm:block print:block" />
-          <div
-            className="font-mono font-bold px-2.5 py-1 rounded-lg text-white"
-            style={{
-              backgroundColor: effectivePrimaryHex,
-              borderBottom: `2px solid ${effectiveSecondaryHex}`,
-            }}
-          >
-            {currentReport.athleteCode} · {typeof pageNo === 'number' ? `S.${pageNo + pageOffset}/${totalReportPages}` : pageNo}
-          </div>
-        </div>
-      </div>
+      <RotaSportsFlyFooterBadge
+        primaryHex={effectivePrimaryHex}
+        clubName={effectiveClubName}
+        athleteCode={currentReport.athleteCode}
+        pageText={typeof pageNo === 'number' ? `S.${pageNo + pageOffset}/${totalReportPages}` : String(pageNo)}
+      />
     </div>
   );
 
@@ -2875,12 +2801,18 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   </h2>
                 </div>
               </div>
-              <div className="px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/25 text-right">
-                <div className="text-[10px] uppercase tracking-wider text-sky-200 font-semibold">
-                  Gelişim Raporu
-                </div>
-                <div className="text-xs font-mono font-bold text-white">
-                  {currentReport.date3}
+              <div className="flex items-center gap-2.5">
+                <RotaSportsFlyHeaderBadge
+                  isDark={true}
+                  effectiveSecondaryHex={effectiveSecondaryHex}
+                />
+                <div className="px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/25 text-right shrink-0">
+                  <div className="text-[10px] uppercase tracking-wider text-sky-200 font-semibold">
+                    Gelişim Raporu
+                  </div>
+                  <div className="text-xs font-mono font-bold text-white">
+                    {currentReport.date3}
+                  </div>
                 </div>
               </div>
             </div>
@@ -3187,12 +3119,18 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   </h2>
                 </div>
               </div>
-              <div className="px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-700 text-right">
-                <div className="text-[10px] uppercase tracking-wider text-sky-200 font-semibold font-mono">
-                  TEKNİK MİZANPAJ
-                </div>
-                <div className="text-xs font-mono font-bold text-sky-300">
-                  {currentReport.date3}
+              <div className="flex items-center gap-2.5">
+                <RotaSportsFlyHeaderBadge
+                  isDark={true}
+                  effectiveSecondaryHex={effectiveSecondaryHex}
+                />
+                <div className="px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-700 text-right shrink-0">
+                  <div className="text-[10px] uppercase tracking-wider text-sky-200 font-semibold font-mono">
+                    TEKNİK MİZANPAJ
+                  </div>
+                  <div className="text-xs font-mono font-bold text-sky-300">
+                    {currentReport.date3}
+                  </div>
                 </div>
               </div>
             </div>
@@ -4137,15 +4075,9 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             );
           })()}
 
-          {/* Recharts Spider Chart Comparison & 2. Ölçüm Karşılaştırma Paneli for Page 2 */}
-          <div className="mb-2.5 space-y-2">
+          {/* 2. Ölçüm Karşılaştırma Paneli for Page 2 */}
+          <div className="mb-2.5">
             <SecondMeasurementComparisonPanel report={currentReport} />
-            <RechartsSportsFlyRadarChart
-              report={currentReport}
-              comparisonMode="periods"
-              height={200}
-              title="3 Dönemlik Motorik Biyomotorik Performans Gelişim Radarı (Spider Chart %0–%100)"
-            />
           </div>
 
           {/* 10 Motor Tests Table (Color-Coded with Explicit Target & Progress Visibility) */}
@@ -4324,71 +4256,6 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
         </div>
 
         {renderPageFooter(2)}
-      </div>
-    );
-  };
-
-  // ============================================================================
-  // PAGE 3: 3. MOTOR PERFORMANS YÜZDELİK RADAR GRAFİĞİ & DETAYLI ANALİZ
-  // ============================================================================
-  const renderPageRadar = () => {
-    return (
-      <div
-        id="sportsfly-lab-page-radar"
-        className={`a4-print-page relative overflow-hidden min-h-[1460px] flex flex-col justify-between rounded-xl p-5 sm:p-7 shadow-xs print:shadow-none ${activeTemplate.pageFrameClass}`}
-      >
-        <div>
-          {renderPageHeader(
-            3,
-            '3. Motor Performans Yüzdelik Radar Analizi',
-            '3 Dönemlik Motorik Biyomotorik Gelişim Radarı (Spider Chart %0–%100) ve Detaylı Performans Dağılımı'
-          )}
-
-          <div
-            className="mt-4"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-              gap: '1rem',
-            }}
-          >
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3 break-inside-avoid" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-900">
-                  Biyomotorik Yetenek Dağılım Profili
-                </span>
-                <span className="text-xs text-slate-500 font-medium">
-                  Karşılaştırmalı 3 Dönem
-                </span>
-              </div>
-              <RechartsSportsFlyRadarChart
-                report={currentReport}
-                comparisonMode="periods"
-                height={460}
-                title="Motorik Gelişim Radarı (%0–%100)"
-              />
-            </div>
-
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-3 flex flex-col justify-between break-inside-avoid" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
-              <div className="space-y-2">
-                <div className="font-extrabold text-slate-900 text-sm">Radar Grafik Değerlendirme Kılavuzu</div>
-                <p className="leading-relaxed text-[11px] text-slate-600">
-                  Radar grafiği üzerindeki eksenler, sporcunun test bataryasında ölçülen farklı motorik becerilerini (sürat, çabukluk, kuvvet, patlayıcı güç, esneklik, aerobik kapasite) 0-100 yüzdelik diliminde temsil eder. Dışa doğru genişleyen alan, gelişmiş atletik kapasiteyi ve çok yönlü motorik gelişimi gösterir.
-                </p>
-              </div>
-              <div className="p-3 rounded-lg bg-white border border-slate-200 space-y-1">
-                <div className="font-bold text-slate-900 text-[11px]">Temel Odak Alanları</div>
-                <ul className="text-[10.5px] text-slate-600 space-y-1 list-disc list-inside">
-                  <li>Sürat ve ivmelenme kapasitesi</li>
-                  <li>Alt ekstremite patlayıcı güç</li>
-                  <li>Kardiyorespiratuvar dayanıklılık</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {renderPageFooter(3)}
       </div>
     );
   };
@@ -4767,21 +4634,9 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 Rapor Tarihi: {currentReport.date3}
               </span>
             </div>
-            <div className="grid grid-cols-3 gap-3 pt-1 text-center text-xs">
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <div className="text-[10px] text-slate-500 uppercase font-bold">Laboratuvar Uzmanı</div>
-                <div className="font-extrabold text-slate-900 mt-2">SportsFly Lab Engine</div>
-                <div className="text-[9px] text-emerald-700 mt-1 font-semibold">✓ Onaylandı</div>
-              </div>
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <div className="text-[10px] text-slate-500 uppercase font-bold">Kulüp / Antrenör</div>
-                <div className="font-extrabold text-slate-900 mt-2">{effectiveClubName}</div>
-                <div className="text-[9px] text-emerald-700 mt-1 font-semibold">✓ Değerlendirildi</div>
-              </div>
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <div className="text-[10px] text-slate-500 uppercase font-bold">Veli / Sporcu</div>
-                <div className="font-extrabold text-slate-900 mt-2">{currentReport.athleteName}</div>
-                <div className="text-[9px] text-emerald-700 mt-1 font-semibold">✓ Bilgilendirildi</div>
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
+              <div className="text-sm font-extrabold text-slate-900">
+                Rota Performans Analiz Ekibi
               </div>
             </div>
           </div>
@@ -4914,98 +4769,55 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               </button>
             </div>
 
-            {/* Grouped PDF Download + Print/Preview Dropdown Menu */}
-            <div className="relative flex items-center">
+            {/* Primary Action Buttons: PDF Preview + A4 Print + Download PDF */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleTogglePdfPreview}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer whitespace-nowrap ${
+                  isPdfPreviewMode
+                    ? 'bg-rose-600 hover:bg-rose-700 text-white ring-2 ring-rose-400/40'
+                    : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100'
+                }`}
+                title="Sporcu karnesini web üzerinde gerçek A4 baskı formatında inceleyin"
+              >
+                <Eye className={`w-4 h-4 ${isPdfPreviewMode ? 'text-white' : 'text-rose-600'} shrink-0`} />
+                <span>{isPdfPreviewMode ? 'PDF Görünümünü Kapat' : 'PDF Olarak Görüntüle'}</span>
+                {isPdfPreviewMode && (
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-black bg-white/20 text-white">
+                    Açık
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePrintA4}
+                className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer whitespace-nowrap"
+                title="A4 formatında yazdırın veya tarayıcıdan PDF olarak kaydedin"
+              >
+                <Printer className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>A4 Yazdır</span>
+              </button>
+
               <button
                 type="button"
                 onClick={handleDownloadPDF}
                 disabled={isGeneratingPDF}
-                className="px-3.5 py-2 rounded-l-xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white text-xs font-extrabold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-60 whitespace-nowrap"
-                title="7 sayfalık sporcu karnesinin tamamını yüksek çözünürlüklü A4 PDF olarak indirin"
+                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white text-xs font-extrabold flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-60 whitespace-nowrap shadow-xs"
+                title="5 sayfalık sporcu karnesinin tamamını yüksek çözünürlüklü A4 PDF olarak indirin"
               >
-                <FileDown className="w-4 h-4 text-sky-400 dark:text-white shrink-0" />
+                {isGeneratingPDF ? (
+                  <div className="w-4 h-4 border-2 border-slate-400 border-t-white rounded-full animate-spin shrink-0" />
+                ) : (
+                  <FileDown className="w-4 h-4 text-sky-400 dark:text-white shrink-0" />
+                )}
                 <span>
                   {isGeneratingPDF
-                    ? `İndiriliyor (${pdfProgressPage || 1}/7)...`
+                    ? `İndiriliyor (${pdfProgressPage || 1}/5)...`
                     : 'Tüm Karneyi İndir'}
                 </span>
               </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setOpenHeaderMenu((prev) => (prev === 'export' ? null : 'export'))
-                }
-                className="px-2.5 py-2 rounded-r-xl border-l border-slate-700 dark:border-sky-500 bg-slate-900 hover:bg-slate-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white text-xs font-bold flex items-center justify-center transition-colors cursor-pointer"
-                title="PDF Görünümü ve A4 Yazdırma Seçenekleri"
-              >
-                <ChevronDown className="w-4 h-4 shrink-0" />
-              </button>
-
-              {openHeaderMenu === 'export' && (
-                <div className="absolute right-0 top-full mt-1.5 w-64 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl p-1.5 z-40 space-y-1">
-                  <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Çıktı &amp; PDF İşlemleri
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenHeaderMenu(null);
-                      handleDownloadPDF();
-                    }}
-                    disabled={isGeneratingPDF}
-                    className="w-full px-3 py-2 rounded-lg text-left text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
-                  >
-                    <FileDown className="w-4 h-4 text-sky-600 shrink-0" />
-                    <div>
-                      <div>Tüm Karneyi İndir (7 Sayfa PDF)</div>
-                      <div className="text-[10px] font-normal text-slate-500">
-                        Yüksek çözünürlüklü A4 PDF dosyası
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenHeaderMenu(null);
-                      handleTogglePdfPreview();
-                    }}
-                    className="w-full px-3 py-2 rounded-lg text-left text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between gap-2 transition-colors cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Eye className="w-4 h-4 text-rose-600 shrink-0" />
-                      <div>
-                        <div>
-                          {isPdfPreviewMode ? 'PDF Görünümünü Kapat' : 'PDF Olarak Görüntüle'}
-                        </div>
-                        <div className="text-[10px] font-normal text-slate-500">
-                          A4 baskı önizleme ölçeği
-                        </div>
-                      </div>
-                    </div>
-                    {isPdfPreviewMode && (
-                      <span className="text-[10px] font-mono font-bold text-rose-600">Açık</span>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenHeaderMenu(null);
-                      handlePrintA4();
-                    }}
-                    className="w-full px-3 py-2 rounded-lg text-left text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
-                  >
-                    <Printer className="w-4 h-4 text-slate-600 dark:text-slate-300 shrink-0" />
-                    <div>
-                      <div>A4 Yazdır</div>
-                      <div className="text-[10px] font-normal text-slate-500">
-                        Tarayıcı yazdırma diyaloğu ile çıktı al
-                      </div>
-                    </div>
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -6902,20 +6714,23 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
       {/* Interactive A4 PDF Document Preview Bar (Shown when 'PDF Olarak Görüntüle' is active) */}
       {isPdfPreviewMode && (
-        <div className="bg-slate-900 text-white rounded-2xl p-3.5 sm:px-5 border border-slate-700 flex flex-wrap items-center justify-between gap-3 shadow-lg print:hidden">
+        <div
+          id="sportsfly-lab-preview-bar"
+          className="bg-slate-900 text-white rounded-2xl p-3.5 sm:px-5 border border-slate-700 flex flex-wrap items-center justify-between gap-3 shadow-lg print:hidden animate-in fade-in duration-200"
+        >
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 shadow-xs">
               <FileText className="w-4 h-4 text-white" />
             </div>
             <div>
               <div className="text-xs sm:text-sm font-extrabold tracking-tight flex items-center gap-2">
                 <span>A4 PDF Önizleme Modu — {currentReport.athleteName}</span>
                 <span className="text-[11px] font-mono font-normal text-slate-300">
-                  (210 × 297 mm · 7 Sayfa · Baskıya Hazır)
+                  (210 × 297 mm · 5 Sayfa · Baskıya Hazır)
                 </span>
               </div>
               <p className="text-[11px] text-slate-400">
-                Karnenin A4 yazdırma stillerini inceleyebilir, doğrudan yazıcıdan çıktı alabilir veya PDF olarak kaydedebilirsiniz.
+                Karnenin A4 yazdırma stillerini inceleyebilir, doğrudan yazıcıdan çıktı alabilir veya PDF olarak indirebilirsiniz.
               </p>
             </div>
           </div>
@@ -6943,19 +6758,19 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
             >
               <Printer className="w-4 h-4" />
-              <span>A4 Yazdır / PDF Çıktısı Al</span>
+              <span>A4 Yazdır</span>
             </button>
 
             <button
               type="button"
               onClick={handleDownloadPDF}
               disabled={isGeneratingPDF}
-              className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 text-xs font-extrabold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 text-xs font-extrabold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
             >
               <FileDown className="w-4 h-4 text-blue-600" />
               <span>
                 {isGeneratingPDF
-                  ? `İndiriliyor (${pdfProgressPage || 1}/7)...`
+                  ? `İndiriliyor (${pdfProgressPage || 1}/5)...`
                   : 'Tüm Karneyi İndir'}
               </span>
             </button>
@@ -6986,8 +6801,8 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
       >
         <div
           id="sportsfly-lab-print-area"
-          className={`mx-auto space-y-6 pb-8 print:space-y-0 print:pb-0 ${
-            isPdfPreviewMode ? 'max-w-[210mm]' : 'max-w-5xl'
+          className={`space-y-8 pb-8 print:space-y-0 print:pb-0 transition-all ${
+            isPdfPreviewMode ? 'max-w-[210mm] mx-auto' : 'w-full max-w-5xl mx-auto'
           }`}
           style={
             isPdfPreviewMode && pdfZoom !== 100
@@ -6996,23 +6811,20 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
           }
         >
               {showBodyMapInfographic && (
-                <div className={`karne-page-wrapper ${viewMode === 'all' || activePage === 0 || isPdfPreviewMode ? 'block' : 'hidden print:block'}`}>
+                <div className={`karne-page-wrapper ${viewMode === 'all' || activePage === 0 || isPdfPreviewMode ? 'block' : 'hidden print:block'} ${isPdfPreviewMode ? 'shadow-2xl ring-1 ring-slate-300 rounded-xl overflow-hidden bg-white mb-8' : ''}`}>
                   {renderAnatomicalBodyMapPage()}
                 </div>
               )}
-              <div className={`karne-page-wrapper ${viewMode === 'all' || activePage === 1 || isPdfPreviewMode ? 'block' : 'hidden print:block'}`}>
+              <div className={`karne-page-wrapper ${viewMode === 'all' || activePage === 1 || isPdfPreviewMode ? 'block' : 'hidden print:block'} ${isPdfPreviewMode ? 'shadow-2xl ring-1 ring-slate-300 rounded-xl overflow-hidden bg-white mb-8' : ''}`}>
                 {renderPage1()}
               </div>
-              <div className={`karne-page-wrapper ${viewMode === 'all' || activePage === 2 || isPdfPreviewMode ? 'block' : 'hidden print:block'}`}>
+              <div className={`karne-page-wrapper ${viewMode === 'all' || activePage === 2 || isPdfPreviewMode ? 'block' : 'hidden print:block'} ${isPdfPreviewMode ? 'shadow-2xl ring-1 ring-slate-300 rounded-xl overflow-hidden bg-white mb-8' : ''}`}>
                 {renderPage2()}
               </div>
-              <div className={`karne-page-wrapper ${viewMode === 'all' || activePage === 3 || isPdfPreviewMode ? 'block' : 'hidden print:block'}`}>
-                {renderPageRadar()}
-              </div>
-              <div className={`karne-page-wrapper ${viewMode === 'all' || activePage === 4 || isPdfPreviewMode ? 'block' : 'hidden print:block'}`}>
+              <div className={`karne-page-wrapper ${viewMode === 'all' || activePage === 3 || isPdfPreviewMode ? 'block' : 'hidden print:block'} ${isPdfPreviewMode ? 'shadow-2xl ring-1 ring-slate-300 rounded-xl overflow-hidden bg-white mb-8' : ''}`}>
                 {renderPage3()}
               </div>
-              <div className={`karne-page-wrapper ${viewMode === 'all' || activePage === 5 || isPdfPreviewMode ? 'block' : 'hidden print:block'}`}>
+              <div className={`karne-page-wrapper ${viewMode === 'all' || activePage === 4 || isPdfPreviewMode ? 'block' : 'hidden print:block'} ${isPdfPreviewMode ? 'shadow-2xl ring-1 ring-slate-300 rounded-xl overflow-hidden bg-white mb-8' : ''}`}>
                 {renderPage5()}
               </div>
         </div>

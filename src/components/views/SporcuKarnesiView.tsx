@@ -40,6 +40,11 @@ import {
 } from 'lucide-react';
 import { SporcuKarnePerformanceCharts } from '../charts/KarnePerformansGrafikleri';
 import { SportsFlyIcon, SportsFlyVectorMark } from '../SportsFlyLogo';
+import {
+  RotaSportsFlyHeaderBadge,
+  RotaSportsFlyFooterBadge,
+} from '../common/RotaSportsFlyBranding';
+import { ROTA_PERFORMANS_LOGO_DATA_URL } from '../../assets/rotaPerformansLogoDataUrl';
 import { getStoredLabSchoolBranding } from '../../data/sportsFlyLabData';
 import { exportContainerToSmartA4Pdf } from '../../utils/pdfExportHelper';
 import { INITIAL_KARNELER, SporcuKarne, getStoredKarneler, saveStoredKarneler } from '../../data/mockKarneData';
@@ -402,12 +407,38 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
     }
   };
 
+  const handleTogglePdfPreview = () => {
+    setIsPdfPreviewMode((prev) => {
+      const next = !prev;
+      if (next) {
+        setShowPerformanceCharts(true);
+        setActiveReportPage('all');
+        showToast('Karne A4 PDF önizleme moduna alındı.');
+        setTimeout(() => {
+          const el = document.getElementById('sporcu-karne-print-area') || document.getElementById('sporcu-karne-preview-bar');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      } else {
+        showToast('Normal çalışma görünümüne dönüldü.');
+      }
+      return next;
+    });
+  };
+
   const handlePrintKarne = () => {
     setShowPerformanceCharts(true);
+    setActiveReportPage('all');
     setPdfZoom(100);
+    setIsPdfPreviewMode(true);
+    showToast('A4 Yazdırma diyaloğu hazırlanıyor...');
     setTimeout(() => {
-      window.print();
-    }, 150);
+      try {
+        window.print();
+      } catch (err) {
+        console.warn('window.print çağrısı uyarısı:', err);
+        showToast('Tarayıcı yazdırma penceresi açılamadı. "Tüm Karneyi İndir" ile temiz A4 PDF dosyasını indirebilirsiniz.');
+      }
+    }, 250);
   };
 
   const getProgressHex = (colorClass: string) => {
@@ -453,6 +484,89 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
       (activeKarne.davranissal?.kriterler?.ortalama || 8)
     ) / 5
   ).toFixed(1) : '0.0';
+
+  const renderPageWatermark = () => (
+    <div
+      className="absolute inset-0 pointer-events-none select-none flex flex-col items-center justify-center overflow-hidden z-0"
+      aria-hidden="true"
+    >
+      <div className="flex flex-col items-center justify-center opacity-[0.065] -rotate-12">
+        <div className="w-[380px] h-[380px] sm:w-[440px] sm:h-[440px] rounded-full border-[5px] border-dashed border-cyan-600 flex flex-col items-center justify-center p-8">
+          <img
+            src={ROTA_PERFORMANS_LOGO_DATA_URL}
+            alt="Rota Performans Logo"
+            className="w-[250px] h-[250px] sm:w-[290px] sm:h-[290px] object-contain"
+          />
+          <div className="mt-2 text-center text-2xl sm:text-3xl font-black tracking-tight uppercase text-slate-900">
+            ROTA <span className="text-cyan-600">PERFORMANS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderPageHeaderBadge = (pageNo: number) => (
+    <>
+      {renderPageWatermark()}
+      <div className="bg-white px-6 md:px-8 pt-4 pb-3 border-b border-slate-200 a4-avoid-break relative z-10">
+      <svg
+        viewBox="0 0 600 6"
+        preserveAspectRatio="none"
+        className="w-full h-1.5 rounded-full overflow-hidden block mb-3"
+        aria-hidden="true"
+      >
+        <rect x="0" y="0" width="348" height="6" fill="#0f172a" />
+        <rect x="348" y="0" width="144" height="6" fill="#0ea5e9" />
+        <rect x="492" y="0" width="108" height="6" fill="#e11d48" />
+      </svg>
+
+      <div className="flex flex-col sm:flex-row print:flex-row sm:items-center print:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          {schoolBranding.logoDataUrl ? (
+            <div className="w-11 h-11 rounded-xl border border-slate-200 bg-slate-50 p-1 flex items-center justify-center shrink-0 overflow-hidden">
+              <img
+                src={schoolBranding.logoDataUrl}
+                alt={schoolBranding.schoolName}
+                className="w-full h-full object-contain"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          ) : (
+            <div className="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-xs shrink-0">
+              {(schoolBranding.schoolName || 'SK').slice(0, 2).toUpperCase()}
+            </div>
+          )}
+          <div>
+            <div className="text-[10px] font-mono font-bold tracking-widest text-sky-700 uppercase">
+              RESMİ SPORCU GELİŞİM &amp; PERFORMANS KARNESİ · {schoolBranding.branchName || 'Merkez Kampüs'}
+            </div>
+            <div className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
+              {schoolBranding.schoolName || 'ATAŞEHİR SPOR OKULLARI AKADEMİSİ'}
+            </div>
+          </div>
+        </div>
+
+        <RotaSportsFlyHeaderBadge
+          isDark={false}
+          pageNo={pageNo}
+          totalReportPages={5}
+          effectiveSecondaryHex="#0284c7"
+        />
+      </div>
+    </div>
+    </>
+  );
+
+  const renderPageFooterBadge = (pageNo: number) => (
+    <div className="pt-3 pb-3 px-6 md:px-8 border-t border-slate-200/90 bg-white a4-avoid-break">
+      <RotaSportsFlyFooterBadge
+        primaryHex="#0284c7"
+        clubName={schoolBranding.schoolName || 'SPOR OKULU AKADEMİSİ'}
+        athleteCode={activeKarne?.id}
+        pageText={`Sayfa 0${pageNo} / 05`}
+      />
+    </div>
+  );
 
   return (
     <div className="flex-1 p-4 lg:p-8 pt-6 overflow-y-auto w-full h-full print:p-0 print:overflow-visible print:h-auto">
@@ -585,16 +699,21 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
               <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
                 <button 
                   type="button"
-                  onClick={() => setIsPdfPreviewMode(prev => !prev)}
-                  className={`flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-colors shadow-2xs cursor-pointer whitespace-nowrap ${
+                  onClick={handleTogglePdfPreview}
+                  className={`flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer whitespace-nowrap ${
                     isPdfPreviewMode
-                      ? 'bg-rose-600 hover:bg-rose-700 text-white'
+                      ? 'bg-rose-600 hover:bg-rose-700 text-white ring-2 ring-rose-400/40'
                       : 'bg-blue-600 hover:bg-blue-700 text-white'
                   }`}
                   title="Sporcu karnesini A4 PDF formatında web üzerinde görüntüleyin ve yazdırın"
                 >
                   <Eye className="w-4 h-4 shrink-0" />
                   <span>{isPdfPreviewMode ? 'PDF Görünümünü Kapat' : 'PDF Olarak Görüntüle'}</span>
+                  {isPdfPreviewMode && (
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-black bg-white/20 text-white">
+                      Açık
+                    </span>
+                  )}
                 </button>
 
                 <button 
@@ -638,7 +757,7 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
 
             {/* Interactive A4 PDF Document Preview Bar (Shown when 'PDF Olarak Görüntüle' is active) */}
             {isPdfPreviewMode && (
-              <div className="mb-4 bg-slate-900 text-white rounded-2xl p-3.5 sm:px-5 border border-slate-700 flex flex-wrap items-center justify-between gap-3 shadow-lg print:hidden">
+              <div id="sporcu-karne-preview-bar" className="mb-4 bg-slate-900 text-white rounded-2xl p-3.5 sm:px-5 border border-slate-700 flex flex-wrap items-center justify-between gap-3 shadow-lg print:hidden animate-in fade-in duration-200">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
                     <FileText className="w-4 h-4 text-white" />
@@ -764,839 +883,780 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                     : undefined
                 }
               >
-              {/* Top Institutional Bar: Spor Okulu Adı & Logosu + SportsFly Lab Co-Branding */}
-              <div className="bg-white px-6 md:px-8 pt-4 pb-3 border-b border-slate-200">
-                <svg
-                  viewBox="0 0 600 6"
-                  preserveAspectRatio="none"
-                  className="w-full h-1.5 rounded-full overflow-hidden block mb-3"
-                  aria-hidden="true"
+              {/* ======================================================== */}
+              {/* SAYFA 1: ÖZET, KÜNYE & PERFORMANS DENGESİ */}
+              {/* ======================================================== */}
+              {(activeReportPage === 'all' || activeReportPage === 1) && (
+                <div
+                  id="sporcu-karne-sayfa-1"
+                  className="a4-print-page bg-white relative overflow-hidden flex flex-col justify-between mb-8 print:mb-0 shadow-xs print:shadow-none border border-slate-200 print:border-none rounded-2xl print:rounded-none"
                 >
-                  <rect x="0" y="0" width="348" height="6" fill="#0f172a" />
-                  <rect x="348" y="0" width="144" height="6" fill="#0ea5e9" />
-                  <rect x="492" y="0" width="108" height="6" fill="#e11d48" />
-                </svg>
-
-                <div className="flex flex-col sm:flex-row print:flex-row sm:items-center print:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    {schoolBranding.logoDataUrl ? (
-                      <div className="w-11 h-11 rounded-xl border border-slate-200 bg-slate-50 p-1 flex items-center justify-center shrink-0 overflow-hidden">
-                        <img
-                          src={schoolBranding.logoDataUrl}
-                          alt={schoolBranding.schoolName}
-                          className="w-full h-full object-contain"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-xs shrink-0">
-                        {(schoolBranding.schoolName || 'SK').slice(0, 2).toUpperCase()}
-                      </div>
-                    )}
-                    <div>
-                      <div className="text-[10px] font-mono font-bold tracking-widest text-sky-700 uppercase">
-                        RESMİ SPORCU GELİŞİM &amp; PERFORMANS KARNESİ · {schoolBranding.branchName || 'Merkez Kampüs'}
-                      </div>
-                      <div className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
-                        {schoolBranding.schoolName || 'ATAŞEHİR SPOR OKULLARI AKADEMİSİ'}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 shrink-0">
-                    <SportsFlyVectorMark className="w-6 h-6" />
-                    <div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs font-black tracking-tight text-slate-900">SportsFly</span>
-                        <span className="text-[10px] font-black tracking-widest text-sky-600 uppercase">LAB</span>
-                      </div>
-                      <div className="text-[8.5px] font-mono font-semibold tracking-wider text-slate-400 uppercase">
-                        ATHLETIC PERFORMANCE LAB
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Report Header */}
-              <div className="bg-slate-900 text-white p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
-                <div className="flex items-center gap-5 relative z-10">
-                  <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-2xl md:text-3xl font-black shadow-md border-2 border-slate-700 shrink-0 overflow-hidden text-white">
-                    {profilePhotoUrl ? (
-                      <img 
-                        src={profilePhotoUrl} 
-                        referrerPolicy="no-referrer" 
-                        className="w-full h-full object-cover" 
-                        alt={activeKarne.adSoyad}
-                        onError={(e) => {
-                          (e.currentTarget as HTMLElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <span>{getAthleteInitials(activeKarne.adSoyad)}</span>
-                    )}
-                  </div>
                   <div>
-                    <div className="text-blue-400 font-bold text-xs uppercase tracking-wider mb-1">
-                      {activeKarne.brans} • {activeKarne.yasGubu}
-                    </div>
-                    <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-1.5 tracking-tight">
-                      {activeKarne.adSoyad}
-                    </h2>
-                    <div className="flex flex-wrap gap-2 text-xs md:text-sm text-slate-300 font-medium">
-                      <span>Takım: {activeKarne.grup}</span>
-                      <span className="text-slate-500">•</span>
-                      <span>{activeKarne.boy} cm</span>
-                      <span className="text-slate-500">•</span>
-                      <span>{activeKarne.kilo} kg</span>
-                      <span className="text-slate-500">•</span>
-                      <span className="text-emerald-300">
-                        Veli: <strong className="text-white font-semibold">{activeKarne.veliAdSoyad || 'Kayıtlı Veli'}</strong> ({activeKarne.veliTelefon || '+90 532...'})
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                    {renderPageHeaderBadge(1)}
 
-                <div className="relative z-10 flex flex-wrap md:flex-col items-start md:items-end justify-between gap-3 shrink-0">
-                  <div className="bg-slate-800/80 px-4 py-2.5 rounded-xl border border-slate-700/60 text-left md:text-right">
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Değerlendirme Tarihi</div>
-                    <div className="text-sm font-bold text-white mt-0.5">
-                      {new Date(activeKarne.tarih).toLocaleDateString('tr-TR')}
-                    </div>
-                    <div className="text-xs text-slate-300 mt-0.5">
-                      Antrenör: <span className="font-semibold text-white">{activeKarne.antrenor}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <div className="bg-blue-950/60 border border-blue-800/50 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
-                      <span className="text-[11px] font-medium text-blue-300">Genel Karne Notu:</span>
-                      <span className="text-sm font-black text-blue-400">{genelOrtalama}</span>
-                      <span className="text-[10px] text-blue-300/70">/ 10</span>
-                      {sporpuanImpact && sporpuanImpact.bonuses.genelOrtalamaBonus > 0 && (
-                        <span className="ml-1 text-[10px] font-black bg-amber-400/20 text-amber-300 border border-amber-400/40 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                          <Flame className="w-3 h-3 text-amber-400 fill-amber-400" />
-                          +{sporpuanImpact.bonuses.genelOrtalamaBonus} SP
-                        </span>
-                      )}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setIsVeliModalOpen(true)}
-                      className="print:hidden flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-emerald-300 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer"
-                    >
-                      <Share2 className="w-3.5 h-3.5" />
-                      <span>Veliye İlet</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dinamik SporPuan & Karne Dengesi Canlı Paneli */}
-              {sporpuanImpact && (
-                <div className="mx-6 md:mx-8 mt-6 p-4 md:p-5 bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-blue-500/10 rounded-2xl border border-amber-200/80">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-slate-950 font-black flex items-center justify-center shadow-md shrink-0">
-                        <Zap className="w-6 h-6 fill-slate-950 text-slate-950" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-extrabold text-slate-900 text-sm md:text-base flex items-center gap-1.5">
-                            Sporpuan & Karne Dinamik Dengesi
-                          </h3>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                            Canlı Senkronize
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-600 mt-0.5">
-                          Antrenörün verdiği hızlı puanlar ve devamlılık puanları sporcu karnesine dinamik not artışı olarak yansır.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Stats & Quick Action */}
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <div className="bg-white/90 border border-amber-200 px-3.5 py-2 rounded-xl text-center shadow-2xs">
-                        <span className="text-[10px] uppercase font-bold text-slate-500 block">Toplam Sporpuan</span>
-                        <span className="text-base font-black text-amber-600">
-                          {sporpuanImpact.totalSP} SP
-                        </span>
-                      </div>
-
-                      <div className="bg-white/90 border border-emerald-200 px-3.5 py-2 rounded-xl text-center shadow-2xs">
-                        <span className="text-[10px] uppercase font-bold text-slate-500 block">Karne Not Katkısı</span>
-                        <span className="text-base font-black text-emerald-600 flex items-center justify-center gap-0.5">
-                          <TrendingUp className="w-3.5 h-3.5" />
-                          +{sporpuanImpact.bonuses.genelOrtalamaBonus} Not
-                        </span>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => setIsQuickPointModalOpen(true)}
-                        className="flex items-center gap-1.5 px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95 print:hidden"
-                      >
-                        <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                        <span>+ Hızlı Puan Ver</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Category Points Breakdown */}
-                  <div className="mt-4 pt-3.5 border-t border-amber-200/60 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                    <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
-                      <span className="text-[10px] font-bold text-slate-500 block">Davranış & Fair-Play</span>
-                      <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.davranis} SP</span>
-                      <span className="text-[10px] text-indigo-600 font-bold ml-1">
-                        (+{sporpuanImpact.bonuses.davranisBonus})
-                      </span>
-                    </div>
-                    <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
-                      <span className="text-[10px] font-bold text-slate-500 block">Teknik & Gelişim</span>
-                      <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.gelisim} SP</span>
-                      <span className="text-[10px] text-blue-600 font-bold ml-1">
-                        (+{sporpuanImpact.bonuses.teknikBonus})
-                      </span>
-                    </div>
-                    <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
-                      <span className="text-[10px] font-bold text-slate-500 block">Liderlik & Zihin</span>
-                      <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.liderlik} SP</span>
-                      <span className="text-[10px] text-amber-600 font-bold ml-1">
-                        (+{sporpuanImpact.bonuses.zihinselBonus})
-                      </span>
-                    </div>
-                    <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
-                      <span className="text-[10px] font-bold text-slate-500 block">Antrenman Devamı</span>
-                      <span className="font-black text-emerald-700">{sporpuanImpact.categoryPoints.devam} SP</span>
-                      <span className="text-[10px] text-emerald-600 font-bold ml-1">
-                        (%{activeKarne.katilimYuzdesi})
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* D3 Radar & Progression Line Charts Panel */}
-              {showPerformanceCharts && (
-                <SporcuKarnePerformanceCharts karne={activeKarne} />
-              )}
-
-              {/* Main Content Grid */}
-              <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-6">
-                
-                {/* Technical Skills */}
-                <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
-                      <Target className="w-4 h-4 text-blue-600" />
-                      Teknik Gelişim
-                    </h3>
-                    <div className="flex items-center gap-1.5">
-                      {sporpuanImpact && sporpuanImpact.bonuses.teknikBonus > 0 && (
-                        <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">
-                          +{sporpuanImpact.bonuses.teknikBonus} SP
-                        </span>
-                      )}
-                      <div className="bg-blue-100 text-blue-700 font-bold px-2.5 py-0.5 rounded-md text-xs">
-                        {activeKarne.teknik.ortalama} / 10
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    {activeKarne.teknik.topKontrolu !== undefined && renderProgressBar('Top Kontrolü', activeKarne.teknik.topKontrolu, 'bg-blue-500', sporpuanImpact?.bonuses.teknikBonus)}
-                    {activeKarne.teknik.pasBasarisi !== undefined && renderProgressBar('Pas Başarısı', activeKarne.teknik.pasBasarisi, 'bg-blue-500', sporpuanImpact?.bonuses.teknikBonus)}
-                    {activeKarne.teknik.sut !== undefined && renderProgressBar('Şut / Bitiricilik', activeKarne.teknik.sut, 'bg-blue-500', sporpuanImpact?.bonuses.teknikBonus)}
-                    {activeKarne.teknik.topSurme !== undefined && renderProgressBar('Top Sürme', activeKarne.teknik.topSurme, 'bg-blue-500', sporpuanImpact?.bonuses.teknikBonus)}
-                    {activeKarne.teknik.savunma !== undefined && renderProgressBar('Birebir Savunma', activeKarne.teknik.savunma, 'bg-blue-500', sporpuanImpact?.bonuses.teknikBonus)}
-                  </div>
-                </div>
-
-                {/* Physical Skills */}
-                <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
-                      <Activity className="w-4 h-4 text-emerald-600" />
-                      Fiziksel Gelişim
-                    </h3>
-                    <div className="flex items-center gap-1.5">
-                      {sporpuanImpact && sporpuanImpact.bonuses.fizikselBonus > 0 && (
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
-                          +{sporpuanImpact.bonuses.fizikselBonus} SP
-                        </span>
-                      )}
-                      <div className="bg-emerald-100 text-emerald-700 font-bold px-2.5 py-0.5 rounded-md text-xs">
-                        {activeKarne.fiziksel.ortalama} / 10
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    {activeKarne.fiziksel.hiz !== undefined && renderProgressBar('Hız / Çabukluk', activeKarne.fiziksel.hiz, 'bg-emerald-500', sporpuanImpact?.bonuses.fizikselBonus)}
-                    {activeKarne.fiziksel.dayaniklilik !== undefined && renderProgressBar('Dayanıklılık (Kondisyon)', activeKarne.fiziksel.dayaniklilik, 'bg-emerald-500', sporpuanImpact?.bonuses.fizikselBonus)}
-                    {activeKarne.fiziksel.guc !== undefined && renderProgressBar('Kuvvet', activeKarne.fiziksel.guc, 'bg-emerald-500', sporpuanImpact?.bonuses.fizikselBonus)}
-                    {activeKarne.fiziksel.ceviklik !== undefined && renderProgressBar('Çeviklik / Koordinasyon', activeKarne.fiziksel.ceviklik, 'bg-emerald-500', sporpuanImpact?.bonuses.fizikselBonus)}
-                  </div>
-                </div>
-
-                {/* Tactical Skills */}
-                <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
-                      <TrendingUp className="w-4 h-4 text-purple-600" />
-                      Taktiksel Gelişim
-                    </h3>
-                    <div className="flex items-center gap-1.5">
-                      {sporpuanImpact && sporpuanImpact.bonuses.taktikselBonus > 0 && (
-                        <span className="text-[10px] font-bold text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded">
-                          +{sporpuanImpact.bonuses.taktikselBonus} SP
-                        </span>
-                      )}
-                      <div className="bg-purple-100 text-purple-700 font-bold px-2.5 py-0.5 rounded-md text-xs">
-                        {activeKarne.taktiksel.ortalama} / 10
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    {activeKarne.taktiksel.oyunZekasi !== undefined && renderProgressBar('Oyun Zekası', activeKarne.taktiksel.oyunZekasi, 'bg-purple-500', sporpuanImpact?.bonuses.taktikselBonus)}
-                    {activeKarne.taktiksel.pozisyonAlma !== undefined && renderProgressBar('Pozisyon Alma', activeKarne.taktiksel.pozisyonAlma, 'bg-purple-500', sporpuanImpact?.bonuses.taktikselBonus)}
-                    {activeKarne.taktiksel.kararVerme !== undefined && renderProgressBar('Karar Verme', activeKarne.taktiksel.kararVerme, 'bg-purple-500', sporpuanImpact?.bonuses.taktikselBonus)}
-                  </div>
-                </div>
-
-                {/* Mental Skills */}
-                <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
-                      <Brain className="w-4 h-4 text-amber-600" />
-                      Zihinsel Gelişim
-                    </h3>
-                    <div className="flex items-center gap-1.5">
-                      {sporpuanImpact && sporpuanImpact.bonuses.zihinselBonus > 0 && (
-                        <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
-                          +{sporpuanImpact.bonuses.zihinselBonus} SP
-                        </span>
-                      )}
-                      <div className="bg-amber-100 text-amber-700 font-bold px-2.5 py-0.5 rounded-md text-xs">
-                        {activeKarne.zihinsel.ortalama} / 10
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    {activeKarne.zihinsel.disiplin !== undefined && renderProgressBar('Antrenman Disiplini', activeKarne.zihinsel.disiplin, 'bg-amber-500', sporpuanImpact?.bonuses.zihinselBonus)}
-                    {activeKarne.zihinsel.ozguven !== undefined && renderProgressBar('Özgüven', activeKarne.zihinsel.ozguven, 'bg-amber-500', sporpuanImpact?.bonuses.zihinselBonus)}
-                    {activeKarne.zihinsel.takimUyumu !== undefined && renderProgressBar('Takım Uyumu', activeKarne.zihinsel.takimUyumu, 'bg-amber-500', sporpuanImpact?.bonuses.zihinselBonus)}
-                    {activeKarne.zihinsel.liderlik !== undefined && renderProgressBar('Liderlik', activeKarne.zihinsel.liderlik, 'bg-amber-500', sporpuanImpact?.bonuses.zihinselBonus)}
-                  </div>
-                </div>
-              </div>
-
-              {/* Behavioral Development Process Section */}
-              {activeKarne.davranissal && (
-                <div className="px-6 md:px-8 pb-8">
-                  <div className="bg-gradient-to-b from-indigo-50/70 to-slate-50/50 border border-indigo-100/90 rounded-2xl p-6 relative overflow-hidden">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm">
-                          <HeartHandshake className="w-6 h-6" />
+                    {/* Report Header */}
+                    <div className="bg-slate-900 text-white p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
+                      <div className="flex items-center gap-5 relative z-10">
+                        <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-2xl md:text-3xl font-black shadow-md border-2 border-slate-700 shrink-0 overflow-hidden text-white">
+                          {profilePhotoUrl ? (
+                            <img
+                              src={profilePhotoUrl}
+                              referrerPolicy="no-referrer"
+                              className="w-full h-full object-cover"
+                              alt={activeKarne.adSoyad}
+                              onError={(e) => {
+                                (e.currentTarget as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <span>{getAthleteInitials(activeKarne.adSoyad)}</span>
+                          )}
                         </div>
                         <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="text-lg font-bold text-slate-900">
-                              Davranışsal Gelişim & Karakter
-                            </h3>
-                            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200">
-                              Karakter, Uyum & Fair-Play
+                          <div className="text-blue-400 font-bold text-xs uppercase tracking-wider mb-1">
+                            {activeKarne.brans} • {activeKarne.yasGubu}
+                          </div>
+                          <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-1.5 tracking-tight">
+                            {activeKarne.adSoyad}
+                          </h2>
+                          <div className="flex flex-wrap gap-2 text-xs md:text-sm text-slate-300 font-medium">
+                            <span>Takım: {activeKarne.grup}</span>
+                            <span className="text-slate-500">•</span>
+                            <span>{activeKarne.boy} cm</span>
+                            <span className="text-slate-500">•</span>
+                            <span>{activeKarne.kilo} kg</span>
+                            <span className="text-slate-500">•</span>
+                            <span className="text-emerald-300">
+                              Veli: <strong className="text-white font-semibold">{activeKarne.veliAdSoyad || 'Kayıtlı Veli'}</strong> ({activeKarne.veliTelefon || '+90 532...'})
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3 shrink-0">
-                        <div className="bg-white border border-indigo-100 px-3.5 py-1.5 rounded-xl shadow-xs text-right">
-                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Davranış Puanı</div>
-                          <div className="text-base font-black text-indigo-600">
-                            {activeKarne.davranissal.kriterler.ortalama} <span className="text-xs font-semibold text-slate-400">/ 10</span>
+                      <div className="relative z-10 flex flex-wrap md:flex-col items-start md:items-end justify-between gap-3 shrink-0">
+                        <div className="bg-slate-800/80 px-4 py-2.5 rounded-xl border border-slate-700/60 text-left md:text-right">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Değerlendirme Tarihi</div>
+                          <div className="text-sm font-bold text-white mt-0.5">
+                            {new Date(activeKarne.tarih).toLocaleDateString('tr-TR')}
+                          </div>
+                          <div className="text-xs text-slate-300 mt-0.5">
+                            Antrenör: <span className="font-semibold text-white">{activeKarne.antrenor}</span>
                           </div>
                         </div>
-                        <button
-                          onClick={() => setIsAddObservationOpen(true)}
-                          className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer print:hidden"
-                          data-html2canvas-ignore="true"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Yeni Gözlem Ekle</span>
-                        </button>
+
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <div className="bg-blue-950/60 border border-blue-800/50 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
+                            <span className="text-[11px] font-medium text-blue-300">Genel Karne Notu:</span>
+                            <span className="text-sm font-black text-blue-400">{genelOrtalama}</span>
+                            <span className="text-[10px] text-blue-300/70">/ 10</span>
+                            {sporpuanImpact && sporpuanImpact.bonuses.genelOrtalamaBonus > 0 && (
+                              <span className="ml-1 text-[10px] font-black bg-amber-400/20 text-amber-300 border border-amber-400/40 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                                <Flame className="w-3 h-3 text-amber-400 fill-amber-400" />
+                                +{sporpuanImpact.bonuses.genelOrtalamaBonus} SP
+                              </span>
+                            )}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => setIsVeliModalOpen(true)}
+                            className="print:hidden flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-emerald-300 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer"
+                          >
+                            <Share2 className="w-3.5 h-3.5" />
+                            <span>Veliye İlet</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                      {/* Left: Criteria & Badges */}
-                      <div className="lg:col-span-6 space-y-5">
-                        {/* Criteria */}
-                        <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs">
-                          <div className="flex items-center justify-between mb-4">
-                            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                              <ShieldCheck className="w-4 h-4 text-indigo-500" />
-                              Temel Davranış Kriterleri
-                            </h4>
-                            <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
-                              Puan / 10
-                            </span>
+                    {/* Dinamik SporPuan & Karne Dengesi Canlı Paneli */}
+                    {sporpuanImpact && (
+                      <div className="mx-6 md:mx-8 mt-5 p-4 md:p-5 bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-blue-500/10 rounded-2xl border border-amber-200/80">
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-slate-950 font-black flex items-center justify-center shadow-md shrink-0">
+                              <Zap className="w-6 h-6 fill-slate-950 text-slate-950" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h3 className="font-extrabold text-slate-900 text-sm md:text-base flex items-center gap-1.5">
+                                  Sporpuan &amp; Karne Dinamik Dengesi
+                                </h3>
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                                  Canlı Senkronize
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-600 mt-0.5">
+                                Antrenörün verdiği hızlı puanlar ve devamlılık puanları sporcu karnesine dinamik not artışı olarak yansır.
+                              </p>
+                            </div>
                           </div>
-                          <div className="space-y-1">
-                            {renderProgressBar('Fair-Play & Centilmenlik', activeKarne.davranissal.kriterler.fairPlay, 'bg-indigo-500', sporpuanImpact?.bonuses.davranisBonus)}
-                            {renderProgressBar('Sorumluluk & Malzeme Düzeni', activeKarne.davranissal.kriterler.sorumlulukEkipman, 'bg-indigo-500', sporpuanImpact?.bonuses.davranisBonus)}
-                            {renderProgressBar('Saygı & Yapıcı İletişim', activeKarne.davranissal.kriterler.saygiIletisim, 'bg-indigo-500', sporpuanImpact?.bonuses.davranisBonus)}
-                            {renderProgressBar('Dinleme & Yönergelere Uyum', activeKarne.davranissal.kriterler.yonergeyeUyum, 'bg-indigo-500', sporpuanImpact?.bonuses.davranisBonus)}
-                            {renderProgressBar('Duygu Kontrolü & Sakinlik', activeKarne.davranissal.kriterler.duyguKontrolu, 'bg-indigo-500', sporpuanImpact?.bonuses.davranisBonus)}
+
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <div className="bg-white/90 border border-amber-200 px-3.5 py-2 rounded-xl text-center shadow-2xs">
+                              <span className="text-[10px] uppercase font-bold text-slate-500 block">Toplam Sporpuan</span>
+                              <span className="text-base font-black text-amber-600">
+                                {sporpuanImpact.totalSP} SP
+                              </span>
+                            </div>
+
+                            <div className="bg-white/90 border border-emerald-200 px-3.5 py-2 rounded-xl text-center shadow-2xs">
+                              <span className="text-[10px] uppercase font-bold text-slate-500 block">Karne Not Katkısı</span>
+                              <span className="text-base font-black text-emerald-600 flex items-center justify-center gap-0.5">
+                                <TrendingUp className="w-3.5 h-3.5" />
+                                +{sporpuanImpact.bonuses.genelOrtalamaBonus} Not
+                              </span>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => setIsQuickPointModalOpen(true)}
+                              className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95 print:hidden"
+                            >
+                              <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                              <span>+ Hızlı Puan Ver</span>
+                            </button>
                           </div>
                         </div>
 
-                        {/* Badges - Kazanılan Rozetler */}
-                        <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs">
-                          <div className="flex items-center justify-between mb-3.5 flex-wrap gap-2">
-                            <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600">
-                                <SportsFlyIcon className="w-4 h-4" />
-                              </div>
-                              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                                Kazanılan Rozetler
-                              </h4>
+                        <div className="mt-4 pt-3 border-t border-amber-200/60 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                          <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
+                            <span className="text-[10px] font-bold text-slate-500 block">Davranış &amp; Fair-Play</span>
+                            <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.davranis} SP</span>
+                            <span className="text-[10px] text-indigo-600 font-bold ml-1">
+                              (+{sporpuanImpact.bonuses.davranisBonus})
+                            </span>
+                          </div>
+                          <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
+                            <span className="text-[10px] font-bold text-slate-500 block">Teknik &amp; Gelişim</span>
+                            <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.gelisim} SP</span>
+                            <span className="text-[10px] text-blue-600 font-bold ml-1">
+                              (+{sporpuanImpact.bonuses.teknikBonus})
+                            </span>
+                          </div>
+                          <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
+                            <span className="text-[10px] font-bold text-slate-500 block">Liderlik &amp; Zihin</span>
+                            <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.liderlik} SP</span>
+                            <span className="text-[10px] text-amber-600 font-bold ml-1">
+                              (+{sporpuanImpact.bonuses.zihinselBonus})
+                            </span>
+                          </div>
+                          <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
+                            <span className="text-[10px] font-bold text-slate-500 block">Antrenman Devamı</span>
+                            <span className="font-black text-emerald-700">{sporpuanImpact.categoryPoints.devam} SP</span>
+                            <span className="text-[10px] text-emerald-600 font-bold ml-1">
+                              (%{activeKarne.katilimYuzdesi})
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Attendance & Group Comparison & Trainer Summary */}
+                    <div className="p-6 md:p-8 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Attendance */}
+                        <div className="flex items-center justify-between bg-slate-50/80 border border-slate-200 rounded-xl p-4 shadow-2xs">
+                          <div>
+                            <h4 className="font-bold text-slate-800 text-sm">Antrenman Devamlılığı</h4>
+                            <div className="text-xs font-medium text-slate-500 mt-0.5">
+                              Toplam {activeKarne.antrenmanSayisi} antrenman tamamlandı
                             </div>
-                            
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                                {activeKarne.davranissal.kazanimlar.length} Rozet
+                          </div>
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-base font-black ${
+                            activeKarne.katilimYuzdesi >= 90 ? 'bg-emerald-100 text-emerald-700' :
+                            activeKarne.katilimYuzdesi >= 75 ? 'bg-amber-100 text-amber-700' :
+                            'bg-rose-100 text-rose-700'
+                          }`}>
+                            %{activeKarne.katilimYuzdesi}
+                          </div>
+                        </div>
+
+                        {/* Trainer Summary */}
+                        <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4">
+                          <h4 className="font-bold text-blue-900 mb-1 text-sm flex items-center gap-1.5">
+                            <FileText className="w-4 h-4 text-blue-600" />
+                            Antrenör Değerlendirmesi
+                          </h4>
+                          <p className="text-xs text-slate-700 leading-relaxed line-clamp-3 italic">
+                            "{activeKarne.antrenorNotu}"
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Grup Karşılaştırması */}
+                      <div className="bg-indigo-50/40 border border-indigo-200 rounded-xl p-4 space-y-2.5">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <h4 className="font-bold text-indigo-950 text-xs sm:text-sm">Grup Karşılaştırması &amp; Genel Konum</h4>
+                            <p className="text-[11px] text-slate-600">
+                              Sporcunun kendi yaş ve branş grubu içerisindeki başarı dengesi
+                            </p>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-extrabold">
+                            Grup İçi Konum: %94
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                          <div className="bg-white p-2.5 rounded-xl border border-indigo-100 text-center">
+                            <div className="text-[9.5px] font-bold text-slate-500 uppercase">Grup Sporcu Sayısı</div>
+                            <div className="text-base font-black font-mono text-slate-900 mt-0.5">15</div>
+                          </div>
+                          <div className="bg-white p-2.5 rounded-xl border border-amber-200 text-center">
+                            <div className="text-[9.5px] font-bold text-amber-800 uppercase">Genel Sıralama</div>
+                            <div className="text-base font-black font-mono text-amber-600 mt-0.5">1.</div>
+                          </div>
+                          <div className="bg-white p-2.5 rounded-xl border border-blue-200 text-center">
+                            <div className="text-[9.5px] font-bold text-blue-800 uppercase">Sportif Performans</div>
+                            <div className="text-base font-black font-mono text-blue-600 mt-0.5">%88</div>
+                          </div>
+                          <div className="bg-white p-2.5 rounded-xl border border-slate-200 text-center">
+                            <div className="text-[9.5px] font-bold text-slate-500 uppercase">Grup Ortalaması</div>
+                            <div className="text-base font-black font-mono text-slate-700 mt-0.5">%72</div>
+                          </div>
+                          <div className="bg-emerald-50 p-2.5 rounded-xl border border-emerald-300 text-center">
+                            <div className="text-[9.5px] font-bold text-emerald-900 uppercase">Grup İçi Konum</div>
+                            <div className="text-base font-black font-mono text-emerald-700 mt-0.5">%94</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {renderPageFooterBadge(1)}
+                </div>
+              )}
+
+              {/* ======================================================== */}
+              {/* SAYFA 2: FİZİKSEL PERFORMANS, BİYOMOTOR & GELİŞİM GRAFİKLERİ */}
+              {/* ======================================================== */}
+              {(activeReportPage === 'all' || activeReportPage === 2) && (
+                <div
+                  id="sporcu-karne-sayfa-2"
+                  className="a4-print-page bg-white relative overflow-hidden flex flex-col justify-between mb-8 print:mb-0 shadow-xs print:shadow-none border border-slate-200 print:border-none rounded-2xl print:rounded-none"
+                >
+                  <div>
+                    {renderPageHeaderBadge(2)}
+
+                    {/* Sub-header banner */}
+                    <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <div className="text-[10px] font-mono font-bold tracking-widest text-emerald-400 uppercase">
+                          BİYOMOTOR KAPASİTE &amp; KONDİSYON GELİŞİMİ
+                        </div>
+                        <div className="text-sm sm:text-base font-extrabold tracking-tight">
+                          Sayfa 2: Fiziksel Performans &amp; Biyomotor Ölçüm Analizi
+                        </div>
+                      </div>
+                      <div className="text-right text-xs font-mono text-slate-300">
+                        {activeKarne.adSoyad} · Genel Fiziksel: <span className="text-emerald-400 font-bold">{activeKarne.fiziksel.ortalama}/10</span>
+                      </div>
+                    </div>
+
+                    {/* D3 Radar & Progression Line Charts Panel */}
+                    {showPerformanceCharts && (
+                      <SporcuKarnePerformanceCharts karne={activeKarne} />
+                    )}
+
+                    {/* Physical Skills Grid */}
+                    <div className="p-6 md:p-8">
+                      <div className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-5 shadow-2xs">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                            <Activity className="w-4 h-4 text-emerald-600" />
+                            Fiziksel Gelişim &amp; Biyomotor Test Parametreleri
+                          </h3>
+                          <div className="flex items-center gap-1.5">
+                            {sporpuanImpact && sporpuanImpact.bonuses.fizikselBonus > 0 && (
+                              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
+                                +{sporpuanImpact.bonuses.fizikselBonus} SP
                               </span>
-                              <button
-                                onClick={() => setIsBadgeModalOpen(true)}
-                                className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors cursor-pointer print:hidden"
-                                data-html2canvas-ignore="true"
-                                title="Sporcuya rozet ver veya düzenle"
-                              >
-                                <Plus className="w-3.5 h-3.5" />
-                                <span>Rozet Ver / Düzenle</span>
-                              </button>
+                            )}
+                            <div className="bg-emerald-100 text-emerald-700 font-bold px-2.5 py-0.5 rounded-md text-xs">
+                              {activeKarne.fiziksel.ortalama} / 10
+                            </div>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                          <div>
+                            {activeKarne.fiziksel.hiz !== undefined && renderProgressBar('Hız / Çabukluk Testi', activeKarne.fiziksel.hiz, 'bg-emerald-500', sporpuanImpact?.bonuses.fizikselBonus)}
+                            {activeKarne.fiziksel.dayaniklilik !== undefined && renderProgressBar('Dayanıklılık (Aerobik Kondisyon)', activeKarne.fiziksel.dayaniklilik, 'bg-emerald-500', sporpuanImpact?.bonuses.fizikselBonus)}
+                          </div>
+                          <div>
+                            {activeKarne.fiziksel.guc !== undefined && renderProgressBar('Kuvvet & Patlayıcı Güç', activeKarne.fiziksel.guc, 'bg-emerald-500', sporpuanImpact?.bonuses.fizikselBonus)}
+                            {activeKarne.fiziksel.ceviklik !== undefined && renderProgressBar('Çeviklik & Koordinasyon Testi', activeKarne.fiziksel.ceviklik, 'bg-emerald-500', sporpuanImpact?.bonuses.fizikselBonus)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {renderPageFooterBadge(2)}
+                </div>
+              )}
+
+              {/* ======================================================== */}
+              {/* SAYFA 3: TEKNİK BECERİLER & TAKTİKSEL OYUN ZEKASI */}
+              {/* ======================================================== */}
+              {(activeReportPage === 'all' || activeReportPage === 3) && (
+                <div
+                  id="sporcu-karne-sayfa-3"
+                  className="a4-print-page bg-white relative overflow-hidden flex flex-col justify-between mb-8 print:mb-0 shadow-xs print:shadow-none border border-slate-200 print:border-none rounded-2xl print:rounded-none"
+                >
+                  <div>
+                    {renderPageHeaderBadge(3)}
+
+                    {/* Sub-header banner */}
+                    <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <div className="text-[10px] font-mono font-bold tracking-widest text-sky-400 uppercase">
+                          BRANŞ BİLGİSİ, OYUN OKUMA &amp; SAHA UYGULAMASI
+                        </div>
+                        <div className="text-sm sm:text-base font-extrabold tracking-tight">
+                          Sayfa 3: Teknik Gelişim &amp; Taktiksel Oyun Zekası
+                        </div>
+                      </div>
+                      <div className="text-right text-xs font-mono text-slate-300">
+                        Teknik: <span className="text-blue-400 font-bold">{activeKarne.teknik.ortalama}/10</span> · Taktik: <span className="text-purple-400 font-bold">{activeKarne.taktiksel.ortalama}/10</span>
+                      </div>
+                    </div>
+
+                    <div className="p-6 md:p-8 space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Technical Skills */}
+                        <div className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-5 shadow-2xs">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                              <Target className="w-4 h-4 text-blue-600" />
+                              Teknik Gelişim Becerileri
+                            </h3>
+                            <div className="flex items-center gap-1.5">
+                              {sporpuanImpact && sporpuanImpact.bonuses.teknikBonus > 0 && (
+                                <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">
+                                  +{sporpuanImpact.bonuses.teknikBonus} SP
+                                </span>
+                              )}
+                              <div className="bg-blue-100 text-blue-700 font-bold px-2.5 py-0.5 rounded-md text-xs">
+                                {activeKarne.teknik.ortalama} / 10
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            {activeKarne.teknik.topKontrolu !== undefined && renderProgressBar('Top Kontrolü', activeKarne.teknik.topKontrolu, 'bg-blue-500', sporpuanImpact?.bonuses.teknikBonus)}
+                            {activeKarne.teknik.pasBasarisi !== undefined && renderProgressBar('Pas Başarısı', activeKarne.teknik.pasBasarisi, 'bg-blue-500', sporpuanImpact?.bonuses.teknikBonus)}
+                            {activeKarne.teknik.sut !== undefined && renderProgressBar('Şut / Bitiricilik', activeKarne.teknik.sut, 'bg-blue-500', sporpuanImpact?.bonuses.teknikBonus)}
+                            {activeKarne.teknik.topSurme !== undefined && renderProgressBar('Top Sürme', activeKarne.teknik.topSurme, 'bg-blue-500', sporpuanImpact?.bonuses.teknikBonus)}
+                            {activeKarne.teknik.savunma !== undefined && renderProgressBar('Birebir Savunma', activeKarne.teknik.savunma, 'bg-blue-500', sporpuanImpact?.bonuses.teknikBonus)}
+                          </div>
+                        </div>
+
+                        {/* Tactical Skills */}
+                        <div className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-5 shadow-2xs">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                              <TrendingUp className="w-4 h-4 text-purple-600" />
+                              Taktiksel Gelişim &amp; Pozisyon
+                            </h3>
+                            <div className="flex items-center gap-1.5">
+                              {sporpuanImpact && sporpuanImpact.bonuses.taktikselBonus > 0 && (
+                                <span className="text-[10px] font-bold text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded">
+                                  +{sporpuanImpact.bonuses.taktikselBonus} SP
+                                </span>
+                              )}
+                              <div className="bg-purple-100 text-purple-700 font-bold px-2.5 py-0.5 rounded-md text-xs">
+                                {activeKarne.taktiksel.ortalama} / 10
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            {activeKarne.taktiksel.oyunZekasi !== undefined && renderProgressBar('Oyun Zekası', activeKarne.taktiksel.oyunZekasi, 'bg-purple-500', sporpuanImpact?.bonuses.taktikselBonus)}
+                            {activeKarne.taktiksel.pozisyonAlma !== undefined && renderProgressBar('Pozisyon Alma', activeKarne.taktiksel.pozisyonAlma, 'bg-purple-500', sporpuanImpact?.bonuses.taktikselBonus)}
+                            {activeKarne.taktiksel.kararVerme !== undefined && renderProgressBar('Karar Verme', activeKarne.taktiksel.kararVerme, 'bg-purple-500', sporpuanImpact?.bonuses.taktikselBonus)}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Technical Tactical Guidance Banner */}
+                      <div className="bg-sky-50/70 border border-sky-200 rounded-2xl p-4 flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0 text-xs font-bold mt-0.5">
+                          ✓
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-sky-950 uppercase tracking-wider mb-0.5">
+                            Saha İçi Uygulama &amp; Antrenman Hedefleri
+                          </div>
+                          <p className="text-xs text-slate-600 leading-relaxed">
+                            Sporcumuz antrenmanlarda teknik istasyon çalışmalarına yüksek odaklanma göstermektedir. Taktiksel karar verme ve baskı altında pas açısı oluşturma alanlarında planlanan özel driller uygulanacaktır.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {renderPageFooterBadge(3)}
+                </div>
+              )}
+
+              {/* ======================================================== */}
+              {/* SAYFA 4: DAVRANIŞSAL GELİŞİM, KARAKTER & ROZETLER */}
+              {/* ======================================================== */}
+              {(activeReportPage === 'all' || activeReportPage === 4) && (
+                <div
+                  id="sporcu-karne-sayfa-4"
+                  className="a4-print-page bg-white relative overflow-hidden flex flex-col justify-between mb-8 print:mb-0 shadow-xs print:shadow-none border border-slate-200 print:border-none rounded-2xl print:rounded-none"
+                >
+                  <div>
+                    {renderPageHeaderBadge(4)}
+
+                    {/* Sub-header banner */}
+                    <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <div className="text-[10px] font-mono font-bold tracking-widest text-indigo-400 uppercase">
+                          FAIR-PLAY, DİSİPLİN &amp; KULÜP KÜLTÜRÜ
+                        </div>
+                        <div className="text-sm sm:text-base font-extrabold tracking-tight">
+                          Sayfa 4: Davranışsal Gelişim, Karakter &amp; Rozetler
+                        </div>
+                      </div>
+                      <div className="text-right text-xs font-mono text-slate-300">
+                        Davranış: <span className="text-indigo-400 font-bold">{activeKarne.davranissal?.kriterler.ortalama || 9}/10</span> · Rozet: <span className="text-amber-400 font-bold">{activeKarne.davranissal?.kazanimlar.length || 0} Adet</span>
+                      </div>
+                    </div>
+
+                    {activeKarne.davranissal && (
+                      <div className="p-6 md:p-8 space-y-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                          {/* Left: Criteria */}
+                          <div className="lg:col-span-6 space-y-5">
+                            <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs">
+                              <div className="flex items-center justify-between mb-4">
+                                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                  <ShieldCheck className="w-4 h-4 text-indigo-500" />
+                                  Temel Davranış Kriterleri
+                                </h4>
+                                <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+                                  Puan / 10
+                                </span>
+                              </div>
+                              <div className="space-y-1">
+                                {renderProgressBar('Fair-Play & Centilmenlik', activeKarne.davranissal.kriterler.fairPlay, 'bg-indigo-500', sporpuanImpact?.bonuses.davranisBonus)}
+                                {renderProgressBar('Sorumluluk & Malzeme Düzeni', activeKarne.davranissal.kriterler.sorumlulukEkipman, 'bg-indigo-500', sporpuanImpact?.bonuses.davranisBonus)}
+                                {renderProgressBar('Saygı & Yapıcı İletişim', activeKarne.davranissal.kriterler.saygiIletisim, 'bg-indigo-500', sporpuanImpact?.bonuses.davranisBonus)}
+                                {renderProgressBar('Dinleme & Yönergelere Uyum', activeKarne.davranissal.kriterler.yonergeyeUyum, 'bg-indigo-500', sporpuanImpact?.bonuses.davranisBonus)}
+                                {renderProgressBar('Duygu Kontrolü & Sakinlik', activeKarne.davranissal.kriterler.duyguKontrolu, 'bg-indigo-500', sporpuanImpact?.bonuses.davranisBonus)}
+                              </div>
+                            </div>
+
+                            {/* Badges - Kazanılan Rozetler */}
+                            <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs">
+                              <div className="flex items-center justify-between mb-3.5 flex-wrap gap-2">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600">
+                                    <SportsFlyIcon className="w-4 h-4" />
+                                  </div>
+                                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                                    Kazanılan Rozetler
+                                  </h4>
+                                </div>
+                                
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                                    {activeKarne.davranissal.kazanimlar.length} Rozet
+                                  </span>
+                                  <button
+                                    onClick={() => setIsBadgeModalOpen(true)}
+                                    className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors cursor-pointer print:hidden"
+                                    data-html2canvas-ignore="true"
+                                    title="Sporcuya rozet ver veya düzenle"
+                                  >
+                                    <Plus className="w-3.5 h-3.5" />
+                                    <span>Rozet Ver / Düzenle</span>
+                                  </button>
+                                </div>
+                              </div>
+
+                              {activeKarne.davranissal.kazanimlar.length === 0 ? (
+                                <div className="text-center py-6 px-4 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                                  <Award className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                                  <p className="text-xs font-semibold text-slate-700">Henüz rozet atanmadı</p>
+                                  <p className="text-[11px] text-slate-400 mt-0.5 mb-3">
+                                    Sporcunun örnek duruşunu ve kulüp içi disiplinini ödüllendirmek için rozet verebilirsiniz.
+                                  </p>
+                                  <button
+                                    onClick={() => setIsBadgeModalOpen(true)}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer print:hidden"
+                                    data-html2canvas-ignore="true"
+                                  >
+                                    <Plus className="w-3.5 h-3.5" />
+                                    Rozet Kataloğundan Seç
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                  {activeKarne.davranissal.kazanimlar.map((kazanim, idx) => {
+                                    const badgeMeta = getBadgeDetails(kazanim);
+                                    const iconName = (badgeMeta?.ikon as any) || 'Award';
+                                    const colors = badgeMeta?.renkTema || {
+                                       bg: 'bg-amber-50/70',
+                                       border: 'border-amber-200/80',
+                                       badgeBg: 'bg-amber-100',
+                                       badgeText: 'text-amber-800',
+                                       iconBg: 'bg-amber-100',
+                                       iconColor: 'text-amber-700',
+                                       activeBorder: 'border-amber-400'
+                                    };
+
+                                    const displayBaslik = kazanim.baslik.toLowerCase().includes('temiz spor')
+                                      ? 'Sağlıklı Yaşam & Sporcu Disiplini'
+                                      : kazanim.baslik;
+
+                                    return (
+                                      <div 
+                                        key={idx} 
+                                        className={`p-3 rounded-xl ${colors.bg} border ${colors.border} flex items-start gap-2.5 relative group transition-all`}
+                                      >
+                                        <div className={`w-8 h-8 rounded-lg ${colors.iconBg} flex items-center justify-center shrink-0 ${colors.iconColor} mt-0.5 shadow-2xs`}>
+                                          {renderBadgeIcon(iconName, "w-4 h-4")}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                          <div className="flex items-center gap-1.5 flex-wrap">
+                                            <span className="text-xs font-bold text-slate-800 leading-tight">
+                                              {displayBaslik}
+                                            </span>
+                                            {(kazanim.kategori || badgeMeta?.kategori) && (
+                                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${colors.badgeBg} ${colors.badgeText}`}>
+                                                {kazanim.kategori || badgeMeta?.kategori}
+                                              </span>
+                                            )}
+                                          </div>
+                                          <p className="text-[11px] text-slate-600 leading-snug mt-1">
+                                            {kazanim.aciklama}
+                                          </p>
+                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleRemoveBadge(kazanim.baslik)}
+                                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md shrink-0 cursor-pointer print:hidden"
+                                          data-html2canvas-ignore="true"
+                                          title="Rozeti Geri Al / Kaldır"
+                                        >
+                                          <X className="w-3.5 h-3.5" />
+                                        </button>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
                             </div>
                           </div>
 
-                          {activeKarne.davranissal.kazanimlar.length === 0 ? (
-                            <div className="text-center py-6 px-4 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
-                              <Award className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                              <p className="text-xs font-semibold text-slate-700">Henüz rozet atanmadı</p>
-                              <p className="text-[11px] text-slate-400 mt-0.5 mb-3">
-                                Sporcunun örnek duruşunu ve kulüp içi disiplinini ödüllendirmek için rozet verebilirsiniz.
-                              </p>
-                              <button
-                                onClick={() => setIsBadgeModalOpen(true)}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer print:hidden"
-                                data-html2canvas-ignore="true"
-                              >
-                                <Plus className="w-3.5 h-3.5" />
-                                Rozet Kataloğundan Seç
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                              {activeKarne.davranissal.kazanimlar.map((kazanim, idx) => {
-                                const badgeMeta = getBadgeDetails(kazanim);
-                                const iconName = (badgeMeta?.ikon as any) || 'Award';
-                                const colors = badgeMeta?.renkTema || {
-                                   bg: 'bg-amber-50/70',
-                                   border: 'border-amber-200/80',
-                                   badgeBg: 'bg-amber-100',
-                                   badgeText: 'text-amber-800',
-                                   iconBg: 'bg-amber-100',
-                                   iconColor: 'text-amber-700',
-                                   activeBorder: 'border-amber-400'
-                                };
+                          {/* Right: Milestone Timeline */}
+                          <div className="lg:col-span-6 flex flex-col">
+                            <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs flex-1 flex flex-col">
+                              <div className="flex items-center justify-between mb-4">
+                                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                                  <Clock className="w-4 h-4 text-indigo-500" />
+                                  Dönem Gözlemleri &amp; Süreç Takibi
+                                </h4>
+                                <span className="text-[11px] text-slate-500 font-medium">
+                                  {activeKarne.davranissal.surecTakibi.length} Aşama
+                                </span>
+                              </div>
 
-                                const displayBaslik = kazanim.baslik.toLowerCase().includes('temiz spor')
-                                  ? 'Sağlıklı Yaşam & Sporcu Disiplini'
-                                  : kazanim.baslik;
+                              <div className="space-y-4 relative flex-1 before:absolute before:top-2 before:bottom-2 before:left-3.5 before:w-0.5 before:bg-indigo-100">
+                                {activeKarne.davranissal.surecTakibi.map((adim, index) => {
+                                  const statusConfig = {
+                                    'Örnek Davranış': {
+                                      dot: 'bg-emerald-500 ring-4 ring-emerald-100',
+                                      badge: 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                    },
+                                    'Hedefe Ulaştı': {
+                                      dot: 'bg-blue-500 ring-4 ring-blue-100',
+                                      badge: 'bg-blue-50 text-blue-700 border-blue-200'
+                                    },
+                                    'Gelişiyor': {
+                                      dot: 'bg-amber-500 ring-4 ring-amber-100',
+                                      badge: 'bg-amber-50 text-amber-700 border-amber-200'
+                                    }
+                                  }[adim.durum] || {
+                                    dot: 'bg-slate-400 ring-4 ring-slate-100',
+                                    badge: 'bg-slate-100 text-slate-700 border-slate-200'
+                                  };
 
-                                return (
-                                  <div 
-                                    key={idx} 
-                                    className={`p-3 rounded-xl ${colors.bg} border ${colors.border} flex items-start gap-2.5 relative group transition-all`}
-                                  >
-                                    <div className={`w-8 h-8 rounded-lg ${colors.iconBg} flex items-center justify-center shrink-0 ${colors.iconColor} mt-0.5 shadow-2xs`}>
-                                      {renderBadgeIcon(iconName, "w-4 h-4")}
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                      <div className="flex items-center gap-1.5 flex-wrap">
-                                        <span className="text-xs font-bold text-slate-800 leading-tight">
-                                          {displayBaslik}
-                                        </span>
-                                        {(kazanim.kategori || badgeMeta?.kategori) && (
-                                          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${colors.badgeBg} ${colors.badgeText}`}>
-                                            {kazanim.kategori || badgeMeta?.kategori}
+                                  return (
+                                    <div key={index} className="relative z-10 flex items-start gap-4">
+                                      <div className={`w-3 h-3 rounded-full mt-1.5 shrink-0 ${statusConfig.dot}`} />
+                                      <div className="flex-1 bg-slate-50/90 hover:bg-slate-50 transition-colors rounded-xl p-3.5 border border-slate-200/70">
+                                        <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
+                                          <span className="text-xs font-bold text-slate-800">{adim.donem}</span>
+                                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${statusConfig.badge}`}>
+                                            {adim.durum}
                                           </span>
-                                        )}
-                                      </div>
-                                      <p className="text-[11px] text-slate-600 leading-snug mt-1">
-                                        {kazanim.aciklama}
-                                      </p>
-                                      {kazanim.onemDerecesi && (
-                                        <div className="mt-1 flex items-center gap-1 text-[9px] font-medium text-slate-500">
-                                          <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-400" />
-                                          <span>{kazanim.onemDerecesi}</span>
                                         </div>
-                                      )}
+                                        <div className="text-xs font-semibold text-indigo-700 mb-1">
+                                          Odak: {adim.odakKonusu}
+                                        </div>
+                                        <p className="text-xs text-slate-600 leading-relaxed">
+                                          {adim.gozlem}
+                                        </p>
+                                        <div className="text-[10px] text-slate-400 mt-2 font-medium">
+                                          Tarih: {new Date(adim.tarih).toLocaleDateString('tr-TR')}
+                                        </div>
+                                      </div>
                                     </div>
-                                    {/* Coach quick remove button */}
-                                    <button
-                                      type="button"
-                                      onClick={() => handleRemoveBadge(kazanim.baslik)}
-                                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md shrink-0 cursor-pointer print:hidden"
-                                      data-html2canvas-ignore="true"
-                                      title="Rozeti Geri Al / Kaldır"
-                                    >
-                                      <X className="w-3.5 h-3.5" />
-                                    </button>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {renderPageFooterBadge(4)}
+                </div>
+              )}
+
+              {/* ======================================================== */}
+              {/* SAYFA 5: ZİHİNSEL GELİŞİM, SAĞLIKLI YAŞAM, METODOLOJİ & İMZALAR */}
+              {/* ======================================================== */}
+              {(activeReportPage === 'all' || activeReportPage === 5) && (
+                <div
+                  id="sporcu-karne-sayfa-5"
+                  className="a4-print-page bg-white relative overflow-hidden flex flex-col justify-between mb-8 print:mb-0 shadow-xs print:shadow-none border border-slate-200 print:border-none rounded-2xl print:rounded-none"
+                >
+                  <div>
+                    {renderPageHeaderBadge(5)}
+
+                    {/* Sub-header banner */}
+                    <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <div className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase">
+                          ZİHİNSEL DİSİPLİN, ALIŞKANLIKLAR &amp; AKADEMİ ONAYI
+                        </div>
+                        <div className="text-sm sm:text-base font-extrabold tracking-tight">
+                          Sayfa 5: Gelişim Alanları, Metodoloji &amp; Resmi Onay
+                        </div>
+                      </div>
+                      <div className="text-right text-xs font-mono text-slate-300">
+                        Zihinsel: <span className="text-amber-400 font-bold">{activeKarne.zihinsel.ortalama}/10</span> · Genel Not: <span className="text-sky-400 font-bold">{genelOrtalama}/10</span>
+                      </div>
+                    </div>
+
+                    <div className="p-6 md:p-8 space-y-5">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        {/* Mental Skills */}
+                        <div className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
+                          <div className="flex items-center justify-between mb-3">
+                            <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                              <Brain className="w-4 h-4 text-amber-600" />
+                              Zihinsel Beceriler &amp; Odaklanma
+                            </h3>
+                            <div className="bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-md text-xs">
+                              {activeKarne.zihinsel.ortalama} / 10
+                            </div>
+                          </div>
+                          <div>
+                            {activeKarne.zihinsel.disiplin !== undefined && renderProgressBar('Antrenman Disiplini', activeKarne.zihinsel.disiplin, 'bg-amber-500', sporpuanImpact?.bonuses.zihinselBonus)}
+                            {activeKarne.zihinsel.ozguven !== undefined && renderProgressBar('Özgüven', activeKarne.zihinsel.ozguven, 'bg-amber-500', sporpuanImpact?.bonuses.zihinselBonus)}
+                            {activeKarne.zihinsel.takimUyumu !== undefined && renderProgressBar('Takım Uyumu', activeKarne.zihinsel.takimUyumu, 'bg-amber-500', sporpuanImpact?.bonuses.zihinselBonus)}
+                            {activeKarne.zihinsel.liderlik !== undefined && renderProgressBar('Liderlik', activeKarne.zihinsel.liderlik, 'bg-amber-500', sporpuanImpact?.bonuses.zihinselBonus)}
+                          </div>
+                        </div>
+
+                        {/* Focus Areas & Attitude */}
+                        <div className="space-y-4">
+                          <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-4">
+                            <h4 className="font-bold text-rose-900 mb-2 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                              <Activity className="w-3.5 h-3.5 text-rose-600" />
+                              Öncelikli Gelişim Alanları
+                            </h4>
+                            <div className="flex flex-wrap gap-1.5">
+                              {activeKarne.gelisimAlanlari.map((alan, index) => (
+                                <span key={index} className="bg-white border border-rose-200 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-semibold shadow-2xs">
+                                  {alan}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          {activeKarne.davranissal?.genelDegerlendirme && (
+                            <div className="bg-indigo-50/50 border border-indigo-100 rounded-xl p-3.5 flex items-start gap-2.5">
+                              <MessageSquare className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                              <div>
+                                <div className="text-[10px] font-bold text-indigo-950 uppercase tracking-wider mb-0.5">
+                                  Karakter ve Tutum Değerlendirmesi
+                                </div>
+                                <p className="text-xs text-slate-700 leading-relaxed italic">
+                                  "{activeKarne.davranissal.genelDegerlendirme}"
+                                </p>
+                              </div>
                             </div>
                           )}
                         </div>
                       </div>
 
-                      {/* Right: Milestone Timeline */}
-                      <div className="lg:col-span-6 flex flex-col">
-                        <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-2xs flex-1 flex flex-col">
-                          <div className="flex items-center justify-between mb-4">
-                            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                              <Clock className="w-4 h-4 text-indigo-500" />
-                              Dönem Gözlemleri & Süreç Takibi
-                            </h4>
-                            <span className="text-[11px] text-slate-500 font-medium">
-                              {activeKarne.davranissal.surecTakibi.length} Aşama
+                      {/* Sağlıklı Yaşam & Alışkanlık Takibi */}
+                      {activeKarne.davranissal?.bagimlilikVeAliskanlik && (
+                        <div className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-2xs">
+                          <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                            <span className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                              Sağlıklı Yaşam &amp; Alışkanlık Takibi
                             </span>
-                          </div>
-
-                          <div className="space-y-4 relative flex-1 before:absolute before:top-2 before:bottom-2 before:left-3.5 before:w-0.5 before:bg-indigo-100">
-                            {activeKarne.davranissal.surecTakibi.map((adim, index) => {
-                              const statusConfig = {
-                                'Örnek Davranış': {
-                                  dot: 'bg-emerald-500 ring-4 ring-emerald-100',
-                                  badge: 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                },
-                                'Hedefe Ulaştı': {
-                                  dot: 'bg-blue-500 ring-4 ring-blue-100',
-                                  badge: 'bg-blue-50 text-blue-700 border-blue-200'
-                                },
-                                'Gelişiyor': {
-                                  dot: 'bg-amber-500 ring-4 ring-amber-100',
-                                  badge: 'bg-amber-50 text-amber-700 border-amber-200'
-                                }
-                              }[adim.durum] || {
-                                dot: 'bg-slate-400 ring-4 ring-slate-100',
-                                badge: 'bg-slate-100 text-slate-700 border-slate-200'
-                              };
-
-                              return (
-                                <div key={index} className="relative z-10 flex items-start gap-4">
-                                  <div className={`w-3 h-3 rounded-full mt-1.5 shrink-0 ${statusConfig.dot}`} />
-                                  <div className="flex-1 bg-slate-50/90 hover:bg-slate-50 transition-colors rounded-xl p-3.5 border border-slate-200/70">
-                                    <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
-                                      <span className="text-xs font-bold text-slate-800">{adim.donem}</span>
-                                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${statusConfig.badge}`}>
-                                        {adim.durum}
-                                      </span>
-                                    </div>
-                                    <div className="text-xs font-semibold text-indigo-700 mb-1">
-                                      Odak: {adim.odakKonusu}
-                                    </div>
-                                    <p className="text-xs text-slate-600 leading-relaxed">
-                                      {adim.gozlem}
-                                    </p>
-                                    <div className="text-[10px] text-slate-400 mt-2 font-medium">
-                                      Tarih: {new Date(adim.tarih).toLocaleDateString('tr-TR')}
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Sağlıklı Yaşam, Dijital Denge & Alışkanlık Takibi */}
-                    {activeKarne.davranissal.bagimlilikVeAliskanlik && (
-                      <div className="mt-6 bg-white border border-slate-200/90 rounded-xl p-5 shadow-2xs">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-100">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-                              <ShieldCheck className="w-4 h-4" />
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                                  Sağlıklı Yaşam & Alışkanlık Takibi
-                                </h4>
-                                <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                  Dijital Denge & Disiplin
-                                </span>
-                              </div>
-                              <p className="text-[11px] text-slate-500 mt-0.5">
-                                Ekran süresi, zararlı alışkanlıklardan korunma bilinci ve düzenli uyku takibi.
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-[11px] text-slate-500 font-medium">Genel Durum:</span>
-                            <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span className="text-xs font-bold px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-800">
                               {activeKarne.davranissal.bagimlilikVeAliskanlik.genelFarkindalik}
                             </span>
                           </div>
-                        </div>
-
-                        {/* 3 Sütunlu Sade Gösterge Kartları */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                          {/* 1. Ekran Süresi & Denge */}
-                          <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-200/70 flex flex-col justify-between">
-                            <div>
-                              <div className="flex items-center justify-between mb-1.5">
-                                <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                                  <Smartphone className="w-3.5 h-3.5 text-indigo-500" />
-                                  Ekran Süresi & Denge
-                                </span>
-                                <span className="text-xs font-black text-indigo-600">
-                                  {activeKarne.davranissal.bagimlilikVeAliskanlik.ekranDengesi.puan} / 10
-                                </span>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                            <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/70">
+                              <div className="text-slate-600 font-bold mb-0.5 flex items-center justify-between">
+                                <span>Ekran Süresi:</span>
+                                <span className="text-indigo-600 font-black">{activeKarne.davranissal.bagimlilikVeAliskanlik.ekranDengesi.puan}/10</span>
                               </div>
-                              <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-indigo-700 border border-indigo-100 mb-2">
-                                {activeKarne.davranissal.bagimlilikVeAliskanlik.ekranDengesi.seviye}
-                              </span>
-                              <p className="text-[11px] text-slate-600 leading-relaxed">
-                                {activeKarne.davranissal.bagimlilikVeAliskanlik.ekranDengesi.aciklama}
-                              </p>
+                              <div className="text-[11px] text-slate-500">{activeKarne.davranissal.bagimlilikVeAliskanlik.ekranDengesi.seviye}</div>
                             </div>
-                          </div>
-
-                          {/* 2. Zararlı Alışkanlık Bilinci */}
-                          <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-200/70 flex flex-col justify-between">
-                            <div>
-                              <div className="flex items-center justify-between mb-1.5">
-                                <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                                  <ShieldAlert className="w-3.5 h-3.5 text-emerald-500" />
-                                  Zararlı Alışkanlık Bilinci
-                                </span>
-                                <span className="text-xs font-black text-emerald-600">
-                                  {activeKarne.davranissal.bagimlilikVeAliskanlik.zararliAliskanlik.puan} / 10
-                                </span>
+                            <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/70">
+                              <div className="text-slate-600 font-bold mb-0.5 flex items-center justify-between">
+                                <span>Sağlıklı Yaşam:</span>
+                                <span className="text-emerald-600 font-black">{activeKarne.davranissal.bagimlilikVeAliskanlik.zararliAliskanlik.puan}/10</span>
                               </div>
-                              <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-emerald-700 border border-emerald-100 mb-2">
-                                {activeKarne.davranissal.bagimlilikVeAliskanlik.zararliAliskanlik.seviye === 'Temiz Spor (Örnek)'
-                                  ? 'Bilinçli (Örnek)'
-                                  : activeKarne.davranissal.bagimlilikVeAliskanlik.zararliAliskanlik.seviye}
-                              </span>
-                              <p className="text-[11px] text-slate-600 leading-relaxed">
-                                {activeKarne.davranissal.bagimlilikVeAliskanlik.zararliAliskanlik.aciklama
-                                  ?.replace(/temiz sporcu kimliği/gi, 'sağlıklı sporcu disiplini')
-                                  ?.replace(/temiz spor/gi, 'sağlıklı yaşam')}
-                              </p>
+                              <div className="text-[11px] text-slate-500">{activeKarne.davranissal.bagimlilikVeAliskanlik.zararliAliskanlik.seviye}</div>
                             </div>
-                          </div>
-
-                          {/* 3. Uyku ve Dinlenme Düzeni */}
-                          <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-200/70 flex flex-col justify-between">
-                            <div>
-                              <div className="flex items-center justify-between mb-1.5">
-                                <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                                  <Moon className="w-3.5 h-3.5 text-blue-500" />
-                                  Uyku ve Dinlenme Düzeni
-                                </span>
-                                <span className="text-xs font-black text-blue-600">
-                                  {activeKarne.davranissal.bagimlilikVeAliskanlik.uykuVeDinlenme.puan} / 10
-                                </span>
+                            <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/70">
+                              <div className="text-slate-600 font-bold mb-0.5 flex items-center justify-between">
+                                <span>Uyku Düzeni:</span>
+                                <span className="text-blue-600 font-black">{activeKarne.davranissal.bagimlilikVeAliskanlik.uykuVeDinlenme.puan}/10</span>
                               </div>
-                              <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-blue-700 border border-blue-100 mb-2">
-                                {activeKarne.davranissal.bagimlilikVeAliskanlik.uykuVeDinlenme.seviye}
-                              </span>
-                              <p className="text-[11px] text-slate-600 leading-relaxed">
-                                {activeKarne.davranissal.bagimlilikVeAliskanlik.uykuVeDinlenme.aciklama}
-                              </p>
+                              <div className="text-[11px] text-slate-500">{activeKarne.davranissal.bagimlilikVeAliskanlik.uykuVeDinlenme.seviye}</div>
                             </div>
                           </div>
                         </div>
+                      )}
 
-                        {/* Alışkanlık Notu */}
-                        {activeKarne.davranissal.bagimlilikVeAliskanlik.egitmenGorus && (
-                          <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-start gap-2 text-xs text-slate-600">
-                            <span className="font-bold text-slate-700 shrink-0">Alışkanlık & Yaşam Notu:</span>
-                            <span className="italic leading-relaxed">
-                              {activeKarne.davranissal.bagimlilikVeAliskanlik.egitmenGorus
-                                .replace(/temiz sporcu kimliği/gi, 'sağlıklı sporcu disiplini')
-                                .replace(/temiz spor/gi, 'sağlıklı yaşam')}
-                            </span>
-                          </div>
-                        )}
+                      {/* 12. Referans ve Metodoloji Bölümü */}
+                      <div className="bg-slate-50/80 border border-slate-200/80 rounded-xl p-3 text-[10.5px] text-slate-500 leading-relaxed">
+                        <span className="font-bold text-slate-700 uppercase tracking-wider block mb-0.5">
+                          12. Referans ve Metodoloji:
+                        </span>
+                        Değerlendirmeler uluslararası ISAK ve Eurofit normatif referansları kullanılarak gerçekleştirilmiştir. Beden sağlığı, motor kabiliyetler ve gelişim takibi Rota Performans analiz sistemi ile doğrulanmıştır.
                       </div>
-                    )}
 
-                    {/* Karakter ve Tutum Özeti */}
-                    {activeKarne.davranissal.genelDegerlendirme && (
-                      <div className="mt-5 bg-white border border-indigo-100/80 rounded-xl p-4 flex items-start gap-3 shadow-2xs">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 text-indigo-600 mt-0.5">
-                          <MessageSquare className="w-4 h-4" />
+                      {/* Footer Signature Area */}
+                      <div className="bg-slate-50/90 rounded-xl p-4 border border-slate-200 flex items-center justify-around pt-5 pb-3">
+                        <div className="text-center">
+                          <div className="w-36 h-px bg-slate-400 mb-2 mx-auto"></div>
+                          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Değerlendiren Antrenör</div>
+                          <div className="text-xs text-slate-900 font-bold mt-0.5">{activeKarne.antrenor}</div>
                         </div>
-                        <div>
-                          <div className="text-xs font-bold text-indigo-950 uppercase tracking-wider mb-1">
-                            Karakter ve Tutum Değerlendirmesi
-                          </div>
-                          <p className="text-xs md:text-sm text-slate-700 leading-relaxed italic">
-                            "{activeKarne.davranissal.genelDegerlendirme}"
-                          </p>
+                        <div className="text-center">
+                          <div className="w-36 h-px bg-slate-400 mb-2 mx-auto"></div>
+                          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Veli / Sporcu İmza</div>
+                          <div className="text-xs text-slate-700 font-medium mt-0.5">{activeKarne.veliAdSoyad || 'Kayıtlı Veli'}</div>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
+                  {renderPageFooterBadge(5)}
                 </div>
               )}
-
-              {/* Attendance & Notes Section */}
-              <div className="px-6 md:px-8 pb-8 space-y-6">
-                
-                {/* Attendance */}
-                <div className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-                  <div>
-                    <h4 className="font-bold text-slate-800 text-sm">Antrenman Katılımı</h4>
-                    <div className="text-xs font-medium text-slate-500 mt-0.5">
-                      Toplam {activeKarne.antrenmanSayisi} antrenman tamamlandı
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-base font-black ${
-                      activeKarne.katilimYuzdesi >= 90 ? 'bg-emerald-100 text-emerald-700' :
-                      activeKarne.katilimYuzdesi >= 75 ? 'bg-amber-100 text-amber-700' :
-                      'bg-rose-100 text-rose-700'
-                    }`}>
-                      %{activeKarne.katilimYuzdesi}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Grup Karşılaştırması (Grup İçi Konum) */}
-                <div className="bg-indigo-50/50 border border-indigo-200 rounded-xl p-5 space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <h4 className="font-bold text-indigo-950 text-sm">Grup Karşılaştırması</h4>
-                      <p className="text-xs text-slate-600 mt-0.5">
-                        Sporcunun bulunduğu grup içerisindeki performansı ve genel konumu
-                      </p>
-                    </div>
-                    <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-extrabold">
-                      Grup İçindeki Konum: %94
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs">
-                    <div className="bg-white p-3 rounded-xl border border-indigo-100">
-                      <div className="text-[10px] font-bold text-slate-500 uppercase">Grubundaki Sporcu Sayısı</div>
-                      <div className="text-lg font-black font-mono text-slate-900 mt-0.5">15</div>
-                    </div>
-                    <div className="bg-white p-3 rounded-xl border border-amber-200">
-                      <div className="text-[10px] font-bold text-amber-800 uppercase">Genel Sıralama</div>
-                      <div className="text-lg font-black font-mono text-amber-600 mt-0.5">1.</div>
-                    </div>
-                    <div className="bg-white p-3 rounded-xl border border-blue-200">
-                      <div className="text-[10px] font-bold text-blue-800 uppercase">Sportif Performans</div>
-                      <div className="text-lg font-black font-mono text-blue-600 mt-0.5">%88</div>
-                    </div>
-                    <div className="bg-white p-3 rounded-xl border border-slate-200">
-                      <div className="text-[10px] font-bold text-slate-500 uppercase">Grup Ortalaması</div>
-                      <div className="text-lg font-black font-mono text-slate-700 mt-0.5">%72</div>
-                    </div>
-                    <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-300">
-                      <div className="text-[10px] font-bold text-emerald-900 uppercase">Grup İçindeki Konum</div>
-                      <div className="text-lg font-black font-mono text-emerald-700 mt-0.5">%94</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Trainer Notes */}
-                <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-5">
-                  <h4 className="font-bold text-blue-900 mb-2 text-sm flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-blue-600" />
-                    Antrenör Genel Değerlendirmesi
-                  </h4>
-                  <p className="text-sm text-slate-700 leading-relaxed">
-                    "{activeKarne.antrenorNotu}"
-                  </p>
-                </div>
-
-                {/* Focus Areas */}
-                <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-5">
-                  <h4 className="font-bold text-rose-900 mb-3 text-sm flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-rose-600" />
-                    Öncelikli Gelişim Alanları
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {activeKarne.gelisimAlanlari.map((alan, index) => (
-                      <span key={index} className="bg-white border border-rose-200 text-rose-700 px-3 py-1 rounded-lg text-xs font-semibold shadow-2xs">
-                        {alan}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 12. Referans ve Metodoloji Bölümü */}
-                <div className="bg-slate-50/80 border border-slate-200/80 rounded-xl p-3.5 text-[11px] text-slate-500 leading-relaxed">
-                  <div className="text-[10.5px] font-bold text-slate-700 uppercase tracking-wider mb-0.5">
-                    12. Referans ve Metodoloji
-                  </div>
-                  <p className="text-[11px] text-slate-600 leading-relaxed">
-                    Değerlendirmeler yaş ve cinsiyete göre normatif referanslar kullanılarak yapılmıştır. Beden kompozisyonu ve büyüme parametreleri ilgili uluslararası standartlarla karşılaştırılmıştır.
-                  </p>
-                </div>
-
-              </div>
-
-              {/* Footer Signature Area & Official SportsFly Lab Branding Strip */}
-              <div className="a4-avoid-break bg-slate-50 p-6 md:p-8 border-t border-slate-200 space-y-5">
-                <div className="flex items-center justify-between">
-                  <div className="text-center">
-                    <div className="w-32 h-px bg-slate-300 mb-2"></div>
-                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">Antrenör</div>
-                    <div className="text-sm text-slate-800 font-medium">{activeKarne.antrenor}</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-32 h-px bg-slate-300 mb-2"></div>
-                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">Veli / Sporcu İmza</div>
-                  </div>
-                </div>
-
-                {/* Bottom SportsFly Lab Brand & Logo Strip */}
-                <div className="pt-4 border-t border-slate-200/90 flex flex-col sm:flex-row print:flex-row sm:items-center print:items-center justify-between gap-3 bg-white px-4 py-3 rounded-xl border border-slate-200">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0">
-                      <SportsFlyVectorMark className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-black tracking-tight text-slate-900">
-                          SportsFly <span className="text-sky-600">LAB</span>
-                        </span>
-                        <span className="text-slate-300">·</span>
-                        <span className="text-[9.5px] font-mono font-bold text-slate-500 uppercase tracking-wider">
-                          ATLETİK PERFORMANS &amp; SPORCU KARNE SİSTEMİ
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-slate-400">
-                        Spor okulları için bilimsel performans ölçümü, gelişim analizi ve kurumsal karne altyapısı
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="text-right font-mono text-[10px] text-slate-500 shrink-0">
-                    <div className="font-bold text-slate-800 uppercase">{schoolBranding.schoolName || 'SPOR OKULU AKADEMİSİ'}</div>
-                    <div>SportsFly Lab Onaylı Belge</div>
-                  </div>
-                </div>
-              </div>
               </div>
             </div>
           </div>

@@ -123,8 +123,36 @@ async function prepareCloneForPdfCapture(
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
   // Inline all images cleanly without corrupting data: URLs
-  const images = Array.from(clonedRoot.querySelectorAll('img'));
-  await Promise.all(images.map((img) => inlineImageAsDataUrl(img)));
+  const sourceImages = Array.from(sourceEl.querySelectorAll('img'));
+  const clonedImages = Array.from(clonedRoot.querySelectorAll('img'));
+
+  for (let i = 0; i < clonedImages.length; i++) {
+    const clonedImg = clonedImages[i];
+    const sourceImg = sourceImages[i];
+
+    if (clonedImg.src && clonedImg.src.startsWith('data:')) {
+      continue;
+    }
+
+    if (sourceImg && sourceImg.complete && sourceImg.naturalWidth > 0) {
+      try {
+        const c = document.createElement('canvas');
+        c.width = sourceImg.naturalWidth;
+        c.height = sourceImg.naturalHeight;
+        const ctx = c.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(sourceImg, 0, 0);
+          clonedImg.src = c.toDataURL('image/png');
+          clonedImg.removeAttribute('srcset');
+          continue;
+        }
+      } catch {
+        // Ignore canvas CORS taint if any
+      }
+    }
+
+    await inlineImageAsDataUrl(clonedImg);
+  }
 
   // Lock explicit pixel dimensions and namespace on all SVG elements so SVG-inside-SVG foreignObject never distorts aspect ratios
   const svgs = Array.from(clonedRoot.querySelectorAll('svg'));
@@ -258,10 +286,9 @@ export async function exportReportPagesToA4Pdf(options: {
     const { canvas } = await captureElementToCleanCanvas(pageEl, 1040, true);
 
     const imgData = canvas.toDataURL('image/jpeg', 0.96);
-    const ratio = Math.min(availW / canvas.width, availH / canvas.height);
-    const renderW = canvas.width * ratio;
-    const renderH = canvas.height * ratio;
-    const offsetX = (pdfWidth - renderW) / 2;
+    const renderW = availW;
+    const renderH = Math.min(availH, (canvas.height * availW) / canvas.width);
+    const offsetX = marginMm;
     const offsetY = marginMm;
 
     if (addedPages > 0) {
@@ -442,10 +469,9 @@ export class BatchA4PdfBuilder {
 
       const { canvas } = await captureElementToCleanCanvas(pageEl, 1040, true);
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const ratio = Math.min(this.availW / canvas.width, this.availH / canvas.height);
-      const renderW = canvas.width * ratio;
-      const renderH = canvas.height * ratio;
-      const offsetX = (this.pdfWidth - renderW) / 2;
+      const renderW = this.availW;
+      const renderH = Math.min(this.availH, (canvas.height * this.availW) / canvas.width);
+      const offsetX = this.marginMm;
       const offsetY = this.marginMm;
 
       if (this.addedPages > 0) {

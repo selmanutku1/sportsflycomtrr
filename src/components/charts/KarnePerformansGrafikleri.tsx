@@ -46,6 +46,7 @@ export interface RechartsSportsFlyRadarProps {
 }
 
 const formatCleanSubjectName = (rawName: string) => {
+  if (!rawName) return '';
   const clean = rawName
     .replace(/testi/gi, '')
     .replace(/ölçümü/gi, '')
@@ -57,13 +58,22 @@ const formatCleanSubjectName = (rawName: string) => {
   if (lower.includes('çabukluk') || lower.includes('agility')) return 'Çabukluk';
   if (lower.includes('reaksiyon')) return 'Reaksiyon';
   if (lower.includes('sırt') || lower.includes('back')) return 'Sırt Kuvveti';
-  if (lower.includes('kavrama') || lower.includes('grip')) return 'Kavrama';
-  if (lower.includes('uzun atlama') || lower.includes('long jump')) return 'Uzun Atlama';
-  if (lower.includes('dikey') || lower.includes('vertical')) return 'Dikey Sıçrama';
+  if (lower.includes('kavrama') || lower.includes('grip')) return 'Kavrama Kuvveti';
+  if (lower.includes('uzun atlama') || lower.includes('long jump')) return 'Durarak Uzun Atlama';
+  if (lower.includes('dikey') || lower.includes('vertical') || lower.includes('sıçrama')) return 'Dikey Sıçrama';
   if (lower.includes('denge') || lower.includes('balance')) return 'Denge';
   if (lower.includes('esneklik') || lower.includes('flexibility')) return 'Esneklik';
   if (lower.includes('aerobik') || lower.includes('dayanıklılık') || lower.includes('pacer')) return 'Aerobik Kapasite';
-  return clean.charAt(0).toUpperCase() + clean.slice(1);
+
+  return clean
+    .split(' ')
+    .map((word) => {
+      if (!word) return '';
+      const first = word.charAt(0).toLocaleUpperCase('tr-TR');
+      const rest = word.slice(1).toLocaleLowerCase('tr-TR');
+      return first + rest;
+    })
+    .join(' ');
 };
 
 export const RechartsSportsFlyRadarChart: React.FC<RechartsSportsFlyRadarProps> = ({
@@ -126,17 +136,23 @@ export const RechartsSportsFlyRadarChart: React.FC<RechartsSportsFlyRadarProps> 
 
       <div style={{ width: '100%', height }}>
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart cx="50%" cy="50%" outerRadius="78%" data={radarData}>
+          <RadarChart cx="50%" cy="48%" outerRadius="66%" data={radarData}>
             <PolarGrid stroke="#cbd5e1" strokeDasharray="3 3" />
             <PolarAngleAxis
               dataKey="subject"
-              tick={{ fill: '#0f172a', fontSize: 9, fontWeight: 600, fontFamily: 'sans-serif' }}
+              tick={{
+                fill: '#0f172a',
+                fontSize: 9.5,
+                fontWeight: 700,
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+              }}
             />
             <PolarRadiusAxis
               angle={30}
               domain={[0, 100]}
               tickFormatter={(val) => `%${val}`}
-              tick={{ fill: '#64748b', fontSize: 8, fontFamily: 'sans-serif', fontWeight: 600 }}
+              tick={{ fill: '#64748b', fontSize: 7.5, fontFamily: 'sans-serif', fontWeight: 600 }}
+              axisLine={false}
             />
             <Tooltip
               content={({ active, payload }) => {
@@ -1783,9 +1799,7 @@ export const SportsFlyLabPerformanceCharts: React.FC<SportsFlyLabPerformanceChar
                           : 'fill-slate-700 dark:fill-slate-300'
                       }`}
                     >
-                      {axis.row.name.length > 16
-                        ? `${axis.row.name.slice(0, 15)}.`
-                        : axis.row.name}
+                      {formatCleanSubjectName(axis.row.name)}
                     </text>
                   </g>
                 );
@@ -2553,7 +2567,7 @@ export const SecondMeasurementComparisonPanel: React.FC<SecondMeasurementPanelPr
 
       return {
         id: row.id,
-        name: row.name.replace(' Testi', '').replace(' Ölçümü', ''),
+        name: formatCleanSubjectName(row.name),
         unit: row.unit,
         m1: row.m1,
         m2: row.m2,

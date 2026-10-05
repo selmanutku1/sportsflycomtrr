@@ -163,21 +163,28 @@ export default function App() {
     return false;
   });
 
-  const handleLoginSuccess = async (userData: { email: string; name: string; photoURL?: string; uid?: string; role?: string }) => {
+  const handleLoginSuccess = async (
+    userData: { email?: string; name?: string; photoURL?: string; uid?: string; role?: string } | string
+  ) => {
+    const userObj =
+      typeof userData === 'string'
+        ? { role: userData, email: '', name: userData, uid: '', photoURL: undefined }
+        : userData;
+
     // If it's a Google login (has email and name), sync it
-    if (userData.email && userData.name) {
-        await syncGoogleProfileData(userData.email, userData.name, userData.photoURL, userData.uid);
+    if (userObj.email && userObj.name) {
+      await syncGoogleProfileData(userObj.email, userObj.name, userObj.photoURL, userObj.uid);
     }
 
     const freshProfile = getStoredUserProfile();
     setUserProfile(freshProfile);
     setIsAuthenticated(true);
-    if (isGoogleRestrictedUser(userData.role || freshProfile?.role, freshProfile?.email)) {
+    if (isGoogleRestrictedUser(userObj.role || freshProfile?.role, freshProfile?.email)) {
       setCurrentPage('paketler');
       try {
         sessionStorage.setItem('sportsfly_active_page', 'paketler');
       } catch (e) {}
-    } else if (!isSuperAdminUser(userData.role || freshProfile?.role, freshProfile?.email)) {
+    } else if (!isSuperAdminUser(userObj.role || freshProfile?.role, freshProfile?.email)) {
       setCurrentPage((prev) =>
         prev === 'spor-okulu-basvurulari' ? 'anasayfa' : prev
       );
@@ -186,7 +193,7 @@ export default function App() {
       sessionStorage.setItem('sportsfly_auth_active', 'true');
       if (typeof BroadcastChannel !== 'undefined') {
         const ch = new BroadcastChannel('sportsfly_auth_channel');
-        ch.postMessage({ type: 'LOGIN', role: userData.role || freshProfile?.role });
+        ch.postMessage({ type: 'LOGIN', role: userObj.role || freshProfile?.role });
         ch.close();
       }
     } catch (e) {}
