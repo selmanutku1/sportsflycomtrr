@@ -1204,7 +1204,7 @@ export const EgitmenlerView: React.FC = () => {
                             <h4 className="font-bold text-slate-900 dark:text-white text-sm leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                               {egitmen.name}
                             </h4>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-sans tabular-nums">
                               Kod: {egitmen.code}
                             </p>
                           </div>
@@ -1416,7 +1416,7 @@ export const EgitmenlerView: React.FC = () => {
                     </p>
 
                     <div className="flex items-center gap-3 text-xs text-slate-400 flex-wrap pt-0.5">
-                      <span className="flex items-center gap-1 font-mono">
+                      <span className="flex items-center gap-1 font-sans tabular-nums">
                         <KeyRound className="w-3.5 h-3.5 text-amber-400" />
                         Kod: {selectedTrainerDetail.code}
                       </span>
@@ -1804,7 +1804,7 @@ export const EgitmenlerView: React.FC = () => {
                           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
                             <div className="text-right text-xs">
                               <span className="font-bold text-slate-900 dark:text-white block">{app.date}</span>
-                              <span className="text-slate-400 font-mono text-[11px]">{app.time}</span>
+                              <span className="text-slate-400 font-sans tabular-nums text-[11px]">{app.time}</span>
                             </div>
                             <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                               {app.status}

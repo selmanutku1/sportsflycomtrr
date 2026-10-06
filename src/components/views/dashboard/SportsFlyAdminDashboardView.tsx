@@ -243,7 +243,7 @@ export const SportsFlyAdminDashboardView: React.FC<SportsFlyAdminDashboardViewPr
                         <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                           {user.name}
                         </span>
-                        <span className="text-[10px] font-mono bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-900/40">
+                        <span className="text-[10px] font-sans tabular-nums bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-900/40">
                           {user.code}
                         </span>
                       </div>
@@ -372,7 +372,7 @@ export const SportsFlyAdminDashboardView: React.FC<SportsFlyAdminDashboardViewPr
                         <div className="font-semibold text-slate-800 dark:text-slate-200">
                           {ticket.subject}
                         </div>
-                        <span className="text-xs font-mono text-slate-400">
+                        <span className="text-xs font-sans tabular-nums text-slate-400">
                           {ticket.id}
                         </span>
                       </td>
@@ -435,7 +435,7 @@ export const SportsFlyAdminDashboardView: React.FC<SportsFlyAdminDashboardViewPr
                 <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base">
                   Destek Talebini Yanıtla
                 </h3>
-                <p className="text-xs text-slate-400 font-mono">
+                <p className="text-xs text-slate-400 font-sans tabular-nums">
                   {selectedTicket.id} - {selectedTicket.userName}
                 </p>
               </div>

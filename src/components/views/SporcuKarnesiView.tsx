@@ -537,7 +537,7 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
             </div>
           )}
           <div>
-            <div className="text-[10px] font-mono font-bold tracking-widest text-sky-700 uppercase">
+            <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-sky-700 uppercase">
               RESMİ SPORCU GELİŞİM &amp; PERFORMANS KARNESİ · {schoolBranding.branchName || 'Merkez Kampüs'}
             </div>
             <div className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
@@ -710,7 +710,7 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                   <Eye className="w-4 h-4 shrink-0" />
                   <span>{isPdfPreviewMode ? 'PDF Görünümünü Kapat' : 'PDF Olarak Görüntüle'}</span>
                   {isPdfPreviewMode && (
-                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-black bg-white/20 text-white">
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-sans tabular-nums font-black bg-white/20 text-white">
                       Açık
                     </span>
                   )}
@@ -765,7 +765,7 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                   <div>
                     <div className="text-xs sm:text-sm font-extrabold tracking-tight flex items-center gap-2">
                       <span>A4 PDF Önizleme Modu — {activeKarne.adSoyad}</span>
-                      <span className="text-[11px] font-mono font-normal text-slate-300">
+                      <span className="text-[11px] font-sans tabular-nums font-normal text-slate-300">
                         (210 × 297 mm · A4 Baskı Formatı)
                       </span>
                     </div>
@@ -782,7 +782,7 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                         key={z}
                         type="button"
                         onClick={() => setPdfZoom(z)}
-                        className={`px-2.5 py-1 rounded-lg font-mono font-bold transition-colors cursor-pointer ${
+                        className={`px-2.5 py-1 rounded-lg font-sans tabular-nums font-bold transition-colors cursor-pointer ${
                           pdfZoom === z ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'
                         }`}
                       >
@@ -1100,23 +1100,23 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
                           <div className="bg-white p-2.5 rounded-xl border border-indigo-100 text-center">
                             <div className="text-[9.5px] font-bold text-slate-500 uppercase">Grup Sporcu Sayısı</div>
-                            <div className="text-base font-black font-mono text-slate-900 mt-0.5">15</div>
+                            <div className="text-base font-black font-sans tabular-nums text-slate-900 mt-0.5">15</div>
                           </div>
                           <div className="bg-white p-2.5 rounded-xl border border-amber-200 text-center">
                             <div className="text-[9.5px] font-bold text-amber-800 uppercase">Genel Sıralama</div>
-                            <div className="text-base font-black font-mono text-amber-600 mt-0.5">1.</div>
+                            <div className="text-base font-black font-sans tabular-nums text-amber-600 mt-0.5">1.</div>
                           </div>
                           <div className="bg-white p-2.5 rounded-xl border border-blue-200 text-center">
                             <div className="text-[9.5px] font-bold text-blue-800 uppercase">Sportif Performans</div>
-                            <div className="text-base font-black font-mono text-blue-600 mt-0.5">%88</div>
+                            <div className="text-base font-black font-sans tabular-nums text-blue-600 mt-0.5">%88</div>
                           </div>
                           <div className="bg-white p-2.5 rounded-xl border border-slate-200 text-center">
                             <div className="text-[9.5px] font-bold text-slate-500 uppercase">Grup Ortalaması</div>
-                            <div className="text-base font-black font-mono text-slate-700 mt-0.5">%72</div>
+                            <div className="text-base font-black font-sans tabular-nums text-slate-700 mt-0.5">%72</div>
                           </div>
                           <div className="bg-emerald-50 p-2.5 rounded-xl border border-emerald-300 text-center">
                             <div className="text-[9.5px] font-bold text-emerald-900 uppercase">Grup İçi Konum</div>
-                            <div className="text-base font-black font-mono text-emerald-700 mt-0.5">%94</div>
+                            <div className="text-base font-black font-sans tabular-nums text-emerald-700 mt-0.5">%94</div>
                           </div>
                         </div>
                       </div>
@@ -1140,14 +1140,14 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                     {/* Sub-header banner */}
                     <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <div className="text-[10px] font-mono font-bold tracking-widest text-emerald-400 uppercase">
+                        <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-emerald-400 uppercase">
                           BİYOMOTOR KAPASİTE &amp; KONDİSYON GELİŞİMİ
                         </div>
                         <div className="text-sm sm:text-base font-extrabold tracking-tight">
                           Sayfa 2: Fiziksel Performans &amp; Biyomotor Ölçüm Analizi
                         </div>
                       </div>
-                      <div className="text-right text-xs font-mono text-slate-300">
+                      <div className="text-right text-xs font-sans tabular-nums text-slate-300">
                         {activeKarne.adSoyad} · Genel Fiziksel: <span className="text-emerald-400 font-bold">{activeKarne.fiziksel.ortalama}/10</span>
                       </div>
                     </div>
@@ -1207,14 +1207,14 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                     {/* Sub-header banner */}
                     <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <div className="text-[10px] font-mono font-bold tracking-widest text-sky-400 uppercase">
+                        <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-sky-400 uppercase">
                           BRANŞ BİLGİSİ, OYUN OKUMA &amp; SAHA UYGULAMASI
                         </div>
                         <div className="text-sm sm:text-base font-extrabold tracking-tight">
                           Sayfa 3: Teknik Gelişim &amp; Taktiksel Oyun Zekası
                         </div>
                       </div>
-                      <div className="text-right text-xs font-mono text-slate-300">
+                      <div className="text-right text-xs font-sans tabular-nums text-slate-300">
                         Teknik: <span className="text-blue-400 font-bold">{activeKarne.teknik.ortalama}/10</span> · Taktik: <span className="text-purple-400 font-bold">{activeKarne.taktiksel.ortalama}/10</span>
                       </div>
                     </div>
@@ -1308,14 +1308,14 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                     {/* Sub-header banner */}
                     <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <div className="text-[10px] font-mono font-bold tracking-widest text-indigo-400 uppercase">
+                        <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-indigo-400 uppercase">
                           FAIR-PLAY, DİSİPLİN &amp; KULÜP KÜLTÜRÜ
                         </div>
                         <div className="text-sm sm:text-base font-extrabold tracking-tight">
                           Sayfa 4: Davranışsal Gelişim, Karakter &amp; Rozetler
                         </div>
                       </div>
-                      <div className="text-right text-xs font-mono text-slate-300">
+                      <div className="text-right text-xs font-sans tabular-nums text-slate-300">
                         Davranış: <span className="text-indigo-400 font-bold">{activeKarne.davranissal?.kriterler.ortalama || 9}/10</span> · Rozet: <span className="text-amber-400 font-bold">{activeKarne.davranissal?.kazanimlar.length || 0} Adet</span>
                       </div>
                     </div>
@@ -1528,14 +1528,14 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                     {/* Sub-header banner */}
                     <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <div className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase">
+                        <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-amber-400 uppercase">
                           ZİHİNSEL DİSİPLİN, ALIŞKANLIKLAR &amp; AKADEMİ ONAYI
                         </div>
                         <div className="text-sm sm:text-base font-extrabold tracking-tight">
                           Sayfa 5: Gelişim Alanları, Metodoloji &amp; Resmi Onay
                         </div>
                       </div>
-                      <div className="text-right text-xs font-mono text-slate-300">
+                      <div className="text-right text-xs font-sans tabular-nums text-slate-300">
                         Zihinsel: <span className="text-amber-400 font-bold">{activeKarne.zihinsel.ortalama}/10</span> · Genel Not: <span className="text-sky-400 font-bold">{genelOrtalama}/10</span>
                       </div>
                     </div>

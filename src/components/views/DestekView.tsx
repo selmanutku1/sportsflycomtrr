@@ -620,7 +620,7 @@ export const DestekView: React.FC = () => {
                       {/* Left: ID, Subject, Category, Branch */}
                       <div className="space-y-1.5 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-mono text-xs font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/40 px-2 py-0.5 rounded-md">
+                          <span className="font-sans tabular-nums text-xs font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/40 px-2 py-0.5 rounded-md">
                             #{ticket.id}
                           </span>
 

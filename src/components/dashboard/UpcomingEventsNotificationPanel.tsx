@@ -498,7 +498,7 @@ export const UpcomingEventsNotificationPanel: React.FC<UpcomingEventsNotificatio
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>Yaklaşan Antrenmanlar</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/20 dark:bg-slate-900/40">
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-sans tabular-nums bg-white/20 dark:bg-slate-900/40">
                 {filteredTrainings.length}
               </span>
             </button>
@@ -514,11 +514,11 @@ export const UpcomingEventsNotificationPanel: React.FC<UpcomingEventsNotificatio
               <FileText className="w-3.5 h-3.5" />
               <span>Sözleşme Yenilemeleri</span>
               {urgentContractsCount > 0 ? (
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-rose-500 text-white font-bold">
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-sans tabular-nums bg-rose-500 text-white font-bold">
                   {urgentContractsCount}
                 </span>
               ) : (
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/20 dark:bg-slate-900/40">
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-sans tabular-nums bg-white/20 dark:bg-slate-900/40">
                   {filteredContracts.length}
                 </span>
               )}
@@ -534,7 +534,7 @@ export const UpcomingEventsNotificationPanel: React.FC<UpcomingEventsNotificatio
             >
               <Bell className="w-3.5 h-3.5" />
               <span>Sistem Bildirimleri</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white/20 dark:bg-slate-900/40">
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-sans tabular-nums bg-white/20 dark:bg-slate-900/40">
                 {notifications.length}
               </span>
             </button>
@@ -614,7 +614,7 @@ export const UpcomingEventsNotificationPanel: React.FC<UpcomingEventsNotificatio
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-start gap-2.5">
-                          <div className="px-2.5 py-1 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 font-mono text-xs font-extrabold shrink-0 mt-0.5">
+                          <div className="px-2.5 py-1 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 font-sans tabular-nums text-xs font-extrabold shrink-0 mt-0.5">
                             {training.time}
                           </div>
                           <div>
@@ -701,7 +701,7 @@ export const UpcomingEventsNotificationPanel: React.FC<UpcomingEventsNotificatio
                             <h5 className="text-xs font-bold text-slate-900 dark:text-slate-100">
                               {contract.athleteName}
                             </h5>
-                            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-200/70 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
+                            <span className="text-[10px] font-sans tabular-nums px-1.5 py-0.2 rounded bg-slate-200/70 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
                               {contract.contractNo}
                             </span>
                           </div>
@@ -787,7 +787,7 @@ export const UpcomingEventsNotificationPanel: React.FC<UpcomingEventsNotificatio
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-start gap-3">
-                      <div className="px-3 py-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-100 font-mono text-xs font-black shrink-0">
+                      <div className="px-3 py-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-100 font-sans tabular-nums text-xs font-black shrink-0">
                         {training.time}
                       </div>
                       <div>
@@ -912,7 +912,7 @@ export const UpcomingEventsNotificationPanel: React.FC<UpcomingEventsNotificatio
                         <div className="font-bold text-slate-900 dark:text-slate-100 text-xs">
                           {c.athleteName}
                         </div>
-                        <div className="text-[11px] text-slate-500 font-mono">
+                        <div className="text-[11px] text-slate-500 font-sans tabular-nums">
                           {c.contractNo} &bull; {c.groupName}
                         </div>
                       </td>
@@ -934,7 +934,7 @@ export const UpcomingEventsNotificationPanel: React.FC<UpcomingEventsNotificatio
                         </span>
                       </td>
                       <td className="p-3.5">
-                        <div className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                        <div className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200">
                           {c.endDate}
                         </div>
                         <div className="text-[10px] text-slate-400">
@@ -1008,7 +1008,7 @@ export const UpcomingEventsNotificationPanel: React.FC<UpcomingEventsNotificatio
                       <h5 className="font-bold text-xs text-slate-900 dark:text-slate-100">
                         {notif.title}
                       </h5>
-                      <span className="text-[10px] text-slate-400 font-mono">
+                      <span className="text-[10px] text-slate-400 font-sans tabular-nums">
                         {notif.time}
                       </span>
                     </div>

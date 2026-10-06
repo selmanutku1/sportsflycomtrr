@@ -385,7 +385,7 @@ export const SubelerView: React.FC<SubelerViewProps> = ({ onNavigate }) => {
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               <span>{s.ad}</span>
-              <span className="text-[10px] opacity-75 font-mono">({s.sporcuSayisi})</span>
+              <span className="text-[10px] opacity-75 font-sans tabular-nums">({s.sporcuSayisi})</span>
             </button>
           ))}
         </div>
@@ -511,7 +511,7 @@ export const SubelerView: React.FC<SubelerViewProps> = ({ onNavigate }) => {
                                   )}
                                 </div>
                                 <div className="flex items-center gap-1.5 mt-0.5">
-                                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                                  <span className="text-[10px] font-sans tabular-nums font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
                                     {sube.kod}
                                   </span>
                                   <span className="text-[11px] text-slate-500">
@@ -688,7 +688,7 @@ export const SubelerView: React.FC<SubelerViewProps> = ({ onNavigate }) => {
                       <div className="flex items-start justify-between gap-3">
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                            <span className="text-[10px] font-sans tabular-nums font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
                               {sube.kod}
                             </span>
                             <span
@@ -895,7 +895,7 @@ export const SubelerView: React.FC<SubelerViewProps> = ({ onNavigate }) => {
                     placeholder="KDK-01"
                     value={formCode}
                     onChange={(e) => setFormCode(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-hidden"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl font-sans tabular-nums font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-hidden"
                   />
                 </div>
 

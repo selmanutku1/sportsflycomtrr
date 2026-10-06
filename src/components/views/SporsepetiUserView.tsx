@@ -180,7 +180,7 @@ export const SporsepetiUserView: React.FC = () => {
                         {user.name}
                       </h4>
                       <p className="text-xs text-slate-500 mt-0.5">{user.email}</p>
-                      <p className="text-[11px] text-slate-400 font-mono mt-0.5">{user.createdAt}</p>
+                      <p className="text-[11px] text-slate-400 font-sans tabular-nums mt-0.5">{user.createdAt}</p>
                     </div>
 
                     <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 shrink-0">
@@ -198,7 +198,7 @@ export const SporsepetiUserView: React.FC = () => {
                     <div>
                       <span className="text-slate-400 block text-[10px]">TC Kimlik:</span>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="font-mono text-slate-800 font-semibold">
+                        <span className="font-sans tabular-nums text-slate-800 font-semibold">
                           {isTcVisible ? user.tcKimlik : '*******'}
                         </span>
                         <button
@@ -261,7 +261,7 @@ export const SporsepetiUserView: React.FC = () => {
                           <p className="text-xs text-slate-500 font-medium">
                             {user.email}
                           </p>
-                          <p className="text-[11px] text-slate-400 font-mono">
+                          <p className="text-[11px] text-slate-400 font-sans tabular-nums">
                             {user.createdAt}
                           </p>
                         </div>
@@ -270,7 +270,7 @@ export const SporsepetiUserView: React.FC = () => {
                       {/* Tc Kimlik Column: masked with toggle eye */}
                       <td className="py-4 px-3 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm font-semibold tracking-wider text-slate-800">
+                          <span className="font-sans tabular-nums text-sm font-semibold tracking-wider text-slate-800">
                             {isTcVisible ? user.tcKimlik : '*******'}
                           </span>
                           <button

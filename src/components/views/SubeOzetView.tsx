@@ -490,7 +490,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
             <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
               <span>Şube Özet & Performans Paneli</span>
               {currentBranch && (
-                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-100/70 text-blue-800 font-mono">
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-100/70 text-blue-800 font-sans tabular-nums">
                   {currentBranch.kod}
                 </span>
               )}
@@ -557,7 +557,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
             >
               <Layers className="w-3.5 h-3.5" />
               <span>Tüm Şubeler (Konsolide)</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-white/20 text-white font-mono">
+              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-white/20 text-white font-sans tabular-nums">
                 {subeler.length}
               </span>
             </button>
@@ -581,7 +581,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
                   />
                   <span>{sube.ad}</span>
                   <span
-                    className={`text-[10px] font-mono px-1 rounded ${
+                    className={`text-[10px] font-sans tabular-nums px-1 rounded ${
                       isSelected ? 'bg-blue-700 text-blue-100' : 'bg-slate-200 text-slate-600'
                     }`}
                   >
@@ -842,7 +842,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
                       <div key={item.month} className="space-y-1">
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-bold text-slate-700 w-24">{item.month}</span>
-                          <div className="flex items-center gap-3 text-[11px] font-mono">
+                          <div className="flex items-center gap-3 text-[11px] font-sans tabular-nums">
                             <span className="text-emerald-700 font-bold">
                               +₺{item.gelir.toLocaleString('tr-TR')}
                             </span>
@@ -976,7 +976,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
 
                 <div className="p-3 bg-slate-50 rounded-xl text-xs flex items-center justify-between">
                   <span className="text-slate-600 font-medium">Toplam Bekleyen Tahsilat:</span>
-                  <span className="font-black text-amber-700 font-mono">
+                  <span className="font-black text-amber-700 font-sans tabular-nums">
                     ₺{branchMetrics.pendingAmount.toLocaleString('tr-TR')}
                   </span>
                 </div>
@@ -1133,7 +1133,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
                               )}
                               <div>
                                 <div className="font-bold text-slate-900">{ath.name}</div>
-                                <div className="text-[10px] font-mono text-slate-400">#{ath.code}</div>
+                                <div className="text-[10px] font-sans tabular-nums text-slate-400">#{ath.code}</div>
                               </div>
                             </div>
                           </td>
@@ -1151,10 +1151,10 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
 
                           <td className="px-4 py-3">
                             <span className="font-medium text-slate-800 block">{ath.parentName}</span>
-                            <span className="text-[10px] text-slate-400 font-mono">{ath.parentPhone}</span>
+                            <span className="text-[10px] text-slate-400 font-sans tabular-nums">{ath.parentPhone}</span>
                           </td>
 
-                          <td className="px-4 py-3 font-bold text-slate-900 font-mono">
+                          <td className="px-4 py-3 font-bold text-slate-900 font-sans tabular-nums">
                             ₺{ath.monthlyFee.toLocaleString('tr-TR')}
                           </td>
 
@@ -1257,7 +1257,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
                         <div>
                           <h4 className="font-bold text-slate-900 text-sm">{coach.name}</h4>
                           <p className="text-xs text-purple-700 font-semibold">{coach.role}</p>
-                          <span className="text-[10px] text-slate-400 font-mono">
+                          <span className="text-[10px] text-slate-400 font-sans tabular-nums">
                             {cSube?.ad || 'Tesis'}
                           </span>
                         </div>
@@ -1291,7 +1291,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
                         <span className="text-[10px] text-slate-400 uppercase font-semibold block">
                           Aylık Hakediş
                         </span>
-                        <span className="font-bold text-slate-800 font-mono">
+                        <span className="font-bold text-slate-800 font-sans tabular-nums">
                           ₺{coach.monthlySalary.toLocaleString('tr-TR')}
                         </span>
                       </div>
@@ -1375,7 +1375,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
                   {filteredTransactions.length > 0 ? (
                     filteredTransactions.map((tx) => (
                       <tr key={tx.id} className="hover:bg-slate-50/60 transition-colors">
-                        <td className="px-4 py-3 font-mono text-slate-500">{tx.date}</td>
+                        <td className="px-4 py-3 font-sans tabular-nums text-slate-500">{tx.date}</td>
 
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
@@ -1420,7 +1420,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
                         </td>
 
                         <td
-                          className={`px-4 py-3 text-right font-black font-mono text-sm ${
+                          className={`px-4 py-3 text-right font-black font-sans tabular-nums text-sm ${
                             tx.type === 'Gelir' ? 'text-emerald-600' : 'text-rose-600'
                           }`}
                         >
@@ -1483,7 +1483,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
                       >
                         <td className="px-4 py-3">
                           <div className="font-bold text-slate-900">{sube.ad}</div>
-                          <span className="text-[10px] font-mono font-semibold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
+                          <span className="text-[10px] font-sans tabular-nums font-semibold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
                             {sube.kod}
                           </span>
                         </td>
@@ -1518,7 +1518,7 @@ export const SubeOzetView: React.FC<SubeOzetViewProps> = ({ onNavigate }) => {
 
                         <td className="px-4 py-3 font-bold text-slate-800">{subeCoaches.length} Eğitmen</td>
 
-                        <td className="px-4 py-3 font-black text-emerald-600 font-mono">
+                        <td className="px-4 py-3 font-black text-emerald-600 font-sans tabular-nums">
                           ₺{(sube.aylikCiro || 120000).toLocaleString('tr-TR')}
                         </td>
 

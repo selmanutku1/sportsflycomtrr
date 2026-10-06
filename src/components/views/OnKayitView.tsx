@@ -1931,7 +1931,7 @@ export const OnKayitView: React.FC = () => {
                   type="text"
                   readOnly
                   value={publicRegistrationLink}
-                  className="flex-1 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-mono select-all outline-none"
+                  className="flex-1 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-sans tabular-nums select-all outline-none"
                 />
                 <button
                   id="btn-copy-public-link"
@@ -2134,7 +2134,7 @@ export const OnKayitView: React.FC = () => {
             <div className="flex items-start justify-between pb-4 border-b border-slate-100">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-xs bg-slate-100 text-slate-800 px-2 py-0.5 rounded">
+                  <span className="font-sans tabular-nums font-bold text-xs bg-slate-100 text-slate-800 px-2 py-0.5 rounded">
                     {selectedRecord.onKayitNo}
                   </span>
                   <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${getStatusBadge(selectedRecord.kayitDurumu)}`}>

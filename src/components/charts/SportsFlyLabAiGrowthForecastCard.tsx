@@ -129,7 +129,7 @@ export const SportsFlyLabAiGrowthForecastCard: React.FC<SportsFlyLabAiGrowthFore
               <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-white">
                 🤖 Yapay Zeka Gelecek Tahminleme &amp; 6 Aylık Gelişim Eğrisisi
               </h3>
-              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[9.5px] font-mono font-bold uppercase">
+              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[9.5px] font-sans tabular-nums font-bold uppercase">
                 AI Powered Model
               </span>
             </div>
@@ -143,7 +143,7 @@ export const SportsFlyLabAiGrowthForecastCard: React.FC<SportsFlyLabAiGrowthFore
           type="button"
           onClick={fetchAiGrowthPrediction}
           disabled={loading}
-          className="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-mono text-xs font-black flex items-center gap-1.5 transition-colors disabled:opacity-50 shrink-0 cursor-pointer"
+          className="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-sans tabular-nums text-xs font-black flex items-center gap-1.5 transition-colors disabled:opacity-50 shrink-0 cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>{loading ? 'Hesaplanıyor...' : 'Yeniden Hesapla'}</span>
@@ -154,53 +154,53 @@ export const SportsFlyLabAiGrowthForecastCard: React.FC<SportsFlyLabAiGrowthFore
       {predictionData && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <div className="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700">
-            <div className="flex items-center justify-between text-[9.5px] text-sky-300 font-mono uppercase font-bold">
+            <div className="flex items-center justify-between text-[9.5px] text-sky-300 font-sans tabular-nums uppercase font-bold">
               <span>6 Aylık Tahmini Boy</span>
               <Ruler className="w-3.5 h-3.5 text-sky-400" />
             </div>
-            <div className="text-lg font-black font-mono text-white mt-1">
+            <div className="text-lg font-black font-sans tabular-nums text-white mt-1">
               {predictionData.predictedMonth6Height} <span className="text-xs font-normal text-slate-300">cm</span>
             </div>
-            <div className="text-[10px] font-mono text-emerald-400 font-bold mt-0.5">
+            <div className="text-[10px] font-sans tabular-nums text-emerald-400 font-bold mt-0.5">
               Bugün {heightVal} cm → +{hGain} cm
             </div>
           </div>
 
           <div className="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700">
-            <div className="flex items-center justify-between text-[9.5px] text-indigo-300 font-mono uppercase font-bold">
+            <div className="flex items-center justify-between text-[9.5px] text-indigo-300 font-sans tabular-nums uppercase font-bold">
               <span>6 Aylık Tahmini Kilo</span>
               <Scale className="w-3.5 h-3.5 text-indigo-400" />
             </div>
-            <div className="text-lg font-black font-mono text-white mt-1">
+            <div className="text-lg font-black font-sans tabular-nums text-white mt-1">
               {predictionData.predictedMonth6Weight} <span className="text-xs font-normal text-slate-300">kg</span>
             </div>
-            <div className="text-[10px] font-mono text-emerald-400 font-bold mt-0.5">
+            <div className="text-[10px] font-sans tabular-nums text-emerald-400 font-bold mt-0.5">
               Bugün {weightVal} kg → +{wGain} kg
             </div>
           </div>
 
           <div className="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700">
-            <div className="flex items-center justify-between text-[9.5px] text-amber-300 font-mono uppercase font-bold">
+            <div className="flex items-center justify-between text-[9.5px] text-amber-300 font-sans tabular-nums uppercase font-bold">
               <span>6 Aylık Tahmini BKİ</span>
               <Activity className="w-3.5 h-3.5 text-amber-400" />
             </div>
-            <div className="text-lg font-black font-mono text-white mt-1">
+            <div className="text-lg font-black font-sans tabular-nums text-white mt-1">
               {predictionData.predictedMonth6Bmi} <span className="text-xs font-normal text-slate-300">kg/m²</span>
             </div>
-            <div className="text-[10px] font-mono text-amber-300 font-bold mt-0.5">
+            <div className="text-[10px] font-sans tabular-nums text-amber-300 font-bold mt-0.5">
               Optimal Fiziksel Denge
             </div>
           </div>
 
           <div className="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700">
-            <div className="flex items-center justify-between text-[9.5px] text-emerald-300 font-mono uppercase font-bold">
+            <div className="flex items-center justify-between text-[9.5px] text-emerald-300 font-sans tabular-nums uppercase font-bold">
               <span>AI Güven Skoru</span>
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
             </div>
-            <div className="text-lg font-black font-mono text-emerald-300 mt-1">
+            <div className="text-lg font-black font-sans tabular-nums text-emerald-300 mt-1">
               %{predictionData.aiConfidenceScore}
             </div>
-            <div className="text-[10px] font-mono text-slate-300 font-bold mt-0.5">
+            <div className="text-[10px] font-sans tabular-nums text-slate-300 font-bold mt-0.5">
               Mirwald &amp; Khamis-Roche
             </div>
           </div>
@@ -210,7 +210,7 @@ export const SportsFlyLabAiGrowthForecastCard: React.FC<SportsFlyLabAiGrowthFore
       {/* 6-Month Recharts Projection Trajectory Chart */}
       {predictionData && predictionData.timelinePoints && (
         <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700 space-y-1.5">
-          <div className="flex items-center justify-between text-[10px] font-mono font-bold text-slate-300 mb-1">
+          <div className="flex items-center justify-between text-[10px] font-sans tabular-nums font-bold text-slate-300 mb-1">
             <span>📊 ÖNÜMÜZDEKİ 6 AYLIK PROJEKSİYON EĞRİSİ (Aylık Büyüme Hızı)</span>
             <span className="text-sky-300">● Boy (cm) &nbsp;&nbsp; ● Kilo (kg)</span>
           </div>
@@ -236,7 +236,7 @@ export const SportsFlyLabAiGrowthForecastCard: React.FC<SportsFlyLabAiGrowthFore
                     if (active && payload && payload.length) {
                       const data = payload[0].payload as GrowthTimelinePoint;
                       return (
-                        <div className="bg-slate-900 border border-slate-700 text-white text-[11px] p-2 rounded-lg font-mono shadow-md">
+                        <div className="bg-slate-900 border border-slate-700 text-white text-[11px] p-2 rounded-lg font-sans tabular-nums shadow-md">
                           <div className="font-extrabold text-sky-300 border-b border-slate-700 pb-1 mb-1">
                             {data.monthLabel} Tahmini
                           </div>
@@ -261,7 +261,7 @@ export const SportsFlyLabAiGrowthForecastCard: React.FC<SportsFlyLabAiGrowthFore
       {predictionData && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
           <div className="p-2.5 rounded-xl bg-slate-800 border border-slate-700 space-y-1">
-            <div className="font-extrabold text-sky-300 text-[10.5px] uppercase font-mono flex items-center gap-1">
+            <div className="font-extrabold text-sky-300 text-[10.5px] uppercase font-sans tabular-nums flex items-center gap-1">
               <Zap className="w-3.5 h-3.5 text-sky-400" />
               <span>Büyüme Eğrisi Analizi</span>
             </div>
@@ -271,7 +271,7 @@ export const SportsFlyLabAiGrowthForecastCard: React.FC<SportsFlyLabAiGrowthFore
           </div>
 
           <div className="p-2.5 rounded-xl bg-slate-800 border border-slate-700 space-y-1">
-            <div className="font-extrabold text-emerald-300 text-[10.5px] uppercase font-mono flex items-center gap-1">
+            <div className="font-extrabold text-emerald-300 text-[10.5px] uppercase font-sans tabular-nums flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
               <span>Beslenme &amp; Rejenerasyon</span>
             </div>
@@ -281,7 +281,7 @@ export const SportsFlyLabAiGrowthForecastCard: React.FC<SportsFlyLabAiGrowthFore
           </div>
 
           <div className="p-2.5 rounded-xl bg-slate-800 border border-slate-700 space-y-1">
-            <div className="font-extrabold text-amber-300 text-[10.5px] uppercase font-mono flex items-center gap-1">
+            <div className="font-extrabold text-amber-300 text-[10.5px] uppercase font-sans tabular-nums flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
               <span>Biyomekanik &amp; Yüklenme</span>
             </div>

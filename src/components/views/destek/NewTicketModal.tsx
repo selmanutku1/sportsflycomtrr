@@ -396,7 +396,7 @@ export const NewTicketModal: React.FC<NewTicketModalProps> = ({
                       <span className="font-medium text-slate-800 dark:text-slate-200 truncate max-w-xs">
                         {file.name}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">({file.size})</span>
+                      <span className="text-[10px] text-slate-400 font-sans tabular-nums">({file.size})</span>
                     </div>
                     <button
                       type="button"

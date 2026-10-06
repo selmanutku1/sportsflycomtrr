@@ -658,7 +658,7 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
                   value={apiKeyInput}
                   onChange={(e) => setApiKeyInput(e.target.value)}
                   placeholder="Örn: sk_live_89234723948..."
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#0b1320] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white font-mono"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#0b1320] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white font-sans tabular-nums"
                 />
               </div>
 
@@ -671,7 +671,7 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
                   value={apiSecretInput}
                   onChange={(e) => setApiSecretInput(e.target.value)}
                   placeholder="••••••••••••••••"
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#0b1320] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white font-mono"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#0b1320] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white font-sans tabular-nums"
                 />
               </div>
 

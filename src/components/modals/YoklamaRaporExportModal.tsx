@@ -403,13 +403,13 @@ export const YoklamaRaporExportModal: React.FC<YoklamaRaporExportModalProps> = (
                   {filteredReportData.length > 0 ? (
                     filteredReportData.map((row) => (
                       <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                        <td className="py-2.5 px-3 font-mono font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                        <td className="py-2.5 px-3 font-sans tabular-nums font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
                           {row.date}
                         </td>
                         <td className="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">
                           {row.groupName}
                         </td>
-                        <td className="py-2.5 px-3 font-mono text-slate-500 whitespace-nowrap">
+                        <td className="py-2.5 px-3 font-sans tabular-nums text-slate-500 whitespace-nowrap">
                           #{row.athleteCode}
                         </td>
                         <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-white whitespace-nowrap">

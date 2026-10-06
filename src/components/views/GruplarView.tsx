@@ -695,7 +695,7 @@ export const GruplarView: React.FC<GruplarViewProps> = ({ onNavigate }) => {
                           {grup.schedule.days?.join(', ') || 'Programlı Günler'}
                         </span>
                       </div>
-                      <span className="font-mono font-bold text-[11px] text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200">
+                      <span className="font-sans tabular-nums font-bold text-[11px] text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200">
                         {grup.schedule.time}
                       </span>
                     </div>
@@ -866,7 +866,7 @@ export const GruplarView: React.FC<GruplarViewProps> = ({ onNavigate }) => {
                             <p className="font-semibold text-slate-800">
                               {grup.schedule.days?.join(', ')}
                             </p>
-                            <p className="text-[11px] text-slate-500 font-mono">{grup.schedule.time}</p>
+                            <p className="text-[11px] text-slate-500 font-sans tabular-nums">{grup.schedule.time}</p>
                           </div>
                         ) : (
                           <span className="text-xs text-slate-400">-</span>
@@ -1148,7 +1148,7 @@ export const GruplarView: React.FC<GruplarViewProps> = ({ onNavigate }) => {
                               <div className="min-w-0">
                                 <p className="font-bold text-slate-900 text-sm truncate">{m.name}</p>
                                 <p className="text-[11px] text-slate-500">
-                                  Kod: <span className="font-mono text-slate-700">{m.code}</span>
+                                  Kod: <span className="font-sans tabular-nums text-slate-700">{m.code}</span>
                                   {m.parentName && ` • Veli: ${m.parentName}`}
                                   {m.birthYear && ` • D.Yılı: ${m.birthYear}`}
                                 </p>
@@ -1213,7 +1213,7 @@ export const GruplarView: React.FC<GruplarViewProps> = ({ onNavigate }) => {
 
                       <div className="bg-white p-3.5 rounded-xl border border-slate-200 space-y-1">
                         <span className="text-[11px] font-semibold text-slate-500">Saat Aralığı:</span>
-                        <p className="font-bold text-slate-900 text-sm font-mono">
+                        <p className="font-bold text-slate-900 text-sm font-sans tabular-nums">
                           {detailModalGroup.schedule?.time || '17:30 - 19:00'}
                         </p>
                       </div>

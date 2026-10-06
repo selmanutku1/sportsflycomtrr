@@ -69,7 +69,7 @@ export const RotaSportsFlyHeaderBadge: React.FC<RotaSportsFlyHeaderBadgeProps> =
           <SportsFlyVectorMark className="w-5 h-5 shrink-0" />
           <div className="text-left">
             <div
-              className={`text-[7.5px] font-mono font-extrabold uppercase tracking-wider leading-none ${
+              className={`text-[7.5px] font-sans font-extrabold uppercase tracking-wider leading-none ${
                 isDark ? 'text-white/60' : 'text-slate-400'
               }`}
             >
@@ -158,7 +158,7 @@ export const RotaSportsFlyFooterBadge: React.FC<RotaSportsFlyFooterBadgeProps> =
             </div>
             <div>
               <div className="flex items-center gap-1 leading-tight">
-                <span className="text-[8px] font-mono font-bold text-slate-400 uppercase">
+                <span className="text-[8px] font-sans font-bold text-slate-400 uppercase">
                   Powered by
                 </span>
                 <span className="text-[10px] font-black tracking-tight text-slate-900">
@@ -172,7 +172,7 @@ export const RotaSportsFlyFooterBadge: React.FC<RotaSportsFlyFooterBadgeProps> =
 
       {/* Right: Verification & Page Index */}
       {(clubName || athleteCode || pageText) && (
-        <div className="flex items-center justify-between sm:justify-end print:justify-end gap-2.5 text-[10px] shrink-0 font-mono">
+        <div className="flex items-center justify-between sm:justify-end print:justify-end gap-2.5 text-[10px] shrink-0 font-sans">
           {clubName && (
             <div className="text-right hidden sm:block print:block font-bold text-slate-700 uppercase tracking-tight">
               {clubName}

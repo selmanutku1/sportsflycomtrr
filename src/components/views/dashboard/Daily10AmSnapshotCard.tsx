@@ -172,7 +172,7 @@ export const Daily10AmSnapshotCard: React.FC<Daily10AmSnapshotCardProps> = ({ on
               <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium block leading-none">
                 Sonraki 10:00 Sayımı:
               </span>
-              <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
+              <span className="text-xs font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200">
                 {nextCountdown || '00:00:00'}
               </span>
             </div>
@@ -217,7 +217,7 @@ export const Daily10AmSnapshotCard: React.FC<Daily10AmSnapshotCardProps> = ({ on
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
                   Bugün Saat 10:00 Sayımı
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-200/70 dark:bg-blue-900/60 text-blue-900 dark:text-blue-200 font-bold">
+                <span className="text-[10px] font-sans tabular-nums px-1.5 py-0.5 rounded bg-blue-200/70 dark:bg-blue-900/60 text-blue-900 dark:text-blue-200 font-bold">
                   {latestSnapshot?.time || '10:00:00'}
                 </span>
               </div>
@@ -367,7 +367,7 @@ export const Daily10AmSnapshotCard: React.FC<Daily10AmSnapshotCardProps> = ({ on
                         >
                           {/* Value tooltip on hover/select */}
                           <div
-                            className={`text-[10px] font-bold font-mono mb-1 transition-all ${
+                            className={`text-[10px] font-bold font-sans tabular-nums mb-1 transition-all ${
                               isSelected
                                 ? 'text-blue-600 dark:text-blue-400 scale-110'
                                 : 'text-slate-500 dark:text-slate-400 opacity-0 group-hover:opacity-100'
@@ -412,7 +412,7 @@ export const Daily10AmSnapshotCard: React.FC<Daily10AmSnapshotCardProps> = ({ on
                   <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                     Seçili 10:00 Sayım Detayı
                   </span>
-                  <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md">
+                  <span className="text-xs font-sans tabular-nums font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md">
                     {selectedSnapshot?.dateFormatted} ({selectedSnapshot?.dayName})
                   </span>
                 </div>
@@ -420,7 +420,7 @@ export const Daily10AmSnapshotCard: React.FC<Daily10AmSnapshotCardProps> = ({ on
                 <div className="mt-3 space-y-2.5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-500">Sayım Saati:</span>
-                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                    <span className="font-sans tabular-nums font-bold text-slate-800 dark:text-slate-200">
                       {selectedSnapshot?.time}
                     </span>
                   </div>
@@ -519,7 +519,7 @@ export const Daily10AmSnapshotCard: React.FC<Daily10AmSnapshotCardProps> = ({ on
                             <span className="text-slate-400 dark:text-slate-500 font-normal">({snap.dayName})</span>
                           </div>
                         </td>
-                        <td className="py-2.5 px-3 font-mono text-slate-600 dark:text-slate-400">
+                        <td className="py-2.5 px-3 font-sans tabular-nums text-slate-600 dark:text-slate-400">
                           {snap.time}
                         </td>
                         <td className="py-2.5 px-3">

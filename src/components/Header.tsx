@@ -1304,7 +1304,7 @@ export const Header: React.FC<HeaderProps> = ({
                       <Bell className="w-4 h-4 text-slate-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                       <span>Bildirim Tercihleri</span>
                     </span>
-                    <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded-md font-mono">
+                    <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded-md font-sans tabular-nums">
                       SMS/E-posta
                     </span>
                   </button>
@@ -1336,7 +1336,7 @@ export const Header: React.FC<HeaderProps> = ({
                       <SportsFlyIcon className="w-4 h-4" />
                       <span>Sistem Güncellemeleri</span>
                     </span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold font-mono">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-extrabold font-sans tabular-nums">
                       v2.8.5 Yeni
                     </span>
                   </button>

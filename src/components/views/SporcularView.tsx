@@ -598,7 +598,7 @@ export const SporcularView: React.FC<SporcularViewProps> = ({ onNavigate }) => {
                         <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 flex items-center gap-1.5">
                           <span>{sporcu.facility}</span>
                           <span>•</span>
-                          <span className="font-mono">{sporcu.code}</span>
+                          <span className="font-sans tabular-nums">{sporcu.code}</span>
                         </div>
                       </div>
                     </div>
@@ -751,7 +751,7 @@ export const SporcularView: React.FC<SporcularViewProps> = ({ onNavigate }) => {
                                 </>
                               )}
                             </div>
-                            <div className="text-[10px] font-mono text-slate-400 dark:text-slate-500 mt-0.5">
+                            <div className="text-[10px] font-sans tabular-nums text-slate-400 dark:text-slate-500 mt-0.5">
                               Lisans Kodu: <strong className="text-slate-600 dark:text-slate-400">{sporcu.code}</strong>
                             </div>
                           </div>
@@ -776,7 +776,7 @@ export const SporcularView: React.FC<SporcularViewProps> = ({ onNavigate }) => {
                       </td>
 
                       {/* Kayıt Tarihi */}
-                      <td className="py-3 px-4 whitespace-nowrap text-slate-500 dark:text-slate-400 font-mono text-[11px]">
+                      <td className="py-3 px-4 whitespace-nowrap text-slate-500 dark:text-slate-400 font-sans tabular-nums text-[11px]">
                         {sporcu.date}
                       </td>
 
@@ -1168,7 +1168,7 @@ export const SporcularView: React.FC<SporcularViewProps> = ({ onNavigate }) => {
                   type="text"
                   readOnly
                   value={inviteUrl}
-                  className="bg-transparent text-xs text-slate-700 dark:text-slate-300 font-mono flex-1 outline-hidden px-2"
+                  className="bg-transparent text-xs text-slate-700 dark:text-slate-300 font-sans tabular-nums flex-1 outline-hidden px-2"
                 />
                 <button
                   onClick={() => {

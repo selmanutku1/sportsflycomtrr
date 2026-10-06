@@ -697,7 +697,7 @@ export const YoneticilerView: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-slate-400 block text-[11px] mb-0.5">Kod / Tarih:</span>
-                    <span className="font-mono text-slate-900 font-semibold text-xs">{manager.code}</span>
+                    <span className="font-sans tabular-nums text-slate-900 font-semibold text-xs">{manager.code}</span>
                     <span className="text-[11px] text-slate-500 block">{manager.createdAt}</span>
                   </div>
                 </div>
@@ -862,7 +862,7 @@ export const YoneticilerView: React.FC = () => {
                           <p className="text-sm text-slate-600 leading-snug">
                             {manager.email}
                           </p>
-                          <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
+                          <div className="flex items-center gap-2 text-xs text-slate-400 font-sans tabular-nums">
                             <span>{manager.code}</span>
                             <span>•</span>
                             <span className="font-sans text-slate-400">{manager.createdAt}</span>

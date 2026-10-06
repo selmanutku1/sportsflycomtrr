@@ -354,7 +354,7 @@ export const KulupEvraklariView: React.FC<KulupEvraklariViewProps> = ({
                               {evrak.title}
                             </p>
                             <p className="text-[11px] text-slate-500 flex items-center gap-2 pt-0.5">
-                              <span className="font-mono uppercase font-bold text-slate-600">
+                              <span className="font-sans tabular-nums uppercase font-bold text-slate-600">
                                 {evrak.fileType}
                               </span>
                               <span>•</span>
@@ -395,7 +395,7 @@ export const KulupEvraklariView: React.FC<KulupEvraklariViewProps> = ({
                         <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-800 border border-slate-200 block w-fit mb-1">
                           {evrak.category}
                         </span>
-                        <span className="text-[11px] font-mono text-slate-500 font-semibold block">
+                        <span className="text-[11px] font-sans tabular-nums text-slate-500 font-semibold block">
                           {evrak.documentNumber || '-'}
                         </span>
                       </td>
@@ -408,7 +408,7 @@ export const KulupEvraklariView: React.FC<KulupEvraklariViewProps> = ({
                       {/* Geçerlilik Tarihi */}
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <div className="space-y-0.5">
-                          <span className="text-xs font-bold font-mono text-slate-900 block">
+                          <span className="text-xs font-bold font-sans tabular-nums text-slate-900 block">
                             {evrak.expiryDate || 'Süresiz'}
                           </span>
                           {isWarning && (
@@ -502,7 +502,7 @@ export const KulupEvraklariView: React.FC<KulupEvraklariViewProps> = ({
                   <h3 className="font-bold text-slate-900 text-sm sm:text-base">
                     Evrak Bilgi Kartı
                   </h3>
-                  <p className="text-[11px] text-slate-500 font-mono">
+                  <p className="text-[11px] text-slate-500 font-sans tabular-nums">
                     {previewEvrak.documentNumber}
                   </p>
                 </div>

@@ -13,7 +13,6 @@ import {
 } from 'recharts';
 import {
   TrendingUp,
-  BarChart2,
   CheckCircle2,
   Target,
   Users,

@@ -394,7 +394,7 @@ export const InitialMeasurementGroupComparisonChart: React.FC<InitialMeasurement
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="bg-slate-900 border border-slate-700 text-white text-[10.5px] p-2 rounded-lg font-mono">
+                    <div className="bg-slate-900 border border-slate-700 text-white text-[10.5px] p-2 rounded-lg font-sans tabular-nums">
                       <div className="font-extrabold text-sky-300 border-b border-slate-700 pb-1 mb-1">
                         {data.subject} (1. Test)
                       </div>
@@ -674,7 +674,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
             <span>%50 Normatif Referans Sınırı</span>
           </span>
         </div>
-        <span className="font-mono text-[10px] text-slate-500">D3.js Çok Boyutlu Polar Radar Analizi</span>
+        <span className="font-sans tabular-nums text-[10px] text-slate-500">D3.js Çok Boyutlu Polar Radar Analizi</span>
       </div>
 
       {/* Top 2-Column Radar Grid: Motor Performance Radar + Body Composition Radar */}
@@ -690,7 +690,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
                 Sürat, kuvvet, çabukluk, denge, esneklik ve reaksiyon yüzdelik dağılımı (0–100%)
               </p>
             </div>
-            <span className="text-xs font-mono font-black text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+            <span className="text-xs font-sans tabular-nums font-black text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
               Ort: %{report.scoreHistory.p3Score}
             </span>
           </div>
@@ -714,7 +714,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
                   <text
                     x={motorRadar.center + 3}
                     y={motorRadar.center - motorRadar.rScale(level) + 8}
-                    className="text-[7px] font-mono fill-slate-400"
+                    className="text-[7px] font-sans tabular-nums fill-slate-400"
                   >
                     %{level}
                   </text>
@@ -801,7 +801,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
               return (
                 <div key={a.row.id} className="flex items-center justify-between border-b border-slate-100 py-0.5">
                   <span className="text-slate-700 font-medium truncate pr-1">{a.row.name}</span>
-                  <span className="font-mono font-bold text-slate-900 shrink-0">
+                  <span className="font-sans tabular-nums font-bold text-slate-900 shrink-0">
                     %{a.p1Norm}→<strong className="text-rose-700">%{a.p3Norm}</strong>{' '}
                     <span className={diff >= 0 ? 'text-emerald-700' : 'text-amber-700'}>
                       ({diff >= 0 ? `+${diff}` : diff})
@@ -824,7 +824,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
                 Boy, ağırlık, BKİ, deri kıvrım kalınlıkları (skinfold) ve çevre ölçümleri dengesi
               </p>
             </div>
-            <span className="text-xs font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+            <span className="text-xs font-sans tabular-nums font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
               {report.somatotype.m3.category}
             </span>
           </div>
@@ -848,7 +848,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
                   <text
                     x={bodyRadar.center + 3}
                     y={bodyRadar.center - bodyRadar.rScale(level) + 8}
-                    className="text-[7px] font-mono fill-slate-400"
+                    className="text-[7px] font-sans tabular-nums fill-slate-400"
                   >
                     %{level}
                   </text>
@@ -926,7 +926,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
             {bodyRadar.axes.map((a) => (
               <div key={a.row.id} className="flex items-center justify-between border-b border-slate-100 py-0.5">
                 <span className="text-slate-700 font-medium truncate pr-1">{a.row.name}</span>
-                <span className="font-mono font-bold text-slate-900 shrink-0">
+                <span className="font-sans tabular-nums font-bold text-slate-900 shrink-0">
                   {a.row.m3} {a.row.unit} (<strong className="text-blue-700">%{a.p3Norm}</strong>)
                 </span>
               </div>
@@ -946,7 +946,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
               I. Ölçüm, II. Ölçüm ve III. Ölçüm (Güncel) normatif yüzdelik dilim ilerlemesi
             </p>
           </div>
-          <span className="text-[10px] font-mono font-bold text-emerald-700">
+          <span className="text-[10px] font-sans tabular-nums font-bold text-emerald-700">
             Hedef Eşik: ≥ %65 Yüzdelik
           </span>
         </div>
@@ -958,7 +958,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
               <div key={idx} className="bg-white p-2.5 rounded-lg border border-slate-200/90">
                 <div className="flex items-center justify-between text-[11px] mb-1.5">
                   <span className="font-bold text-slate-900">{c.name}</span>
-                  <span className="font-mono text-[10px]">
+                  <span className="font-sans tabular-nums text-[10px]">
                     I: %{c.p1} · II: %{c.p2} ·{' '}
                     <strong className="text-rose-700">III: %{c.p3}</strong>{' '}
                     <span className="text-emerald-700 font-bold">
@@ -969,21 +969,21 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
                 {/* 3 Stacked/Comparative Vector Progress Bars */}
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 text-[9px] font-mono text-slate-400">I.</span>
+                    <span className="w-6 text-[9px] font-sans tabular-nums text-slate-400">I.</span>
                     <svg viewBox="0 0 200 6" preserveAspectRatio="none" className="flex-1 h-1.5 rounded-full overflow-hidden block">
                       <rect x="0" y="0" width="200" height="6" rx="3" fill="#f1f5f9" />
                       <rect x="0" y="0" width={Math.max(4, Math.min(200, c.p1 * 2))} height="6" rx="3" fill="#94a3b8" />
                     </svg>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="w-6 text-[9px] font-mono text-blue-600">II.</span>
+                    <span className="w-6 text-[9px] font-sans tabular-nums text-blue-600">II.</span>
                     <svg viewBox="0 0 200 6" preserveAspectRatio="none" className="flex-1 h-1.5 rounded-full overflow-hidden block">
                       <rect x="0" y="0" width="200" height="6" rx="3" fill="#f1f5f9" />
                       <rect x="0" y="0" width={Math.max(4, Math.min(200, c.p2 * 2))} height="6" rx="3" fill="#3b82f6" />
                     </svg>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="w-6 text-[9px] font-mono font-bold text-rose-700">III.</span>
+                    <span className="w-6 text-[9px] font-sans tabular-nums font-bold text-rose-700">III.</span>
                     <svg viewBox="0 0 200 8" preserveAspectRatio="none" className="flex-1 h-2 rounded-full overflow-hidden block">
                       <rect x="0" y="0" width="200" height="8" rx="4" fill="#f1f5f9" />
                       <rect x="0" y="0" width={Math.max(4, Math.min(200, c.p3 * 2))} height="8" rx="4" fill="#e11d48" />
@@ -1002,7 +1002,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
           <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
             Biyomotorik Radar Denge Katsayısı
           </div>
-          <div className="text-base font-black font-mono text-slate-900 mt-1">
+          <div className="text-base font-black font-sans tabular-nums text-slate-900 mt-1">
             %{report.scoreHistory.p3Score} · Dengeli Profil
           </div>
           <p className="text-[10px] text-slate-600 mt-1 leading-relaxed">
@@ -1014,7 +1014,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
           <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
             Alt / Üst Ekstremite Kuvvet Simetrisi
           </div>
-          <div className="text-base font-black font-mono text-blue-700 mt-1">
+          <div className="text-base font-black font-sans tabular-nums text-blue-700 mt-1">
             Optimal Koridor (±0.5 SD)
           </div>
           <p className="text-[10px] text-slate-600 mt-1 leading-relaxed">
@@ -1026,7 +1026,7 @@ export const SportsFlyLabKarnePage5RadarContent: React.FC<{ report: SportsFlyLab
           <div className="text-[10px] font-bold uppercase tracking-wider text-sky-400">
             Antropometrik &amp; Motor Uyum
           </div>
-          <div className="text-base font-black font-mono text-emerald-400 mt-1">
+          <div className="text-base font-black font-sans tabular-nums text-emerald-400 mt-1">
             {report.somatotype.m3.category}
           </div>
           <p className="text-[10px] text-slate-300 mt-1 leading-relaxed">
@@ -1170,10 +1170,10 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+            <span className="text-xs font-sans tabular-nums font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
               Net Gelişim: {netScoreGain >= 0 ? `+${netScoreGain}` : netScoreGain} Puan
             </span>
-            <span className="text-xs font-mono font-black text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200">
+            <span className="text-xs font-sans tabular-nums font-black text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200">
               Hedef: %{overallTarget}
             </span>
           </div>
@@ -1206,7 +1206,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
                     x={heroLine.margin.left - 8}
                     y={t.y + 3}
                     textAnchor="end"
-                    className="text-[9px] font-mono fill-slate-400"
+                    className="text-[9px] font-sans tabular-nums fill-slate-400"
                   >
                     %{t.val}
                   </text>
@@ -1227,7 +1227,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
                 x={heroLine.width - heroLine.margin.right - 4}
                 y={heroLine.refY - 5}
                 textAnchor="end"
-                className="text-[8px] font-mono font-bold fill-emerald-700"
+                className="text-[8px] font-sans tabular-nums font-bold fill-emerald-700"
               >
                 Normatif İdeal Referans (%65)
               </text>
@@ -1269,7 +1269,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
                     x={pt.x}
                     y={heroLine.height - 4}
                     textAnchor="middle"
-                    className="text-[8px] font-mono fill-slate-400"
+                    className="text-[8px] font-sans tabular-nums fill-slate-400"
                   >
                     {pt.date}
                   </text>
@@ -1285,7 +1285,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
                     x={pt.x}
                     y={pt.y - 10}
                     textAnchor="middle"
-                    className={`text-[10px] font-mono font-extrabold ${
+                    className={`text-[10px] font-sans tabular-nums font-extrabold ${
                       pt.isTarget ? 'fill-rose-700' : 'fill-slate-900'
                     }`}
                   >
@@ -1322,7 +1322,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
                     {pt.period}
                   </div>
                   <div
-                    className={`text-[9px] font-mono ${
+                    className={`text-[9px] font-sans tabular-nums ${
                       idx === 2 ? 'text-slate-300' : 'text-slate-400'
                     }`}
                   >
@@ -1330,7 +1330,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
                   </div>
                 </div>
                 <div
-                  className={`text-sm font-black font-mono ${
+                  className={`text-sm font-black font-sans tabular-nums ${
                     pt.isTarget
                       ? 'text-rose-700'
                       : idx === 2
@@ -1358,7 +1358,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
                 <h4 className="text-xs font-extrabold text-slate-900">{sc.title}</h4>
                 <p className="text-[10px] text-slate-500">{sc.subtitle}</p>
               </div>
-              <span className="text-[10px] font-mono font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded shrink-0">
+              <span className="text-[10px] font-sans tabular-nums font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded shrink-0">
                 İdeal: {sc.refMid} {sc.unit}
               </span>
             </div>
@@ -1381,7 +1381,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
                     x={sc.layout.margin.left - 6}
                     y={t.y + 3}
                     textAnchor="end"
-                    className="text-[8px] font-mono fill-slate-400"
+                    className="text-[8px] font-sans tabular-nums fill-slate-400"
                   >
                     {t.val}
                   </text>
@@ -1440,7 +1440,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
                     x={pt.x}
                     y={pt.y - 8}
                     textAnchor="middle"
-                    className={`text-[9px] font-mono font-extrabold ${
+                    className={`text-[9px] font-sans tabular-nums font-extrabold ${
                       pt.isTarget ? 'fill-rose-700' : 'fill-slate-900'
                     }`}
                   >
@@ -1450,7 +1450,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
               ))}
             </svg>
 
-            <div className="mt-1 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-600">
+            <div className="mt-1 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px] font-sans tabular-nums text-slate-600">
               <span>
                 I: <strong>{sc.points[0].value}</strong> → III: <strong className="text-slate-900">{sc.points[2].value} {sc.unit}</strong>
               </span>
@@ -1473,7 +1473,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
               Sporcunun 3 ölçüm periyodundaki ham ölçüm değerleri, yüzdelik dilimi ve net gelişim yönü
             </p>
           </div>
-          <span className="text-[10px] font-mono font-bold text-emerald-700">
+          <span className="text-[10px] font-sans tabular-nums font-bold text-emerald-700">
             Bireysel Gelişim Takibi
           </span>
         </div>
@@ -1490,7 +1490,7 @@ export const SportsFlyLabKarnePage6LineContent: React.FC<{ report: SportsFlyLabR
                 <div className="text-[10px] font-bold text-slate-900 truncate" title={row.name}>
                   {row.name}
                 </div>
-                <div className="flex items-baseline justify-between mt-1 font-mono">
+                <div className="flex items-baseline justify-between mt-1 font-sans tabular-nums">
                   <span className="text-[10px] text-slate-500">
                     {row.m1}→<strong className="text-slate-900">{row.m3}</strong>
                   </span>
@@ -1710,7 +1710,7 @@ export const SportsFlyLabPerformanceCharts: React.FC<SportsFlyLabPerformanceChar
               <button
                 type="button"
                 onClick={() => setShowPeriod1((v) => !v)}
-                className={`px-2 py-1 rounded-md font-mono font-bold border transition-colors cursor-pointer ${
+                className={`px-2 py-1 rounded-md font-sans tabular-nums font-bold border transition-colors cursor-pointer ${
                   showPeriod1
                     ? 'bg-slate-200/80 dark:bg-slate-800 border-slate-400 text-slate-800 dark:text-slate-200'
                     : 'border-slate-200 text-slate-400 opacity-50'
@@ -1721,7 +1721,7 @@ export const SportsFlyLabPerformanceCharts: React.FC<SportsFlyLabPerformanceChar
               <button
                 type="button"
                 onClick={() => setShowPeriod2((v) => !v)}
-                className={`px-2 py-1 rounded-md font-mono font-bold border transition-colors cursor-pointer ${
+                className={`px-2 py-1 rounded-md font-sans tabular-nums font-bold border transition-colors cursor-pointer ${
                   showPeriod2
                     ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-400 text-blue-700 dark:text-blue-300'
                     : 'border-slate-200 text-slate-400 opacity-50'
@@ -1732,7 +1732,7 @@ export const SportsFlyLabPerformanceCharts: React.FC<SportsFlyLabPerformanceChar
               <button
                 type="button"
                 onClick={() => setShowPeriod3((v) => !v)}
-                className={`px-2 py-1 rounded-md font-mono font-bold border transition-colors cursor-pointer ${
+                className={`px-2 py-1 rounded-md font-sans tabular-nums font-bold border transition-colors cursor-pointer ${
                   showPeriod3
                     ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-700 dark:text-rose-300'
                     : 'border-slate-200 text-slate-400 opacity-50'
@@ -1763,7 +1763,7 @@ export const SportsFlyLabPerformanceCharts: React.FC<SportsFlyLabPerformanceChar
                   <text
                     x={radarGeometry.center + 4}
                     y={radarGeometry.center - radarGeometry.rScale(level) + 9}
-                    className="text-[8px] font-mono fill-slate-400"
+                    className="text-[8px] font-sans tabular-nums fill-slate-400"
                   >
                     %{level}
                   </text>
@@ -1866,7 +1866,7 @@ export const SportsFlyLabPerformanceCharts: React.FC<SportsFlyLabPerformanceChar
                     {hoveredAxisData.row.name}{' '}
                     <span className="text-slate-400 font-normal">({hoveredAxisData.row.unit})</span>
                   </div>
-                  <div className="flex items-center gap-3 font-mono text-[11px]">
+                  <div className="flex items-center gap-3 font-sans tabular-nums text-[11px]">
                     <span className="text-slate-500">I: {hoveredAxisData.row.m1}</span>
                     <span className="text-blue-600">II: {hoveredAxisData.row.m2}</span>
                     <span className="font-extrabold text-rose-600">
@@ -1935,7 +1935,7 @@ export const SportsFlyLabPerformanceCharts: React.FC<SportsFlyLabPerformanceChar
                     x={d3LineLayout.margin.left - 8}
                     y={t.y + 3}
                     textAnchor="end"
-                    className="text-[9px] font-mono fill-slate-400"
+                    className="text-[9px] font-sans tabular-nums fill-slate-400"
                   >
                     {t.val}
                   </text>
@@ -1955,7 +1955,7 @@ export const SportsFlyLabPerformanceCharts: React.FC<SportsFlyLabPerformanceChar
                 x={d3LineLayout.width - d3LineLayout.margin.right - 2}
                 y={d3LineLayout.refY - 5}
                 textAnchor="end"
-                className="text-[8px] font-mono font-bold fill-emerald-700"
+                className="text-[8px] font-sans tabular-nums font-bold fill-emerald-700"
               >
                 Normatif İdeal ({lineChartData.refMid} {lineChartData.unit})
               </text>
@@ -2002,7 +2002,7 @@ export const SportsFlyLabPerformanceCharts: React.FC<SportsFlyLabPerformanceChar
                       x={pt.x}
                       y={d3LineLayout.height - 6}
                       textAnchor="middle"
-                      className="text-[8px] font-mono fill-slate-400"
+                      className="text-[8px] font-sans tabular-nums fill-slate-400"
                     >
                       {pt.date}
                     </text>
@@ -2020,7 +2020,7 @@ export const SportsFlyLabPerformanceCharts: React.FC<SportsFlyLabPerformanceChar
                       x={pt.x}
                       y={pt.y - 10}
                       textAnchor="middle"
-                      className={`text-[10px] font-mono font-extrabold ${
+                      className={`text-[10px] font-sans tabular-nums font-extrabold ${
                         pt.isTarget
                           ? 'fill-rose-600'
                           : 'fill-slate-900 dark:fill-white'
@@ -2035,7 +2035,7 @@ export const SportsFlyLabPerformanceCharts: React.FC<SportsFlyLabPerformanceChar
           </div>
 
           <div className="px-3.5 py-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-4 font-mono">
+            <div className="flex items-center gap-4 font-sans tabular-nums">
               <span className="text-slate-500">
                 I. Ölçüm: <strong className="text-slate-800 dark:text-slate-200">{lineChartData.points[0].value}</strong>
               </span>
@@ -2329,7 +2329,7 @@ export const SporcuKarnePerformanceCharts: React.FC<SporcuKarnePerformanceCharts
                 <text
                   x={d3Radar.center + 3}
                   y={d3Radar.center - d3Radar.rScale(lvl) + 8}
-                  className="text-[7px] font-mono fill-slate-400"
+                  className="text-[7px] font-sans tabular-nums fill-slate-400"
                 >
                   %{lvl}
                 </text>
@@ -2457,7 +2457,7 @@ export const SporcuKarnePerformanceCharts: React.FC<SporcuKarnePerformanceCharts
                   x={d3Progression.margin.left - 8}
                   y={t.y + 3}
                   textAnchor="end"
-                  className="text-[9px] font-mono fill-slate-400"
+                  className="text-[9px] font-sans tabular-nums fill-slate-400"
                 >
                   %{t.val}
                 </text>
@@ -2515,7 +2515,7 @@ export const SporcuKarnePerformanceCharts: React.FC<SporcuKarnePerformanceCharts
                     x={cx}
                     y={cy - 9}
                     textAnchor="middle"
-                    className={`text-[9px] font-mono font-extrabold ${
+                    className={`text-[9px] font-sans tabular-nums font-extrabold ${
                       idx === 3 ? 'fill-rose-700' : 'fill-slate-900'
                     }`}
                   >
@@ -2609,17 +2609,17 @@ export const SecondMeasurementComparisonPanel: React.FC<SecondMeasurementPanelPr
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-sans">
         <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
           <span className="text-[9.5px] font-bold text-slate-500 uppercase block">1. Ölçüm (Önceki - {report.date1})</span>
-          <span className="text-base font-black text-slate-700 mt-0.5 block font-mono">%{p1Score} Puan</span>
+          <span className="text-base font-black text-slate-700 mt-0.5 block font-sans tabular-nums">%{p1Score} Puan</span>
           <span className="text-[9px] text-slate-500">Başlangıç Seviyesi</span>
         </div>
         <div className="p-2.5 rounded-xl bg-sky-50/80 border-2 border-sky-400">
           <span className="text-[9.5px] font-extrabold text-sky-900 uppercase block">2. Ölçüm (Mevcut - {report.date2})</span>
-          <span className="text-lg font-black text-sky-700 mt-0.5 block font-mono">%{p2Score} Puan</span>
+          <span className="text-lg font-black text-sky-700 mt-0.5 block font-sans tabular-nums">%{p2Score} Puan</span>
           <span className="text-[9.5px] font-bold text-emerald-700">+%{p2Score - p1Score} İlerleme</span>
         </div>
         <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
           <span className="text-[9.5px] font-bold text-slate-500 uppercase block">Dönemsel Değişim (Δ)</span>
-          <span className={`text-base font-black mt-0.5 block font-mono ${isProgress ? 'text-emerald-700' : 'text-amber-700'}`}>
+          <span className={`text-base font-black mt-0.5 block font-sans tabular-nums ${isProgress ? 'text-emerald-700' : 'text-amber-700'}`}>
             {isProgress ? `+${scoreDiff}` : scoreDiff} Puan
           </span>
           <span className="text-[9px] text-slate-500">1. → 2. Ölçüm Farkı</span>
@@ -2651,9 +2651,9 @@ export const SecondMeasurementComparisonPanel: React.FC<SecondMeasurementPanelPr
               {comparisonRows.map((row) => (
                 <tr key={row.id} className="hover:bg-sky-50/50 transition-colors">
                   <td className="py-1.5 px-2.5 font-bold text-slate-900">{row.name} ({row.unit})</td>
-                  <td className="py-1.5 px-1.5 text-center text-slate-600 font-mono">{row.m1}</td>
-                  <td className="py-1.5 px-1.5 text-center font-black text-sky-900 bg-sky-50 font-mono">{row.m2}</td>
-                  <td className="py-1.5 px-2 text-center font-bold font-mono">
+                  <td className="py-1.5 px-1.5 text-center text-slate-600 font-sans tabular-nums">{row.m1}</td>
+                  <td className="py-1.5 px-1.5 text-center font-black text-sky-900 bg-sky-50 font-sans tabular-nums">{row.m2}</td>
+                  <td className="py-1.5 px-2 text-center font-bold font-sans tabular-nums">
                     <span className={row.isPositive ? 'text-emerald-700' : 'text-rose-600'}>
                       {row.delta >= 0 ? `+${row.delta}` : row.delta} {row.unit}
                     </span>
@@ -2743,7 +2743,7 @@ export const ThreeWayGroupTargetAthleteComparisonChart: React.FC<ThreeWayCompari
             Motor Biyomotor Performans Üçlü Veri Karşılaştırması
           </h3>
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+        <div className="flex flex-wrap items-center gap-2 text-xs font-sans tabular-nums">
           <span className="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-semibold">
             Grup Ort: %{grpAvgScore}
           </span>

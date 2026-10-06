@@ -177,7 +177,7 @@ export const ReferralProgramView: React.FC<{ onNavigate?: (page: any) => void }>
           Bu bağlantıyı tanıdıklarınıza, akrabalarınıza veya diğer velilere gönderdiğinizde; ön kayıt sayfasında adınız ve telefon numaranız otomatik eşleşir ve kayıt tamamlandığında indiriminiz anında hesabınıza yansır.
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-3 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
-          <code className="text-xs text-blue-600 dark:text-blue-400 font-mono truncate w-full px-2">
+          <code className="text-xs text-blue-600 dark:text-blue-400 font-sans tabular-nums truncate w-full px-2">
             {referralLink}
           </code>
           <button
@@ -234,7 +234,7 @@ export const ReferralProgramView: React.FC<{ onNavigate?: (page: any) => void }>
                       {ref.branch}
                     </span>
                   </td>
-                  <td className="py-4 px-6 font-mono text-slate-500 flex items-center gap-1.5">
+                  <td className="py-4 px-6 font-sans tabular-nums text-slate-500 flex items-center gap-1.5">
                     <Phone className="w-3.5 h-3.5 text-slate-400" />
                     <span>{ref.parentPhone}</span>
                   </td>

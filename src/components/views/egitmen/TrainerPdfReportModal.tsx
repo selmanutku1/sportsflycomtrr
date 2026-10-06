@@ -287,7 +287,7 @@ export const TrainerPdfReportModal: React.FC<TrainerPdfReportModalProps> = ({
                         </span>
                       </div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                        {targetTrainer.title || 'Başantrenör'} • {targetTrainer.branch || 'Futbol'} Branşı • Kod: <span className="font-mono">{targetTrainer.code}</span>
+                        {targetTrainer.title || 'Başantrenör'} • {targetTrainer.branch || 'Futbol'} Branşı • Kod: <span className="font-sans tabular-nums">{targetTrainer.code}</span>
                       </p>
                     </div>
                   </div>
@@ -474,7 +474,7 @@ export const TrainerPdfReportModal: React.FC<TrainerPdfReportModalProps> = ({
                             <span className="font-bold text-slate-900 dark:text-white block">{t.name}</span>
                             <span className="text-[10px] text-slate-400">{t.title || 'Antrenör'}</span>
                           </td>
-                          <td className="py-2.5 px-3 font-mono text-[11px] text-slate-500">{t.code}</td>
+                          <td className="py-2.5 px-3 font-sans tabular-nums text-[11px] text-slate-500">{t.code}</td>
                           <td className="py-2.5 px-3">
                             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
                               {t.branch || 'Futbol'}

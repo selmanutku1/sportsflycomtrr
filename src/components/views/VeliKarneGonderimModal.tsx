@@ -591,7 +591,7 @@ export const VeliKarneGonderimModal: React.FC<VeliKarneGonderimModalProps> = ({
                     rows={12}
                     value={waMessage}
                     onChange={(e) => setWaMessage(e.target.value)}
-                    className="w-full text-xs font-mono p-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 leading-relaxed custom-scrollbar"
+                    className="w-full text-xs font-sans tabular-nums p-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 leading-relaxed custom-scrollbar"
                   />
                   <div className="flex items-center justify-between text-[11px] text-slate-500">
                     <span>*yıldız* ile kalın metin, satır sonları korunur.</span>
@@ -982,7 +982,7 @@ export const VeliKarneGonderimModal: React.FC<VeliKarneGonderimModalProps> = ({
                     type="password"
                     value={smsConfig.apiSifre}
                     onChange={(e) => setSmsConfig({ ...smsConfig, apiSifre: e.target.value })}
-                    className="w-full text-xs p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-500 font-mono"
+                    className="w-full text-xs p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-500 font-sans tabular-nums"
                   />
                 </div>
 
@@ -1097,7 +1097,7 @@ export const VeliKarneGonderimModal: React.FC<VeliKarneGonderimModalProps> = ({
                     <tbody className="divide-y divide-slate-100">
                       {logs.map((log) => (
                         <tr key={log.id} className="hover:bg-slate-50/70 transition-colors">
-                          <td className="p-3 font-mono text-[11px] text-slate-500 whitespace-nowrap">
+                          <td className="p-3 font-sans tabular-nums text-[11px] text-slate-500 whitespace-nowrap">
                             {log.tarih}
                           </td>
                           <td className="p-3 font-bold text-slate-800">
@@ -1119,7 +1119,7 @@ export const VeliKarneGonderimModal: React.FC<VeliKarneGonderimModalProps> = ({
                               </span>
                             )}
                           </td>
-                          <td className="p-3 font-mono text-[11px] text-slate-600">
+                          <td className="p-3 font-sans tabular-nums text-[11px] text-slate-600">
                             {log.telefon}
                           </td>
                           <td className="p-3">

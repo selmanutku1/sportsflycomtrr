@@ -675,7 +675,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
               </div>
 
               {/* Jersey Number Badge (Top-Left) */}
-              <span className="absolute -top-2 -left-2 bg-slate-900/90 text-white text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md border border-white/80 z-10 shadow-xs">
+              <span className="absolute -top-2 -left-2 bg-slate-900/90 text-white text-[10px] font-sans tabular-nums font-bold px-1.5 py-0.5 rounded-md border border-white/80 z-10 shadow-xs">
                 #{currentProfil.kimlik.formaNo}
               </span>
 
@@ -705,7 +705,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
                 {currentProfil.kimlik.kulup} • {currentProfil.kimlik.takimGrup} • {currentProfil.kimlik.mevki}
               </p>
 
-              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 pt-1 font-mono">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 pt-1 font-sans tabular-nums">
                 <span>Sporcu Kodu: <strong className="text-slate-800">{currentProfil.sporcuKodu}</strong></span>
                 <span>•</span>
                 <span>Lisans: <strong className="text-slate-800">{currentProfil.kimlik.lisansNo}</strong></span>
@@ -961,7 +961,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                 <span className="text-[11px] font-semibold text-slate-500 block">T.C. Kimlik Numarası</span>
-                <span className="text-sm font-mono font-bold text-slate-800 mt-0.5 block">{currentProfil.kimlik.tcKimlik}</span>
+                <span className="text-sm font-sans tabular-nums font-bold text-slate-800 mt-0.5 block">{currentProfil.kimlik.tcKimlik}</span>
               </div>
 
               <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
@@ -1032,7 +1032,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
 
                 <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                   <span className="text-[11px] font-semibold text-slate-500 block">Lisans Belge No</span>
-                  <span className="text-sm font-mono font-bold text-slate-800 mt-0.5 block">{currentProfil.kimlik.lisansNo}</span>
+                  <span className="text-sm font-sans tabular-nums font-bold text-slate-800 mt-0.5 block">{currentProfil.kimlik.lisansNo}</span>
                 </div>
 
                 <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
@@ -1199,7 +1199,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
                     <span className="text-slate-500">Telefon:</span>
                     <a
                       href={`tel:${currentProfil.veli.babaTelefon}`}
-                      className="font-mono font-bold text-blue-600 hover:underline"
+                      className="font-sans tabular-nums font-bold text-blue-600 hover:underline"
                     >
                       {currentProfil.veli.babaTelefon}
                     </a>
@@ -1234,7 +1234,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
                     <span className="text-slate-500">Telefon:</span>
                     <a
                       href={`tel:${currentProfil.veli.anneTelefon}`}
-                      className="font-mono font-bold text-blue-600 hover:underline"
+                      className="font-sans tabular-nums font-bold text-blue-600 hover:underline"
                     >
                       {currentProfil.veli.anneTelefon}
                     </a>
@@ -1293,7 +1293,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
                     <span className="text-amber-800">Acil Telefon:</span>
                     <a
                       href={`tel:${currentProfil.veli.acilDurumTelefon}`}
-                      className="font-mono font-bold text-amber-950 hover:underline"
+                      className="font-sans tabular-nums font-bold text-amber-950 hover:underline"
                     >
                       {currentProfil.veli.acilDurumTelefon}
                     </a>
@@ -1372,7 +1372,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
                 </div>
                 <div className="flex justify-between py-1">
                   <span className="text-slate-500">Poliçe Numarası:</span>
-                  <span className="font-mono font-bold text-slate-800">{currentProfil.saglik.sigortaPoliceNo}</span>
+                  <span className="font-sans tabular-nums font-bold text-slate-800">{currentProfil.saglik.sigortaPoliceNo}</span>
                 </div>
               </div>
             </div>
@@ -1533,7 +1533,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
                     {currentProfil.performans.fizikselTestler.map((t, idx) => (
                       <tr key={idx} className="hover:bg-slate-50/70">
                         <td className="py-2.5 px-3 font-semibold text-slate-800">{t.testAdi}</td>
-                        <td className="py-2.5 px-3 font-mono text-slate-900 font-bold">{t.sonuc}</td>
+                        <td className="py-2.5 px-3 font-sans tabular-nums text-slate-900 font-bold">{t.sonuc}</td>
                         <td className="py-2.5 px-3 text-slate-500">{t.hedef}</td>
                         <td className="py-2.5 px-3 text-right">
                           <span
@@ -1625,7 +1625,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
                   <tbody className="divide-y divide-slate-100 font-medium">
                     {currentProfil.yoklama.sonKayitlar.map((kayit, idx) => (
                       <tr key={idx} className="hover:bg-slate-50/70">
-                        <td className="py-2.5 px-3 font-mono text-slate-700">
+                        <td className="py-2.5 px-3 font-sans tabular-nums text-slate-700">
                           {kayit.tarih} - {kayit.saat}
                         </td>
                         <td className="py-2.5 px-3 font-semibold text-slate-900">{kayit.baslik}</td>
@@ -1714,7 +1714,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
                   <tbody className="divide-y divide-slate-100 font-medium">
                     {currentProfil.finans.odemeler.map((o) => (
                       <tr key={o.id} className="hover:bg-slate-50/70">
-                        <td className="py-2.5 px-3 font-mono font-bold text-slate-800">{o.makbuzNo}</td>
+                        <td className="py-2.5 px-3 font-sans tabular-nums font-bold text-slate-800">{o.makbuzNo}</td>
                         <td className="py-2.5 px-3 text-slate-700">{o.donem}</td>
                         <td className="py-2.5 px-3 font-bold text-slate-900">{o.tutar} TL</td>
                         <td className="py-2.5 px-3 text-slate-500">{o.odemeTarihi}</td>
@@ -2018,7 +2018,7 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
                           </span>
                         </div>
 
-                        <div className="space-y-1 text-[11px] text-slate-500 pt-1 font-mono">
+                        <div className="space-y-1 text-[11px] text-slate-500 pt-1 font-sans tabular-nums">
                           {doc.documentNumber && (
                             <div className="flex justify-between">
                               <span>Belge No:</span>

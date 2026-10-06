@@ -73,7 +73,7 @@ export const TrainingPlanModal: React.FC<TrainingPlanModalProps> = ({
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                 {plan.difficulty}
               </span>
-              <span className="text-xs text-slate-400 font-mono">Kod: {plan.code}</span>
+              <span className="text-xs text-slate-400 font-sans tabular-nums">Kod: {plan.code}</span>
             </div>
 
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -123,7 +123,7 @@ export const TrainingPlanModal: React.FC<TrainingPlanModalProps> = ({
           {/* Live Stopwatch for Coach */}
           <div className="flex items-center gap-2.5 bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700">
             <span className="text-[11px] text-slate-400 font-medium">Canlı Seans Sayacı:</span>
-            <span className="font-mono font-black text-sm text-emerald-400">
+            <span className="font-sans tabular-nums font-black text-sm text-emerald-400">
               {formatTimer(secondsElapsed)}
             </span>
             <button

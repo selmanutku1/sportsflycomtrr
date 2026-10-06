@@ -607,7 +607,7 @@ export const SporcuD3OzetAlani: React.FC<SporcuD3OzetAlaniProps> = ({
                 <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-full border border-blue-400/30">
                   D3 Performans & Katılım Özeti
                 </span>
-                <span className="text-[11px] text-slate-300 font-mono font-semibold">
+                <span className="text-[11px] text-slate-300 font-sans tabular-nums font-semibold">
                   #{activeSporcu.code}
                 </span>
               </div>

@@ -153,7 +153,7 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
         {/* Modal Top Header */}
         <div className="px-6 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-[#162238]/80 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center font-mono font-bold text-sm shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center font-sans tabular-nums font-bold text-sm shrink-0">
               #{ticket.id}
             </div>
             <div className="min-w-0">
@@ -299,7 +299,7 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
                     <span className={`font-bold ${isAgent ? 'text-blue-700 dark:text-blue-400' : 'text-blue-100'}`}>
                       {msg.senderName}
                     </span>
-                    <span className={`font-mono text-[10px] ${isAgent ? 'text-slate-400' : 'text-blue-200'}`}>
+                    <span className={`font-sans tabular-nums text-[10px] ${isAgent ? 'text-slate-400' : 'text-blue-200'}`}>
                       {msg.createdAt}
                     </span>
                   </div>
@@ -327,7 +327,7 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
                           >
                             <Paperclip className="w-3.5 h-3.5 shrink-0" />
                             <span className="truncate max-w-[140px]">{att.name}</span>
-                            <span className="text-[10px] opacity-75 font-mono">({att.size})</span>
+                            <span className="text-[10px] opacity-75 font-sans tabular-nums">({att.size})</span>
                           </div>
                         ))}
                       </div>

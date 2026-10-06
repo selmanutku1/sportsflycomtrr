@@ -109,7 +109,7 @@ export async function downloadSporcuDevelopmentPdfReport({
         </div>
 
         <div style="text-align: right;">
-          <span style="display: inline-block; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; font-family: monospace;">
+          <span style="display: inline-block; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700;">
             REF: ${reportCode}
           </span>
           <p style="margin: 4px 0 0 0; font-size: 10px; color: #64748b; font-weight: 500;">
@@ -135,7 +135,7 @@ export async function downloadSporcuDevelopmentPdfReport({
           </div>
           <div>
             <span style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600; display: block;">Sporcu No / Lisans</span>
-            <span style="font-size: 13px; font-weight: 700; color: #1e293b; font-family: monospace;">#${sporcu.code}</span>
+            <span style="font-size: 13px; font-weight: 700; color: #1e293b;">#${sporcu.code}</span>
           </div>
           <div>
             <span style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600; display: block;">Tesis / Şube</span>

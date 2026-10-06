@@ -176,7 +176,7 @@ export const GenericPageView: React.FC<GenericPageViewProps> = ({ page }) => {
               {config.items.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
                   <td className="py-4 px-3 font-bold text-slate-800">{item.name}</td>
-                  <td className="py-4 px-3 text-slate-500 font-mono text-xs">{item.slug}</td>
+                  <td className="py-4 px-3 text-slate-500 font-sans tabular-nums text-xs">{item.slug}</td>
                   <td className="py-4 px-3">
                     <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                       {item.status}

@@ -181,7 +181,7 @@ export const ReminderPushToast: React.FC<ReminderPushToastProps> = ({ onNavigate
                 </span>
                 
                 {activeAlert.channels.map((ch, idx) => (
-                  <span key={idx} className="px-1.5 py-0.5 rounded bg-blue-900/40 text-blue-300 border border-blue-700/40 font-mono text-[9px]">
+                  <span key={idx} className="px-1.5 py-0.5 rounded bg-blue-900/40 text-blue-300 border border-blue-700/40 font-sans tabular-nums text-[9px]">
                     {ch}
                   </span>
                 ))}

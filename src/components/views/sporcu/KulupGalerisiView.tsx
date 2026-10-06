@@ -934,7 +934,7 @@ export const KulupGalerisiView: React.FC<KulupGalerisiViewProps> = ({
                             <Folder className="w-3 h-3" />
                             {item.folderName || 'Klasörsüz'}
                           </span>
-                          <span className="font-mono text-[10px]">{item.date}</span>
+                          <span className="font-sans tabular-nums text-[10px]">{item.date}</span>
                         </div>
 
                         <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -1066,7 +1066,7 @@ export const KulupGalerisiView: React.FC<KulupGalerisiViewProps> = ({
                           </td>
 
                           {/* Date & Size */}
-                          <td className="py-2.5 px-4 whitespace-nowrap font-mono text-[11px] text-slate-500">
+                          <td className="py-2.5 px-4 whitespace-nowrap font-sans tabular-nums text-[11px] text-slate-500">
                             <div>{item.date}</div>
                             <div className="text-[10px] text-slate-400">{item.fileSize || '3.2 MB'}</div>
                           </td>
@@ -1114,7 +1114,7 @@ export const KulupGalerisiView: React.FC<KulupGalerisiViewProps> = ({
           {/* Top Bar inside Lightbox */}
           <div className="flex items-center justify-between gap-4 text-white z-10">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-white/10">
+              <span className="text-xs font-sans tabular-nums font-bold px-2.5 py-1 rounded-lg bg-white/10">
                 {lightboxIndex + 1} / {filteredGaleri.length}
               </span>
               <span className="text-sm font-bold truncate max-w-xs sm:max-w-md">

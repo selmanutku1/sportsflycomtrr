@@ -1298,7 +1298,7 @@ export const TurnuvaYonetimiView: React.FC<TurnuvaYonetimiViewProps> = ({
                           )}
                           {/* Sub Score Breakdown (Quarter / Set) */}
                           {mac.setScores && mac.setScores.length > 0 && (
-                            <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                            <div className="text-[10px] text-slate-400 font-sans tabular-nums mt-0.5">
                               {mac.setScores
                                 .map((s) => `${s.home}-${s.away}`)
                                 .join(' | ')}
@@ -1376,13 +1376,13 @@ export const TurnuvaYonetimiView: React.FC<TurnuvaYonetimiViewProps> = ({
                         <div className="space-y-1.5 text-xs">
                           <div className="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
                             <span className="truncate">{m.homeTeam}</span>
-                            <span className="text-blue-600 font-mono">
+                            <span className="text-blue-600 font-sans tabular-nums">
                               {m.homeScore ?? '-'}
                             </span>
                           </div>
                           <div className="flex items-center justify-between font-bold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
                             <span className="truncate">{m.awayTeam}</span>
-                            <span className="text-blue-600 font-mono">
+                            <span className="text-blue-600 font-sans tabular-nums">
                               {m.awayScore ?? '-'}
                             </span>
                           </div>
@@ -1420,13 +1420,13 @@ export const TurnuvaYonetimiView: React.FC<TurnuvaYonetimiViewProps> = ({
                         <div className="space-y-2 text-xs">
                           <div className="flex items-center justify-between font-extrabold text-slate-900 dark:text-white bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-amber-200 dark:border-amber-800">
                             <span className="truncate">{m.homeTeam}</span>
-                            <span className="text-amber-600 font-mono text-sm">
+                            <span className="text-amber-600 font-sans tabular-nums text-sm">
                               {m.homeScore ?? '-'}
                             </span>
                           </div>
                           <div className="flex items-center justify-between font-extrabold text-slate-900 dark:text-white bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-amber-200 dark:border-amber-800">
                             <span className="truncate">{m.awayTeam}</span>
-                            <span className="text-amber-600 font-mono text-sm">
+                            <span className="text-amber-600 font-sans tabular-nums text-sm">
                               {m.awayScore ?? '-'}
                             </span>
                           </div>
@@ -1762,7 +1762,7 @@ export const TurnuvaYonetimiView: React.FC<TurnuvaYonetimiViewProps> = ({
                     type="text"
                     readOnly
                     value={currentRegistrationUrl}
-                    className="w-full bg-transparent text-xs font-mono text-slate-700 dark:text-slate-300 focus:outline-hidden"
+                    className="w-full bg-transparent text-xs font-sans tabular-nums text-slate-700 dark:text-slate-300 focus:outline-hidden"
                   />
                   <button
                     onClick={handleCopyLink}
@@ -2215,7 +2215,7 @@ export const TurnuvaYonetimiView: React.FC<TurnuvaYonetimiViewProps> = ({
                 type="text"
                 readOnly
                 value={currentRegistrationUrl}
-                className="w-full bg-transparent text-xs font-mono text-slate-700 dark:text-slate-300 focus:outline-hidden"
+                className="w-full bg-transparent text-xs font-sans tabular-nums text-slate-700 dark:text-slate-300 focus:outline-hidden"
               />
               <button
                 onClick={handleCopyLink}

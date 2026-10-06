@@ -202,7 +202,7 @@ export const ActiveAthletesQuickList: React.FC<ActiveAthletesQuickListProps> = (
                         <span>{ath.name}</span>
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" title="Aktif Sporcu" />
                       </div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-mono">
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-sans tabular-nums">
                         <span>{ath.code}</span>
                         <span>&bull;</span>
                         <span>{ath.birthYear} Doğumlu ({ath.gender})</span>
@@ -236,7 +236,7 @@ export const ActiveAthletesQuickList: React.FC<ActiveAthletesQuickListProps> = (
                   <div className="text-slate-800 dark:text-slate-200 font-medium">
                     {ath.parentName}
                   </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1 mt-0.5">
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-sans tabular-nums flex items-center gap-1 mt-0.5">
                     <Phone className="w-2.5 h-2.5 text-slate-400" />
                     <span>{ath.parentPhone}</span>
                   </div>
@@ -260,7 +260,7 @@ export const ActiveAthletesQuickList: React.FC<ActiveAthletesQuickListProps> = (
                         }`}
                       />
                     </div>
-                    <span className="text-[10px] text-slate-400 mt-0.5 font-mono">
+                    <span className="text-[10px] text-slate-400 mt-0.5 font-sans tabular-nums">
                       {ath.attendedCount}/{ath.totalSessions} Seans
                     </span>
                   </div>

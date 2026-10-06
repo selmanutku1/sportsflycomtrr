@@ -566,7 +566,7 @@ export const GoogleUsersAccessManagerPanel: React.FC<GoogleUsersAccessManagerPan
                       Süper Admin
                     </span>
                   </div>
-                  <span className="text-[11px] font-mono text-emerald-700 dark:text-emerald-300 block truncate">
+                  <span className="text-[11px] font-sans tabular-nums text-emerald-700 dark:text-emerald-300 block truncate">
                     {ADMIN_GOOGLE_EMAIL}
                   </span>
                 </div>
@@ -649,7 +649,7 @@ export const GoogleUsersAccessManagerPanel: React.FC<GoogleUsersAccessManagerPan
 
                             <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                               <Mail className="w-3 h-3 text-slate-400 shrink-0" />
-                              <span className="truncate font-mono">{user.email}</span>
+                              <span className="truncate font-sans tabular-nums">{user.email}</span>
                             </div>
 
                             <div className="flex items-center gap-3 mt-1.5 text-[10px] text-slate-400">
@@ -719,7 +719,7 @@ export const GoogleUsersAccessManagerPanel: React.FC<GoogleUsersAccessManagerPan
                   </div>
                   <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                     <span>{selectedUser.name}</span>
-                    <span className="text-xs font-mono font-normal text-slate-500 dark:text-slate-400">
+                    <span className="text-xs font-sans tabular-nums font-normal text-slate-500 dark:text-slate-400">
                       ({selectedUser.email})
                     </span>
                   </h3>
@@ -1048,7 +1048,7 @@ export const GoogleUsersAccessManagerPanel: React.FC<GoogleUsersAccessManagerPan
                   placeholder="ornek.kullanici@gmail.com"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#162238] text-slate-900 dark:text-white font-mono"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#162238] text-slate-900 dark:text-white font-sans tabular-nums"
                 />
               </div>
 

@@ -1284,17 +1284,30 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
   // Apply AI Summary & Top Recommendations directly into Page 5 Expert Comment
   const handleApplyAiToExpertComment = () => {
-    const topDrills = activeAiAnalysis.improvementAreas
-      .slice(0, 2)
-      .map((i) => `${i.metricName} (${i.currentValue} → Hedef ${i.targetValue}): ${i.drillRecommendation}`)
-      .join(' | ');
-    const enrichedComment = `${activeAiAnalysis.overallSummary} Öncelikli Gelişim Reçetesi: ${topDrills}`;
-    handleUpdateCurrentReport({
+    const drillBullets = activeAiAnalysis.improvementAreas
+      .slice(0, 3)
+      .map(
+        (i, idx) =>
+          `• ${idx + 1}. ${i.metricName} (Mevcut: ${i.currentValue} → Hedef: ${i.targetValue}): ${i.drillRecommendation}`
+      )
+      .join('\n');
+
+    const sections = [
+      activeAiAnalysis.overallSummary,
+      drillBullets ? `\n\n📌 ÖNCELİKLİ GELİŞİM VE DRİLL REÇETESİ:\n${drillBullets}` : '',
+      activeAiAnalysis.nutritionAndRecoveryTip
+        ? `\n\n🥗 BESLENME & TOPARLANMA REHBERİ: ${activeAiAnalysis.nutritionAndRecoveryTip}`
+        : '',
+    ].filter(Boolean);
+
+    const enrichedComment = sections.join('');
+    const updated = {
       ...currentReport,
       expertComment: enrichedComment,
       aiRecommendations: activeAiAnalysis,
-    });
-    notify('Yapay zeka performans önerileri 5. sayfadaki Uzman Görüşü alanına aktarıldı.');
+    };
+    handleUpdateCurrentReport(updated);
+    notify('✓ Uzman ve yapay zeka değerlendirmesi karneye (5. Sayfa Uzman Görüşü alanına) başarıyla aktarıldı.');
   };
 
   // Handle PDF Download of the complete 7-page report card ('Tüm Karneyi İndir')
@@ -1519,7 +1532,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
         {/* Corporate Technical Top Protocol Strip (Only in 'corporate-technical' template) */}
         {karneTemplate === 'corporate-technical' && (
           <div
-            className="flex flex-wrap items-center justify-between gap-2 px-3 py-1 mb-1.5 rounded-md text-[9px] font-mono font-bold uppercase tracking-widest border"
+            className="flex flex-wrap items-center justify-between gap-2 px-3 py-1 mb-1.5 rounded-md text-[9px] font-sans tabular-nums font-bold uppercase tracking-widest border"
             style={{
               backgroundColor: '#f8fafc',
               borderColor: effectivePrimaryHex,
@@ -1605,7 +1618,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             </div>
 
             <div>
-              <div className="flex flex-wrap items-center gap-2 text-[9.5px] font-mono font-bold tracking-widest uppercase">
+              <div className="flex flex-wrap items-center gap-2 text-[9.5px] font-sans tabular-nums font-bold tracking-widest uppercase">
                 <span
                   style={{
                     color: isDarkHeaderTpl ? effectiveSecondaryHex : effectivePrimaryHex,
@@ -1669,14 +1682,14 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             <span className="text-slate-300">·</span>
             <div>
               <span className="text-slate-400">Yaş: </span>
-              <span className="font-mono font-bold text-slate-800">
+              <span className="font-sans tabular-nums font-bold text-slate-800">
                 {currentReport.ageYears} ({currentReport.ageMonths} ay)
               </span>
             </div>
             <span className="text-slate-300">·</span>
             <div>
               <span className="text-slate-400">Ölçümler: </span>
-              <span className="font-mono text-[11px] text-slate-700">
+              <span className="font-sans tabular-nums text-[11px] text-slate-700">
                 I: {currentReport.date1} · II: {currentReport.date2} · III: {currentReport.date3}
               </span>
             </div>
@@ -1684,7 +1697,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               <>
                 <span className="text-slate-300">·</span>
                 <span
-                  className="font-mono text-[10px] font-black px-2 py-0.5 rounded text-white"
+                  className="font-sans tabular-nums text-[10px] font-black px-2 py-0.5 rounded text-white"
                   style={{ backgroundColor: effectivePrimaryHex }}
                 >
                   SKOR: %{currentReport.scoreHistory.p3Score}
@@ -1882,62 +1895,62 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
           {/* Top 6-Card High-Contrast Clinical Biometric Ribbon */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 print:grid-cols-6 gap-2 mb-3 relative z-10">
             <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90">
-              <div className="text-[9px] font-mono font-bold text-slate-500 uppercase">
+              <div className="text-[9px] font-sans tabular-nums font-bold text-slate-500 uppercase">
                 BOY UZUNLUĞU (STATURE)
               </div>
-              <div className="text-base font-black font-mono text-slate-900 mt-0.5">
+              <div className="text-base font-black font-sans tabular-nums text-slate-900 mt-0.5">
                 {heightVal} <span className="text-[10px] font-normal text-slate-500">cm</span>
               </div>
-              <div className="text-[9.5px] font-mono font-bold text-emerald-700">
+              <div className="text-[9.5px] font-sans tabular-nums font-bold text-emerald-700">
                 {heightGain >= 0 ? `+${heightGain}` : heightGain} cm (I→III) · %{getPct('height', 76)}
               </div>
             </div>
 
             <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90">
-              <div className="text-[9px] font-mono font-bold text-slate-500 uppercase">
+              <div className="text-[9px] font-sans tabular-nums font-bold text-slate-500 uppercase">
                 VÜCUT KÜTLESİ &amp; BKİ
               </div>
-              <div className="text-base font-black font-mono text-slate-900 mt-0.5">
+              <div className="text-base font-black font-sans tabular-nums text-slate-900 mt-0.5">
                 {weightVal} <span className="text-[10px] font-normal text-slate-500">kg</span>
               </div>
-              <div className="text-[9.5px] font-mono font-bold text-sky-700">
+              <div className="text-[9.5px] font-sans tabular-nums font-bold text-sky-700">
                 BKİ: {bmiVal} kg/m² ({weightDelta >= 0 ? `+${weightDelta}` : weightDelta} kg)
               </div>
             </div>
 
             <div className="p-2.5 rounded-xl bg-rose-50/60 border border-rose-200/90">
-              <div className="text-[9px] font-mono font-bold text-rose-800 uppercase">
+              <div className="text-[9px] font-sans tabular-nums font-bold text-rose-800 uppercase">
                 VÜCUT YAĞ ORANI (%)
               </div>
-              <div className="text-base font-black font-mono text-rose-700 mt-0.5">
+              <div className="text-base font-black font-sans tabular-nums text-rose-700 mt-0.5">
                 %{fatVal}{' '}
                 <span className="text-[10px] font-normal text-rose-600">({fatMassKg} kg)</span>
               </div>
-              <div className="text-[9.5px] font-mono font-bold text-emerald-700">
+              <div className="text-[9.5px] font-sans tabular-nums font-bold text-emerald-700">
                 Δ {fatDelta > 0 ? `+${fatDelta}` : fatDelta}% · {getStatus('bodyFat', 'Optimal')}
               </div>
             </div>
 
             <div className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200/90">
-              <div className="text-[9px] font-mono font-bold text-emerald-800 uppercase">
+              <div className="text-[9px] font-sans tabular-nums font-bold text-emerald-800 uppercase">
                 YAĞSIZ KAS KÜTLESİ (FFM)
               </div>
-              <div className="text-base font-black font-mono text-emerald-800 mt-0.5">
+              <div className="text-base font-black font-sans tabular-nums text-emerald-800 mt-0.5">
                 {leanMassKg} <span className="text-[10px] font-normal text-emerald-700">kg</span>
               </div>
-              <div className="text-[9.5px] font-mono font-bold text-emerald-700">
+              <div className="text-[9.5px] font-sans tabular-nums font-bold text-emerald-700">
                 %{leanMassPct} Aktif Kas/İskelet
               </div>
             </div>
 
             <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90">
-              <div className="text-[9px] font-mono font-bold text-slate-500 uppercase">
+              <div className="text-[9px] font-sans tabular-nums font-bold text-slate-500 uppercase">
                 5 BÖLGE SKINFOLD TOPLAMI
               </div>
-              <div className="text-base font-black font-mono text-slate-900 mt-0.5">
+              <div className="text-base font-black font-sans tabular-nums text-slate-900 mt-0.5">
                 {sumSkinVal} <span className="text-[10px] font-normal text-slate-500">mm</span>
               </div>
-              <div className="text-[9.5px] font-mono font-bold text-indigo-700">
+              <div className="text-[9.5px] font-sans tabular-nums font-bold text-indigo-700">
                 Harpenden Kaliper Standardı
               </div>
             </div>
@@ -1949,11 +1962,11 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 borderColor: effectiveSecondaryHex,
               }}
             >
-              <div className="text-[9px] font-mono font-bold text-white/75 uppercase">
+              <div className="text-[9px] font-sans tabular-nums font-bold text-white/75 uppercase">
                 SOMATOTİP (HEATH-CARTER)
               </div>
               <div
-                className="text-base font-black font-mono mt-0.5"
+                className="text-base font-black font-sans tabular-nums mt-0.5"
                 style={{ color: effectiveSecondaryHex }}
               >
                 {somatoM3.endo} - {somatoM3.meso} - {somatoM3.ecto}
@@ -1981,12 +1994,12 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   <div>
                     <div className="flex items-center justify-between gap-1.5">
                       <span
-                        className="px-1.5 py-0.5 rounded text-[9px] font-mono font-black text-white"
+                        className="px-1.5 py-0.5 rounded text-[9px] font-sans tabular-nums font-black text-white"
                         style={{ backgroundColor: item.accent }}
                       >
                         NOKTA {item.code}
                       </span>
-                      <span className="text-[9.5px] font-mono font-bold text-emerald-700">
+                      <span className="text-[9.5px] font-sans tabular-nums font-bold text-emerald-700">
                         {item.status} · %{item.pct}
                       </span>
                     </div>
@@ -1997,7 +2010,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   </div>
 
                   <div className="mt-2.5 pt-2 border-t border-slate-100">
-                    <div className="flex items-baseline justify-between font-mono">
+                    <div className="flex items-baseline justify-between font-sans tabular-nums">
                       <div className="text-[9.5px] text-slate-500">
                         I: <strong>{item.m1}</strong> → II: <strong>{item.m2}</strong>
                       </div>
@@ -2017,7 +2030,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         fill={item.accent}
                       />
                     </svg>
-                    <div className="flex justify-between text-[8.5px] font-mono text-slate-400 mt-0.5">
+                    <div className="flex justify-between text-[8.5px] font-sans tabular-nums text-slate-400 mt-0.5">
                       <span>ISAK Kaliper Protokolü</span>
                       <span>Z-Skor: {item.sd > 0 ? `+${item.sd}` : item.sd} SD</span>
                     </div>
@@ -2039,13 +2052,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     style={{ backgroundColor: effectiveSecondaryHex }}
                   />
                   <span
-                    className="text-[10.5px] font-mono font-black uppercase tracking-wider"
+                    className="text-[10.5px] font-sans tabular-nums font-black uppercase tracking-wider"
                     style={{ color: effectivePrimaryHex }}
                   >
                     ANATOMİK BİYOMEKANİK SİLÜET &amp; ÖLÇÜM HARİTASI (ANTERİOR / KORONAL EKSEN)
                   </span>
                 </div>
-                <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-white">
+                <span className="text-[9px] font-sans tabular-nums font-bold px-2 py-0.5 rounded bg-slate-900 text-white">
                   1:10 ÖLÇEK · ISAK L2
                 </span>
               </div>
@@ -2107,13 +2120,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   <rect x="52" y="284" width="480" height="92" rx="8" fill="#fff1f2" fillOpacity="0.35" />
                   <rect x="52" y="378" width="480" height="202" rx="8" fill="#f0fdf4" fillOpacity="0.35" />
 
-                  <text x="526" y="160" textAnchor="end" className="text-[7.5px] font-mono font-bold fill-slate-400">
+                  <text x="526" y="160" textAnchor="end" className="text-[7.5px] font-sans tabular-nums font-bold fill-slate-400">
                     BÖLGE I · ÜST EKSTREMİTE &amp; TORAKS
                   </text>
-                  <text x="526" y="298" textAnchor="end" className="text-[7.5px] font-mono font-bold fill-rose-400">
+                  <text x="526" y="298" textAnchor="end" className="text-[7.5px] font-sans tabular-nums font-bold fill-rose-400">
                     BÖLGE II · MERKEZ GÖVDE (CORE &amp; PELVİS)
                   </text>
-                  <text x="526" y="392" textAnchor="end" className="text-[7.5px] font-mono font-bold fill-emerald-600/70">
+                  <text x="526" y="392" textAnchor="end" className="text-[7.5px] font-sans tabular-nums font-bold fill-emerald-600/70">
                     BÖLGE III · ALT EKSTREMİTE &amp; İTKİ ZİNCİRİ
                   </text>
 
@@ -2137,7 +2150,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         x="33"
                         y={tick.y + 3}
                         textAnchor="end"
-                        className="text-[7.5px] font-mono font-bold fill-slate-500"
+                        className="text-[7.5px] font-sans tabular-nums font-bold fill-slate-500"
                       >
                         {tick.cm}
                       </text>
@@ -2155,7 +2168,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     strokeDasharray="4,2"
                   />
                   <rect x="54" y="63" width="118" height="18" rx="4" fill="#0284c7" />
-                  <text x="113" y="75" textAnchor="middle" className="text-[8.5px] font-mono font-black fill-white">
+                  <text x="113" y="75" textAnchor="middle" className="text-[8.5px] font-sans tabular-nums font-black fill-white">
                     BOY: {heightVal} cm
                   </text>
 
@@ -2170,7 +2183,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     strokeDasharray="3,3"
                   />
                   <rect x="218" y="20" width="140" height="16" rx="4" fill="#0f172a" />
-                  <text x="288" y="30.5" textAnchor="middle" className="text-[7.5px] font-mono font-bold fill-white">
+                  <text x="288" y="30.5" textAnchor="middle" className="text-[7.5px] font-sans tabular-nums font-bold fill-white">
                     SİMETRİ EKSENİ · 0.0°
                   </text>
 
@@ -2209,7 +2222,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
                   {/* Force Plate Telemetry Pill */}
                   <rect x="138" y="616" width="300" height="24" rx="6" fill={effectivePrimaryHex} />
-                  <text x="288" y="631.5" textAnchor="middle" className="text-[9px] font-mono font-black fill-white">
+                  <text x="288" y="631.5" textAnchor="middle" className="text-[9px] font-sans tabular-nums font-black fill-white">
                     KÜTLE: {weightVal} kg · YAĞSIZ KAS: {leanMassKg} kg · YAĞ: %{fatVal}
                   </text>
 
@@ -2483,10 +2496,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     strokeWidth="1.5"
                   />
                   <rect x="48" y="129" width="76" height="24" rx="5" fill="#0284c7" />
-                  <text x="86" y="140" textAnchor="middle" className="text-[7px] font-mono font-bold fill-white/85">
+                  <text x="86" y="140" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-bold fill-white/85">
                     01 BICEPS SF
                   </text>
-                  <text x="86" y="149" textAnchor="middle" className="text-[8.5px] font-mono font-black fill-white">
+                  <text x="86" y="149" textAnchor="middle" className="text-[8.5px] font-sans tabular-nums font-black fill-white">
                     {bicepsSf} mm
                   </text>
 
@@ -2498,10 +2511,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     strokeWidth="1.5"
                   />
                   <rect x="48" y="231" width="76" height="24" rx="5" fill="#6366f1" />
-                  <text x="86" y="242" textAnchor="middle" className="text-[7px] font-mono font-bold fill-white/85">
+                  <text x="86" y="242" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-bold fill-white/85">
                     02 TRICEPS SF
                   </text>
-                  <text x="86" y="251" textAnchor="middle" className="text-[8.5px] font-mono font-black fill-white">
+                  <text x="86" y="251" textAnchor="middle" className="text-[8.5px] font-sans tabular-nums font-black fill-white">
                     {tricepsSf} mm
                   </text>
 
@@ -2513,10 +2526,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     strokeWidth="1.5"
                   />
                   <rect x="48" y="335" width="76" height="24" rx="5" fill="#059669" />
-                  <text x="86" y="346" textAnchor="middle" className="text-[7px] font-mono font-bold fill-white/85">
+                  <text x="86" y="346" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-bold fill-white/85">
                     03 KÜREK ALTI
                   </text>
-                  <text x="86" y="355" textAnchor="middle" className="text-[8.5px] font-mono font-black fill-white">
+                  <text x="86" y="355" textAnchor="middle" className="text-[8.5px] font-sans tabular-nums font-black fill-white">
                     {subscapSf} mm
                   </text>
 
@@ -2528,10 +2541,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     strokeWidth="1.5"
                   />
                   <rect x="48" y="435" width="76" height="24" rx="5" fill="#10b981" />
-                  <text x="86" y="446" textAnchor="middle" className="text-[7px] font-mono font-bold fill-white/85">
+                  <text x="86" y="446" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-bold fill-white/85">
                     04 SUPRAILIAC
                   </text>
-                  <text x="86" y="455" textAnchor="middle" className="text-[8.5px] font-mono font-black fill-white">
+                  <text x="86" y="455" textAnchor="middle" className="text-[8.5px] font-sans tabular-nums font-black fill-white">
                     {suprailiacSf} mm
                   </text>
 
@@ -2544,10 +2557,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     strokeWidth="1.5"
                   />
                   <rect x="454" y="129" width="82" height="24" rx="5" fill={effectivePrimaryHex} />
-                  <text x="495" y="140" textAnchor="middle" className="text-[7px] font-mono font-bold fill-white/85">
+                  <text x="495" y="140" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-bold fill-white/85">
                     05 PAZU ÇEVRE
                   </text>
-                  <text x="495" y="149" textAnchor="middle" className="text-[8.5px] font-mono font-black fill-white">
+                  <text x="495" y="149" textAnchor="middle" className="text-[8.5px] font-sans tabular-nums font-black fill-white">
                     {flexedBic} cm
                   </text>
 
@@ -2566,10 +2579,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     strokeDasharray="3,2"
                   />
                   <rect x="454" y="231" width="82" height="24" rx="5" fill="#d97706" />
-                  <text x="495" y="242" textAnchor="middle" className="text-[7px] font-mono font-bold fill-white/85">
+                  <text x="495" y="242" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-bold fill-white/85">
                     06 KEMİK ÇAPI
                   </text>
-                  <text x="495" y="251" textAnchor="middle" className="text-[8.5px] font-mono font-black fill-white">
+                  <text x="495" y="251" textAnchor="middle" className="text-[8.5px] font-sans tabular-nums font-black fill-white">
                     {humerusBr} / {femurBr} cm
                   </text>
 
@@ -2581,10 +2594,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     strokeWidth="1.5"
                   />
                   <rect x="454" y="335" width="82" height="24" rx="5" fill="#e11d48" />
-                  <text x="495" y="346" textAnchor="middle" className="text-[7px] font-mono font-bold fill-white/85">
+                  <text x="495" y="346" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-bold fill-white/85">
                     07 WHR &amp; YAĞ
                   </text>
-                  <text x="495" y="355" textAnchor="middle" className="text-[8.5px] font-mono font-black fill-white">
+                  <text x="495" y="355" textAnchor="middle" className="text-[8.5px] font-sans tabular-nums font-black fill-white">
                     {whrVal} · %{fatVal}
                   </text>
 
@@ -2596,10 +2609,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     strokeWidth="1.5"
                   />
                   <rect x="454" y="435" width="82" height="24" rx="5" fill="#0f766e" />
-                  <text x="495" y="446" textAnchor="middle" className="text-[7px] font-mono font-bold fill-white/85">
+                  <text x="495" y="446" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-bold fill-white/85">
                     08 BALDIR
                   </text>
-                  <text x="495" y="455" textAnchor="middle" className="text-[8.5px] font-mono font-black fill-white">
+                  <text x="495" y="455" textAnchor="middle" className="text-[8.5px] font-sans tabular-nums font-black fill-white">
                     {calfCirc}cm / {calfSf}mm
                   </text>
 
@@ -2621,7 +2634,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         x={pin.cx}
                         y={pin.cy + 2.5}
                         textAnchor="middle"
-                        className="text-[7.5px] font-mono font-black fill-white"
+                        className="text-[7.5px] font-sans tabular-nums font-black fill-white"
                       >
                         {pin.code}
                       </text>
@@ -2631,7 +2644,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               </div>
 
               {/* Bottom Stage Legend Bar inside Center Frame */}
-              <div className="pt-2 border-t border-slate-200/90 flex flex-wrap items-center justify-between gap-2 text-[9.5px] font-mono text-slate-600 px-1">
+              <div className="pt-2 border-t border-slate-200/90 flex flex-wrap items-center justify-between gap-2 text-[9.5px] font-sans tabular-nums text-slate-600 px-1">
                 <div className="flex items-center gap-3">
                   <span className="flex items-center gap-1">
                     <span className="w-2.5 h-2.5 rounded-full bg-sky-600 inline-block" />
@@ -2663,12 +2676,12 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   <div>
                     <div className="flex items-center justify-between gap-1.5">
                       <span
-                        className="px-1.5 py-0.5 rounded text-[9px] font-mono font-black text-white"
+                        className="px-1.5 py-0.5 rounded text-[9px] font-sans tabular-nums font-black text-white"
                         style={{ backgroundColor: item.accent }}
                       >
                         NOKTA {item.code}
                       </span>
-                      <span className="text-[9.5px] font-mono font-bold text-emerald-700">
+                      <span className="text-[9.5px] font-sans tabular-nums font-bold text-emerald-700">
                         {item.status} · %{item.pct}
                       </span>
                     </div>
@@ -2679,7 +2692,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   </div>
 
                   <div className="mt-2.5 pt-2 border-t border-slate-100">
-                    <div className="flex items-baseline justify-between font-mono">
+                    <div className="flex items-baseline justify-between font-sans tabular-nums">
                       <div className="text-[9.5px] text-slate-500">
                         I: <strong>{item.m1}</strong> → II: <strong>{item.m2}</strong>
                       </div>
@@ -2699,7 +2712,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         fill={item.accent}
                       />
                     </svg>
-                    <div className="flex justify-between text-[8.5px] font-mono text-slate-400 mt-0.5">
+                    <div className="flex justify-between text-[8.5px] font-sans tabular-nums text-slate-400 mt-0.5">
                       <span>Bölgesel Normatif Skala</span>
                       <span>Z-Skor: {item.sd > 0 ? `+${item.sd}` : item.sd} SD</span>
                     </div>
@@ -2721,7 +2734,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <span className="text-[10px] font-extrabold text-sky-900 uppercase">
                   I. ÜST EKSTREMİTE &amp; TORAKS SENTEZİ
                 </span>
-                <span className="text-[10px] font-mono font-bold text-sky-700">
+                <span className="text-[10px] font-sans tabular-nums font-bold text-sky-700">
                   Pazu: {flexedBic} cm
                 </span>
               </div>
@@ -2735,7 +2748,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <span className="text-[10px] font-extrabold text-rose-900 uppercase">
                   II. MERKEZ GÖVDE (CORE) &amp; METABOLİK DENGE
                 </span>
-                <span className="text-[10px] font-mono font-bold text-rose-700">
+                <span className="text-[10px] font-sans tabular-nums font-bold text-rose-700">
                   WHR: {whrVal} · Yağ: %{fatVal}
                 </span>
               </div>
@@ -2749,7 +2762,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <span className="text-[10px] font-extrabold text-emerald-900 uppercase">
                   III. ALT EKSTREMİTE &amp; KİNETİK İTKİ ZİNCİRİ
                 </span>
-                <span className="text-[10px] font-mono font-bold text-emerald-700">
+                <span className="text-[10px] font-sans tabular-nums font-bold text-emerald-700">
                   Baldır: {calfCirc} cm · Femur: {femurBr} cm
                 </span>
               </div>
@@ -2793,7 +2806,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   )}
                 </div>
                 <div>
-                  <h1 className="text-xs font-mono font-bold tracking-wider text-sky-200 uppercase">
+                  <h1 className="text-xs font-sans tabular-nums font-bold tracking-wider text-sky-200 uppercase">
                     {effectiveClubName}
                   </h1>
                   <h2 className="text-lg sm:text-xl font-black tracking-tight text-white mt-0.5">
@@ -2810,7 +2823,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   <div className="text-[10px] uppercase tracking-wider text-sky-200 font-semibold">
                     Gelişim Raporu
                   </div>
-                  <div className="text-xs font-mono font-bold text-white">
+                  <div className="text-xs font-sans tabular-nums font-bold text-white">
                     {currentReport.date3}
                   </div>
                 </div>
@@ -2855,7 +2868,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block" />
                 <span>Bugünkü Durumun</span>
               </h3>
-              <span className="px-3 py-1 rounded-xl bg-emerald-600 text-white font-mono text-xs font-black">
+              <span className="px-3 py-1 rounded-xl bg-emerald-600 text-white font-sans tabular-nums text-xs font-black">
                 Genel İlerleme Düzeyi: %{p3Score}
               </span>
             </div>
@@ -2863,17 +2876,17 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             <div className="grid grid-cols-3 gap-3 text-center">
               <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-2xs">
                 <div className="text-[10px] font-bold text-slate-500 uppercase">1. Ölçüm ({currentReport.date1})</div>
-                <div className="text-lg font-black font-mono text-slate-700 mt-1">%{p1Score}</div>
+                <div className="text-lg font-black font-sans tabular-nums text-slate-700 mt-1">%{p1Score}</div>
                 <div className="text-[9.5px] text-slate-500 mt-0.5">Başlangıç Seviyesi</div>
               </div>
               <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-2xs">
                 <div className="text-[10px] font-bold text-slate-500 uppercase">2. Ölçüm ({currentReport.date2})</div>
-                <div className="text-lg font-black font-mono text-blue-700 mt-1">%{p2Score}</div>
+                <div className="text-lg font-black font-sans tabular-nums text-blue-700 mt-1">%{p2Score}</div>
                 <div className="text-[9.5px] text-blue-600 font-bold mt-0.5">+%{p2Score - p1Score} İlerleme</div>
               </div>
               <div className="p-3 rounded-xl bg-white border-2 border-emerald-500 shadow-2xs">
                 <div className="text-[10px] font-bold text-emerald-800 uppercase">3. Ölçüm (Güncel)</div>
-                <div className="text-xl font-black font-mono text-emerald-600 mt-0.5">%{p3Score}</div>
+                <div className="text-xl font-black font-sans tabular-nums text-emerald-600 mt-0.5">%{p3Score}</div>
                 <div className="text-[9.5px] text-emerald-700 font-extrabold mt-0.5">✨ Harika Gelişim</div>
               </div>
             </div>
@@ -2982,7 +2995,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             </h3>
 
             <div className="p-3.5 rounded-xl bg-white border border-indigo-200 shadow-2xs space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold font-mono">
+              <div className="flex items-center justify-between text-xs font-bold font-sans tabular-nums">
                 <span className="text-slate-600">Başlangıç: %{p1Score}</span>
                 <span className="text-emerald-700">Bugün: %{p3Score}</span>
                 <span className="text-indigo-700 font-extrabold">🎯 Bir Sonraki Ölçüm Hedefi: %{nextGoalScore}</span>
@@ -3069,7 +3082,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <strong className="text-emerald-800 font-extrabold">Velinin Evde Destek Önerisi: </strong>
                 Sporcumuzun antrenman günlerinde düzenli uyku almasını destekleyebilir, antrenman sonrasında su tüketimi ve dengeli beslenme alışkanlıklarını evde teşvik edebilirsiniz.
               </div>
-              <span className="px-3 py-1 rounded-lg bg-emerald-100 text-emerald-950 font-mono text-[11px] font-black shrink-0">
+              <span className="px-3 py-1 rounded-lg bg-emerald-100 text-emerald-950 font-sans tabular-nums text-[11px] font-black shrink-0">
                 Bir Sonraki Ölçüm: {currentReport.nextTargetDate || '15 Kasım 2026'}
               </span>
             </div>
@@ -3111,7 +3124,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   )}
                 </div>
                 <div>
-                  <h1 className="text-xs font-mono font-bold tracking-wider text-sky-300 uppercase">
+                  <h1 className="text-xs font-sans tabular-nums font-bold tracking-wider text-sky-300 uppercase">
                     {effectiveClubName} · AKADEMİ PERFORMANS RAPORU
                   </h1>
                   <h2 className="text-lg sm:text-xl font-black tracking-tight text-white mt-0.5">
@@ -3125,10 +3138,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   effectiveSecondaryHex={effectiveSecondaryHex}
                 />
                 <div className="px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-700 text-right shrink-0">
-                  <div className="text-[10px] uppercase tracking-wider text-sky-200 font-semibold font-mono">
+                  <div className="text-[10px] uppercase tracking-wider text-sky-200 font-semibold font-sans tabular-nums">
                     TEKNİK MİZANPAJ
                   </div>
-                  <div className="text-xs font-mono font-bold text-sky-300">
+                  <div className="text-xs font-sans tabular-nums font-bold text-sky-300">
                     {currentReport.date3}
                   </div>
                 </div>
@@ -3177,13 +3190,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <span className="w-3 h-3 rounded-full bg-slate-900 inline-block" />
                 <span>Güncel Performans Profili</span>
               </h3>
-              <span className="text-xs font-mono font-bold text-slate-600">
+              <span className="text-xs font-sans tabular-nums font-bold text-slate-600">
                 Test Bazlı Skorlar &amp; Dönemsel Değişim (±%)
               </span>
             </div>
 
             <div className="overflow-x-auto rounded-xl border border-slate-200">
-              <table className="w-full text-xs border-collapse font-mono">
+              <table className="w-full text-xs border-collapse font-sans tabular-nums">
                 <thead>
                   <tr className="bg-slate-900 text-white text-[10px] uppercase font-bold">
                     <th className="py-2.5 px-2.5 text-left">
@@ -3216,9 +3229,9 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         </td>
                         <td className="py-2 px-2 text-right font-sans font-bold">
                           {isPositive ? (
-                            <span className="text-emerald-700 font-mono text-[11px]">📈 İlerleme</span>
+                            <span className="text-emerald-700 font-sans tabular-nums text-[11px]">📈 İlerleme</span>
                           ) : (
-                            <span className="text-rose-600 font-mono text-[11px]">📉 Takip Edilmeli</span>
+                            <span className="text-rose-600 font-sans tabular-nums text-[11px]">📉 Takip Edilmeli</span>
                           )}
                         </td>
                       </tr>
@@ -3257,14 +3270,14 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   <span className="w-3 h-3 rounded-full bg-emerald-600 inline-block" />
                   <span>Öne Çıkan Fiziksel ve Motorik Kapasiteler</span>
                 </span>
-                <span className="text-[10px] font-mono font-bold text-emerald-800">Top 3 Parametre</span>
+                <span className="text-[10px] font-sans tabular-nums font-bold text-emerald-800">Top 3 Parametre</span>
               </h3>
 
               <div className="space-y-2 text-xs">
                 <div className="p-2.5 rounded-xl bg-white border border-emerald-200 shadow-2xs">
                   <div className="flex justify-between font-bold">
                     <span className="text-slate-900">Sıçrama Yüksekliği (Dikey Sıçrama)</span>
-                    <span className="font-mono text-emerald-700">40.5 cm (+2.78 SD · %100 Yüzdelik)</span>
+                    <span className="font-sans tabular-nums text-emerald-700">40.5 cm (+2.78 SD · %100 Yüzdelik)</span>
                   </div>
                   <p className="text-[10.5px] text-slate-600 mt-1 leading-snug">
                     Referans değere göre en yüksek 1. parametre. Elit standartlar üstü relatif bacak patlayıcı gücü.
@@ -3274,7 +3287,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <div className="p-2.5 rounded-xl bg-white border border-emerald-200 shadow-2xs">
                   <div className="flex justify-between font-bold">
                     <span className="text-slate-900">Kavrama Kuvveti (Grip Strength)</span>
-                    <span className="font-mono text-emerald-700">23.8 kg/m (+2.13 SD · %98 Yüzdelik)</span>
+                    <span className="font-sans tabular-nums text-emerald-700">23.8 kg/m (+2.13 SD · %98 Yüzdelik)</span>
                   </div>
                   <p className="text-[10.5px] text-slate-600 mt-1 leading-snug">
                     Referans değere göre en yüksek 2. parametre. İkili mücadele ve nesne kontrol biyomekaniği üst düzey.
@@ -3284,7 +3297,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <div className="p-2.5 rounded-xl bg-white border border-emerald-200 shadow-2xs">
                   <div className="flex justify-between font-bold">
                     <span className="text-slate-900">Humerus Bikondiler Çapı</span>
-                    <span className="font-mono text-emerald-700">6.2 cm (+2.13 SD · %98 Yüzdelik)</span>
+                    <span className="font-sans tabular-nums text-emerald-700">6.2 cm (+2.13 SD · %98 Yüzdelik)</span>
                   </div>
                   <p className="text-[10.5px] text-slate-600 mt-1 leading-snug">
                     Referans değere göre en yüksek 3. parametre. Kas-iskelet yapısı üst ekstremite itki kuvvetini destekliyor.
@@ -3300,14 +3313,14 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   <span className="w-3 h-3 rounded-full bg-rose-600 inline-block" />
                   <span>Öncelikli Gelişim Alanları ve Antrenman Gerekçesi</span>
                 </span>
-                <span className="text-[10px] font-mono font-bold text-rose-800">Risk &amp; Darboğaz Notu</span>
+                <span className="text-[10px] font-sans tabular-nums font-bold text-rose-800">Risk &amp; Darboğaz Notu</span>
               </h3>
 
               <div className="space-y-2 text-xs">
                 <div className="p-2.5 rounded-xl bg-white border border-rose-200 shadow-2xs">
                   <div className="flex justify-between font-bold">
                     <span className="text-slate-900">Denge Testi (Y-Balance / Flamingo)</span>
-                    <span className="font-mono text-rose-700">19.00 sn (-0.89 SD · %19 Yüzdelik)</span>
+                    <span className="font-sans tabular-nums text-rose-700">19.00 sn (-0.89 SD · %19 Yüzdelik)</span>
                   </div>
                   <p className="text-[10.5px] text-rose-900 mt-1 leading-snug font-medium">
                     ⚠️ <strong>Sakatlık Riski Notu:</strong> Ayak bileği ve diz çevresi propriosepsiyon eksikliği eklem yükünü artırabilir. Tek ayak stabilizasyon antrenmanı gerekçelendirilmiştir.
@@ -3317,7 +3330,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <div className="p-2.5 rounded-xl bg-white border border-rose-200 shadow-2xs">
                   <div className="flex justify-between font-bold">
                     <span className="text-slate-900">Aerobik Kapasite (VO2peak)</span>
-                    <span className="font-mono text-amber-700">35 ml/kg/dk (-0.42 SD · %27 Yüzdelik)</span>
+                    <span className="font-sans tabular-nums text-amber-700">35 ml/kg/dk (-0.42 SD · %27 Yüzdelik)</span>
                   </div>
                   <p className="text-[10.5px] text-amber-900 mt-1 leading-snug font-medium">
                      <strong>Kondisyonel Darboğaz:</strong> Maksimal laktat toparlanma süresi uzamaktadır; HIIT ve aerobik baz yüklenmesi önerilir.
@@ -3327,7 +3340,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <div className="p-2.5 rounded-xl bg-white border border-rose-200 shadow-2xs">
                   <div className="flex justify-between font-bold">
                     <span className="text-slate-900">Beden Yağ Oranı (Beden Yağ %)</span>
-                    <span className="font-mono text-amber-700">%33.8 (+1.83 SD · %97 Yüzdelik)</span>
+                    <span className="font-sans tabular-nums text-amber-700">%33.8 (+1.83 SD · %97 Yüzdelik)</span>
                   </div>
                   <p className="text-[10.5px] text-slate-700 mt-1 leading-snug font-medium">
                     📉 <strong>Mekanik Verimlilik Riski:</strong> Relatif güç (W/kg) çıktısını düşürmektedir; beslenme takibi ve Zone-2 aerobik blok önerilir.
@@ -3344,13 +3357,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <span className="w-3 h-3 rounded-full bg-indigo-600 inline-block" />
                 <span>Dönemsel Hedef ve Gerçekleşme Oranı</span>
               </h3>
-              <span className="px-3 py-1 rounded-xl bg-indigo-600 text-white font-mono text-xs font-black">
+              <span className="px-3 py-1 rounded-xl bg-indigo-600 text-white font-sans tabular-nums text-xs font-black">
                 Ortalama Gerçekleşme Oranı: %90.5
               </span>
             </div>
 
             <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-              <table className="w-full text-xs border-collapse font-mono">
+              <table className="w-full text-xs border-collapse font-sans tabular-nums">
                 <thead>
                   <tr className="bg-indigo-950 text-indigo-200 text-[10px] uppercase font-bold">
                     <th className="py-2 px-2.5 text-left font-sans">Hedef Parametresi</th>
@@ -3396,10 +3409,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   <span className="w-3 h-3 rounded-full bg-slate-900 inline-block" />
                   <span>Referans Grup Karşılaştırması</span>
                 </span>
-                <span className="text-[10px] font-mono font-bold text-slate-600">{currentReport.groupInfo.groupNo}. Grup ({currentReport.groupInfo.ageRange})</span>
+                <span className="text-[10px] font-sans tabular-nums font-bold text-slate-600">{currentReport.groupInfo.groupNo}. Grup ({currentReport.groupInfo.ageRange})</span>
               </h3>
 
-              <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">
+              <div className="grid grid-cols-3 gap-2 text-center font-sans tabular-nums text-xs">
                 <div className="p-2 rounded-xl bg-white border border-slate-200">
                   <div className="text-[9px] font-sans text-slate-500 font-bold uppercase">Yüzdelik Dilim</div>
                   <div className="text-base font-black text-slate-900 mt-0.5">%{grpPos}</div>
@@ -3426,10 +3439,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   <span className="w-3 h-3 rounded-full bg-emerald-600 inline-block" />
                   <span>Branş Yatkınlık Analizi</span>
                 </span>
-                <span className="text-[10px] font-mono font-bold text-emerald-700">Uyum Skoru: %94</span>
+                <span className="text-[10px] font-sans tabular-nums font-bold text-emerald-700">Uyum Skoru: %94</span>
               </h3>
 
-              <div className="space-y-1.5 text-xs font-mono">
+              <div className="space-y-1.5 text-xs font-sans tabular-nums">
                 <div className="p-2 rounded-lg bg-white border border-emerald-200 flex justify-between items-center">
                   <span>1. {currentReport.sportBranch}</span>
                   <span className="font-extrabold text-emerald-700">%94 Morfolojik &amp; Motor Uyum</span>
@@ -3453,7 +3466,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <span className="w-3 h-3 rounded-full bg-emerald-400 inline-block" />
                 <span>Bireysel Antrenman Planı ve Ölçüm Takvimi</span>
               </h3>
-              <span className="text-xs font-mono font-bold text-emerald-400">
+              <span className="text-xs font-sans tabular-nums font-bold text-emerald-400">
                 İzleme Sıklığı: 4 Haftada Bir Ara Kontrol
               </span>
             </div>
@@ -3613,22 +3626,22 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           {row.description}
                         </div>
                       </td>
-                      <td className="py-2.5 px-2 text-center font-mono font-bold text-slate-700 bg-slate-100/70 border-r border-slate-200">
+                      <td className="py-2.5 px-2 text-center font-sans tabular-nums font-bold text-slate-700 bg-slate-100/70 border-r border-slate-200">
                         {row.m1}
                       </td>
-                      <td className="py-2.5 px-2 text-center font-mono font-bold text-blue-900 bg-blue-50/50 border-r border-slate-200">
+                      <td className="py-2.5 px-2 text-center font-sans tabular-nums font-bold text-blue-900 bg-blue-50/50 border-r border-slate-200">
                         {row.m2}
                       </td>
                       <td className="py-2.5 px-2 text-center border-r border-slate-200 bg-blue-100/60">
-                        <span className="font-mono font-black text-xs text-blue-950 bg-white border-2 border-blue-500 px-2 py-0.5 rounded-md inline-block shadow-2xs">
+                        <span className="font-sans tabular-nums font-black text-xs text-blue-950 bg-white border-2 border-blue-500 px-2 py-0.5 rounded-md inline-block shadow-2xs">
                           {row.m3}
                         </span>
                       </td>
-                      <td className="py-2.5 px-2 text-center font-mono text-xs font-bold text-slate-700 border-r border-slate-200">
+                      <td className="py-2.5 px-2 text-center font-sans tabular-nums text-xs font-bold text-slate-700 border-r border-slate-200">
                         {row.unit}
                       </td>
-                      <td className="py-2.5 px-2 text-center font-mono border-r border-slate-200">
-                        <span className="font-mono font-black text-xs text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded inline-block">
+                      <td className="py-2.5 px-2 text-center font-sans tabular-nums border-r border-slate-200">
+                        <span className="font-sans tabular-nums font-black text-xs text-slate-900 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded inline-block">
                           %{row.percentile}
                         </span>
                       </td>
@@ -3637,13 +3650,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           <span className={getStatusBadge(row.status)}>
                             {row.status}
                           </span>
-                          <span className="text-[9px] font-mono font-bold text-slate-600">
+                          <span className="text-[9px] font-sans tabular-nums font-bold text-slate-600">
                             Hedef: <strong className="text-slate-900">{row.refMid} {row.unit}</strong>
                           </span>
                         </div>
                       </td>
                       <td className="py-3 pl-3 pr-3.5">
-                        <div className="flex items-center justify-between text-[9.5px] font-mono font-bold text-slate-700 mb-1">
+                        <div className="flex items-center justify-between text-[9.5px] font-sans tabular-nums font-bold text-slate-700 mb-1">
                           <span className="text-slate-600">Alt: {row.refLow}</span>
                           <span className="text-emerald-800 font-black">İdeal: {row.refMid}</span>
                           <span className="text-slate-600">Üst: {row.refHigh}</span>
@@ -3681,7 +3694,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 >
                   1.1 Bölgesel Deri Kıvrımı (Skinfold mm) Dönemsel Değişim Analizi (I → II → III)
                 </span>
-                <span className="text-[10px] font-mono font-bold text-slate-700">
+                <span className="text-[10px] font-sans tabular-nums font-bold text-slate-700">
                   Düşük Değer = Daha Yüksek Yağsız Kas Tanımlaması
                 </span>
               </div>
@@ -3691,7 +3704,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   return (
                     <div key={sf.id} className="p-2.5 rounded-xl bg-slate-50 border-2 border-slate-200 shadow-2xs">
                       <div className="text-[11px] font-black text-slate-900 truncate">{sf.name}</div>
-                      <div className="flex items-baseline justify-between mt-1 font-mono">
+                      <div className="flex items-baseline justify-between mt-1 font-sans tabular-nums">
                         <span className="text-sm font-black text-slate-900">{sf.m3} mm</span>
                         <span
                           className={`text-[10px] font-black px-1.5 py-0.5 rounded ${
@@ -3701,7 +3714,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           {delta > 0 ? `+${delta}` : delta} mm
                         </span>
                       </div>
-                      <div className="text-[9.5px] font-mono text-slate-700 font-bold mt-1">
+                      <div className="text-[9.5px] font-sans tabular-nums text-slate-700 font-bold mt-1">
                         I: {sf.m1} · II: {sf.m2} · III: {sf.m3}
                       </div>
                     </div>
@@ -3726,20 +3739,20 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
           >
             <div>
               <div className="text-[10px] font-black uppercase tracking-wider text-slate-200">PHV (Tepe Boy Hızı) Yaşı</div>
-              <div className="text-lg font-black font-mono text-white mt-0.5">
+              <div className="text-lg font-black font-sans tabular-nums text-white mt-0.5">
                 {currentReport.phvAge} <span className="text-xs font-semibold text-slate-200">yaş</span>
               </div>
             </div>
             <div>
               <div className="text-[10px] font-black uppercase tracking-wider text-slate-200">PHV Dönemi Boy Tahmini</div>
-              <div className="text-lg font-black font-mono text-white mt-0.5">
+              <div className="text-lg font-black font-sans tabular-nums text-white mt-0.5">
                 {currentReport.phvHeight} <span className="text-xs font-semibold text-slate-200">cm</span>
               </div>
             </div>
             <div>
               <div className="text-[10px] font-black uppercase tracking-wider text-slate-200">18. Yaş Yetişkin Boy Olasılığı</div>
               <div
-                className="text-lg font-black font-mono mt-0.5"
+                className="text-lg font-black font-sans tabular-nums mt-0.5"
                 style={{ color: effectiveSecondaryHex === '#0c1d4a' || effectiveSecondaryHex === '#0f172a' ? '#facc15' : (effectiveSecondaryHex || '#facc15') }}
               >
                 {currentReport.predictedAdultHeight} <span className="text-xs font-semibold text-slate-200">cm</span>
@@ -3754,7 +3767,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
           <div className="grid grid-cols-2 sm:grid-cols-4 print:grid-cols-4 gap-2.5">
             <div className="p-2.5 rounded-xl bg-slate-50 border-2 border-slate-200/90 shadow-2xs">
               <div className="text-[10px] font-black text-slate-800 uppercase tracking-wider">Dönemsel Boy Kazanımı</div>
-              <div className="text-base font-black font-mono text-slate-900 mt-0.5">
+              <div className="text-base font-black font-sans tabular-nums text-slate-900 mt-0.5">
                 {heightGain >= 0 ? `+${heightGain}` : heightGain} cm
               </div>
               <div className="text-[10px] text-emerald-900 font-extrabold mt-0.5">
@@ -3763,7 +3776,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             </div>
             <div className="p-2.5 rounded-xl bg-slate-50 border-2 border-slate-200/90 shadow-2xs">
               <div className="text-[10px] font-black text-slate-800 uppercase tracking-wider">Vücut Kitle &amp; BKİ</div>
-              <div className="text-base font-black font-mono text-slate-900 mt-0.5">
+              <div className="text-base font-black font-sans tabular-nums text-slate-900 mt-0.5">
                 {bmiRow?.m3 ?? 18.2} kg/m²
               </div>
               <div className="text-[10px] text-blue-900 font-extrabold mt-0.5">
@@ -3772,7 +3785,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             </div>
             <div className="p-2.5 rounded-xl bg-slate-50 border-2 border-slate-200/90 shadow-2xs">
               <div className="text-[10px] font-black text-slate-800 uppercase tracking-wider">Vücut Yağ &amp; Deri Kıvrımı</div>
-              <div className="text-base font-black font-mono text-rose-700 mt-0.5">
+              <div className="text-base font-black font-sans tabular-nums text-rose-700 mt-0.5">
                 %{fatRow?.m3 ?? 14.2} <span className="text-xs font-semibold text-slate-600">({sumSkinRow?.m3 ?? 26} mm)</span>
               </div>
               <div className="text-[10px] text-emerald-900 font-extrabold mt-0.5">
@@ -3781,7 +3794,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             </div>
             <div className="p-2.5 rounded-xl bg-slate-50 border-2 border-slate-200/90 shadow-2xs">
               <div className="text-[10px] font-black text-slate-800 uppercase tracking-wider">Bel/Kalça &amp; Metabolik Denge</div>
-              <div className="text-base font-black font-mono text-slate-900 mt-0.5">
+              <div className="text-base font-black font-sans tabular-nums text-slate-900 mt-0.5">
                 {whrRow?.m3 ?? 0.78} Oran
               </div>
               <div className="text-[10px] text-slate-800 font-extrabold mt-0.5">
@@ -4015,7 +4028,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 {/* 1. Gelişim Göstermesi Gereken Alanlar */}
                 <div className="p-2.5 rounded-xl border-2 border-rose-300 bg-rose-50 flex flex-col justify-between shadow-2xs">
                   <div className="flex items-center justify-between gap-1.5 mb-1">
-                    <span className="px-2 py-0.5 rounded bg-rose-600 text-white font-mono text-[9px] font-black uppercase tracking-wider">
+                    <span className="px-2 py-0.5 rounded bg-rose-600 text-white font-sans tabular-nums text-[9px] font-black uppercase tracking-wider">
                       1. GELİŞİM GÖSTERMELİ ({devList.length} TEST)
                     </span>
                     <span className="text-[9px] font-extrabold text-rose-900">Öncelikli Hedef</span>
@@ -4024,7 +4037,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     {devList.map((item) => (
                       <span
                         key={item.id}
-                        className="px-1.5 py-0.5 rounded bg-white border border-rose-300 text-rose-950 text-[9.5px] font-extrabold font-mono"
+                        className="px-1.5 py-0.5 rounded bg-white border border-rose-300 text-rose-950 text-[9.5px] font-extrabold font-sans tabular-nums"
                       >
                         • {item.name.replace(' Testi', '')}: {item.m3}→{item.refMid} {item.unit}
                       </span>
@@ -4035,7 +4048,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 {/* 2. Takip Edilmesi / Korunması Gereken Alanlar */}
                 <div className="p-2.5 rounded-xl border-2 border-amber-300 bg-amber-50 flex flex-col justify-between shadow-2xs">
                   <div className="flex items-center justify-between gap-1.5 mb-1">
-                    <span className="px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-mono text-[9px] font-black uppercase tracking-wider">
+                    <span className="px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-sans tabular-nums text-[9px] font-black uppercase tracking-wider">
                       2. TAKİP EDİLMELİ ({watchList.length} TEST)
                     </span>
                     <span className="text-[9px] font-extrabold text-amber-950">İzlem &amp; Koruma</span>
@@ -4044,7 +4057,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     {watchList.map((item) => (
                       <span
                         key={item.id}
-                        className="px-1.5 py-0.5 rounded bg-white border border-amber-300 text-amber-950 text-[9.5px] font-extrabold font-mono"
+                        className="px-1.5 py-0.5 rounded bg-white border border-amber-300 text-amber-950 text-[9.5px] font-extrabold font-sans tabular-nums"
                       >
                         • {item.name.replace(' Testi', '')}: {item.m3}→{item.refHigh} {item.unit}
                       </span>
@@ -4055,7 +4068,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 {/* 3. Hedefe Ulaşılan / Güçlü Alanlar */}
                 <div className="p-2.5 rounded-xl border-2 border-emerald-400 bg-emerald-50 flex flex-col justify-between shadow-2xs">
                   <div className="flex items-center justify-between gap-1.5 mb-1">
-                    <span className="px-2 py-0.5 rounded bg-emerald-600 text-white font-mono text-[9px] font-black uppercase tracking-wider">
+                    <span className="px-2 py-0.5 rounded bg-emerald-600 text-white font-sans tabular-nums text-[9px] font-black uppercase tracking-wider">
                       3. HEDEFE ULAŞTI ✓ ({reachedList.length} TEST)
                     </span>
                     <span className="text-[9px] font-extrabold text-emerald-950">Üst Performans</span>
@@ -4064,7 +4077,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     {reachedList.map((item) => (
                       <span
                         key={item.id}
-                        className="px-1.5 py-0.5 rounded bg-white border border-emerald-300 text-emerald-950 text-[9.5px] font-extrabold font-mono"
+                        className="px-1.5 py-0.5 rounded bg-white border border-emerald-300 text-emerald-950 text-[9.5px] font-extrabold font-sans tabular-nums"
                       >
                         ✓ {item.name.replace(' Testi', '')}: {item.m3} {item.unit} (%{item.percentile})
                       </span>
@@ -4156,7 +4169,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                       <td className="py-1.5 pr-2 pl-2.5 border-r border-slate-200">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="font-extrabold text-slate-900 text-xs tracking-tight">{row.name}</span>
-                          <span className="text-[9.5px] font-mono font-bold text-slate-500">
+                          <span className="text-[9.5px] font-sans tabular-nums font-bold text-slate-500">
                             ({row.unit})
                           </span>
                         </div>
@@ -4166,15 +4179,15 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           </strong>
                         </div>
                       </td>
-                      <td className="py-1.5 px-1.5 text-center font-mono font-bold text-slate-700 bg-white/70 border-r border-slate-200">
+                      <td className="py-1.5 px-1.5 text-center font-sans tabular-nums font-bold text-slate-700 bg-white/70 border-r border-slate-200">
                         {row.m1}
                       </td>
-                      <td className="py-1.5 px-1.5 text-center font-mono font-bold text-blue-900 bg-blue-50/40 border-r border-slate-200">
+                      <td className="py-1.5 px-1.5 text-center font-sans tabular-nums font-bold text-blue-900 bg-blue-50/40 border-r border-slate-200">
                         {row.m2}
                       </td>
                       <td className="py-1.5 px-2 text-center border-r border-slate-200 bg-white/90">
                         <span
-                          className={`font-mono font-black text-xs px-2 py-0.5 rounded-md inline-block border-2 ${
+                          className={`font-sans tabular-nums font-black text-xs px-2 py-0.5 rounded-md inline-block border-2 ${
                             isNeedsDev
                               ? 'bg-rose-50 text-rose-950 border-rose-500'
                               : isMaintain
@@ -4186,18 +4199,18 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         </span>
                       </td>
                       <td className="py-1.5 px-2 text-center border-r border-slate-200 bg-slate-50">
-                        <div className="font-mono font-black text-xs text-slate-900 bg-white border border-slate-300 px-1.5 py-0.5 rounded inline-block">
+                        <div className="font-sans tabular-nums font-black text-xs text-slate-900 bg-white border border-slate-300 px-1.5 py-0.5 rounded inline-block">
                           {targetValue} <span className="text-[8.5px] font-normal text-slate-500">{row.unit}</span>
                         </div>
                       </td>
-                      <td className="py-1.5 px-1.5 text-center font-mono border-r border-slate-200">
-                        <span className="font-mono font-black text-xs text-slate-900 bg-white border border-slate-300 px-1.5 py-0.5 rounded inline-block">
+                      <td className="py-1.5 px-1.5 text-center font-sans tabular-nums border-r border-slate-200">
+                        <span className="font-sans tabular-nums font-black text-xs text-slate-900 bg-white border border-slate-300 px-1.5 py-0.5 rounded inline-block">
                           %{row.percentile}
                         </span>
                       </td>
                       <td className="py-1.5 px-2 text-center border-r border-slate-200">
                         <div className="flex flex-col items-center gap-0.5">
-                          <span className={`inline-block px-1.5 py-0.5 rounded text-[8.5px] font-mono font-black uppercase tracking-wider border ${statusHeaderPill}`}>
+                          <span className={`inline-block px-1.5 py-0.5 rounded text-[8.5px] font-sans tabular-nums font-black uppercase tracking-wider border ${statusHeaderPill}`}>
                             {statusHeaderLabel}
                           </span>
                           <span className={`inline-block px-1.5 py-0.2 rounded text-[9px] font-extrabold border ${guidance.verdictBadgeClass}`}>
@@ -4206,7 +4219,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         </div>
                       </td>
                       <td className="py-1.5 pl-2 pr-2.5">
-                        <div className="flex items-center justify-between text-[8.5px] font-mono font-bold text-slate-700 mb-0.5">
+                        <div className="flex items-center justify-between text-[8.5px] font-sans tabular-nums font-bold text-slate-700 mb-0.5">
                           <span className="text-slate-500">Alt:{row.refLow}</span>
                           <span className="text-slate-900 font-black">Hedef:{row.refMid}</span>
                           <span className="text-emerald-800 font-black">Üst:{row.refHigh}</span>
@@ -4455,7 +4468,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             </div>
           </div>
 
-          {/* 2. SECTION: BİRLEŞİK GELİŞİM VE KARŞILAŞTIRMA GRAFİĞİ BİLEŞENİ (ÇUBUK/ÇİZGİ VE RAPOR İNDİR DÜĞMESİ) */}
+          {/* 2. SECTION: BİRLEŞİK GELİŞİM VE KARŞILAŞTIRMA GRAFİĞİ BİLEŞENİ (SABİT KURUMSAL GÖRÜNÜM) */}
           <AthleteDevelopmentComparisonChart
             report={currentReport}
             height={320}
@@ -4746,7 +4759,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               >
                 <Users className="w-3.5 h-3.5 text-violet-600 shrink-0" />
                 <span>Toplu Karne</span>
-                <span className="text-[11px] font-mono tabular-nums text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] font-sans tabular-nums tabular-nums text-slate-500 dark:text-slate-400">
                   ({batchReports.length})
                 </span>
               </button>
@@ -4763,7 +4776,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               >
                 <Archive className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                 <span>Arşiv</span>
-                <span className="text-[11px] font-mono tabular-nums text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] font-sans tabular-nums tabular-nums text-slate-500 dark:text-slate-400">
                   ({archivedReports.length})
                 </span>
               </button>
@@ -4784,7 +4797,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <Eye className={`w-4 h-4 ${isPdfPreviewMode ? 'text-white' : 'text-rose-600'} shrink-0`} />
                 <span>{isPdfPreviewMode ? 'PDF Görünümünü Kapat' : 'PDF Olarak Görüntüle'}</span>
                 {isPdfPreviewMode && (
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-black bg-white/20 text-white">
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-sans tabular-nums font-black bg-white/20 text-white">
                     Açık
                   </span>
                 )}
@@ -5093,7 +5106,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                             : 'Anatomik Vücut Haritası gizlendi.'
                         );
                       }}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-lg text-[10px] font-sans tabular-nums font-bold cursor-pointer ${
                         showBodyMapInfographic
                           ? 'bg-emerald-600 text-white'
                           : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
@@ -5272,7 +5285,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         </div>
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono text-slate-500">
+                    <span className="text-[10px] font-sans tabular-nums text-slate-500">
                       {showBrandingSettings ? 'Açık' : 'Kapalı'}
                     </span>
                   </button>
@@ -5296,7 +5309,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                       </div>
                     </div>
                     <span
-                      className={`text-[10px] font-mono font-bold ${
+                      className={`text-[10px] font-sans tabular-nums font-bold ${
                         showChartsPanel ? 'text-emerald-600' : 'text-slate-400'
                       }`}
                     >
@@ -5323,7 +5336,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                       </div>
                     </div>
                     <span
-                      className={`text-[10px] font-mono font-bold ${
+                      className={`text-[10px] font-sans tabular-nums font-bold ${
                         showAiPanel ? 'text-indigo-600' : 'text-slate-400'
                       }`}
                     >
@@ -5562,7 +5575,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                             <span className="text-xs font-extrabold text-slate-900 dark:text-white">
                               {tpl.shortName}
                             </span>
-                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${tpl.badgeColor}`}>
+                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-sans tabular-nums font-bold ${tpl.badgeColor}`}>
                               {isSelected ? 'AKTİF ŞABLON' : 'SEÇ'}
                             </span>
                           </div>
@@ -5683,7 +5696,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">
                     Toplu Karne Oluşturma — Excel&apos;den Çoklu Sporcu Karnesi Üretimi
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-extrabold bg-violet-100 dark:bg-violet-950/70 text-violet-800 dark:text-violet-300 border border-violet-200 dark:border-violet-800">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-sans tabular-nums font-extrabold bg-violet-100 dark:bg-violet-950/70 text-violet-800 dark:text-violet-300 border border-violet-200 dark:border-violet-800">
                     {batchReports.length} Sporcu Yüklü · {selectedBatchReports.length} Seçili
                   </span>
                 </div>
@@ -5803,7 +5816,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 </span>
               </div>
               {batchSourceFileName && (
-                <div className="mt-2.5 text-[11px] font-mono text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                <div className="mt-2.5 text-[11px] font-sans tabular-nums text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                   <span className="truncate max-w-xs">Aktif Veri: {batchSourceFileName}</span>
                 </div>
@@ -5863,7 +5876,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   </span>
                 </label>
 
-                <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] font-sans tabular-nums text-slate-500 dark:text-slate-400">
                   Arşiv Formatı: [Sporcu Adı] — {batchGroupTitle || 'Dönem Karnesi'}
                 </span>
               </div>
@@ -5879,12 +5892,12 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   <div className="text-xs sm:text-sm font-extrabold">
                     Toplu A4 PDF Karneler Oluşturuluyor — Lütfen Bekleyin
                   </div>
-                  <div className="text-xs text-violet-300 font-mono mt-0.5">
+                  <div className="text-xs text-violet-300 font-sans tabular-nums mt-0.5">
                     {batchPdfStatusText}
                   </div>
                 </div>
               </div>
-              <span className="text-[11px] font-mono text-slate-400">
+              <span className="text-[11px] font-sans tabular-nums text-slate-400">
                 7 Sayfa × {selectedBatchReports.length} Sporcu ({selectedBatchReports.length * 7} A4 Sayfası)
               </span>
             </div>
@@ -5912,7 +5925,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
               <div className="text-xs">
                 <span className="text-slate-400">Seçili Sporcu: </span>
-                <strong className="text-white font-mono">
+                <strong className="text-white font-sans tabular-nums">
                   {selectedBatchReports.length} / {batchReports.length} Sporcu
                 </strong>
                 <span className="text-slate-400 ml-2 hidden sm:inline">
@@ -6059,7 +6072,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                             <div className="font-extrabold text-slate-900 dark:text-white">
                               {rep.athleteName}
                             </div>
-                            <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+                            <div className="text-[10px] font-sans tabular-nums text-slate-500 dark:text-slate-400">
                               {rep.athleteCode} · {rep.date3}
                             </div>
                           </div>
@@ -6073,13 +6086,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           {rep.ageYears} Yaş ({rep.gender}) · {effectiveClubName}
                         </div>
                       </td>
-                      <td className="py-3 px-3 text-center font-mono">
+                      <td className="py-3 px-3 text-center font-sans tabular-nums">
                         <div className="font-bold text-slate-900 dark:text-white">
                           {heightM3} cm / {weightM3} kg
                         </div>
                         <div className="text-[10px] text-slate-500">BKİ: {bmiM3} kg/m²</div>
                       </td>
-                      <td className="py-3 px-3 text-center font-mono">
+                      <td className="py-3 px-3 text-center font-sans tabular-nums">
                         <div className="font-bold text-slate-900 dark:text-white">
                           {sprintM3} sn
                         </div>
@@ -6087,7 +6100,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           Dikey Sıçrama: {vjM3} cm
                         </div>
                       </td>
-                      <td className="py-3 px-3 text-center font-mono">
+                      <td className="py-3 px-3 text-center font-sans tabular-nums">
                         <div className="font-bold text-emerald-700 dark:text-emerald-400">
                           {rep.cardio.test3Vo2} ml/kg/dk
                         </div>
@@ -6095,13 +6108,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           {rep.somatotype.m3.endo}-{rep.somatotype.m3.meso}-{rep.somatotype.m3.ecto}
                         </div>
                       </td>
-                      <td className="py-3 px-3 text-center font-mono">
+                      <td className="py-3 px-3 text-center font-sans tabular-nums">
                         <div className="font-bold text-indigo-700 dark:text-indigo-400">
                           {rep.predictedAdultHeight} cm
                         </div>
                         <div className="text-[10px] text-slate-500">PHV: {rep.phvAge} Yaş</div>
                       </td>
-                      <td className="py-3 px-3 text-center font-mono">
+                      <td className="py-3 px-3 text-center font-sans tabular-nums">
                         <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-black">
                           %{rep.scoreHistory.p3Score}
                         </div>
@@ -6170,7 +6183,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">
                     Karne Arşivi — Kayıtlı Sporcu Performans Karneleri
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-extrabold bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-sans tabular-nums font-extrabold bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                     {archivedReports.length} Kayıtlı Karne
                   </span>
                 </div>
@@ -6287,7 +6300,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-sans tabular-nums font-bold text-slate-600 dark:text-slate-300">
                               <Calendar className="w-3 h-3 text-amber-600 shrink-0" />
                               <span>Kayıt: {item.savedAt}</span>
                             </span>
@@ -6362,7 +6375,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           <div className="text-[10px] font-bold text-slate-400 uppercase">
                             Genel Puan
                           </div>
-                          <div className="text-base font-black font-mono text-emerald-600 dark:text-emerald-400">
+                          <div className="text-base font-black font-sans tabular-nums text-emerald-600 dark:text-emerald-400">
                             %{rep.scoreHistory.p3Score}
                           </div>
                         </div>
@@ -6374,7 +6387,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           <div className="text-[9px] font-bold text-slate-400 uppercase">
                             Boy / Kilo
                           </div>
-                          <div className="text-[11px] font-bold font-mono text-slate-800 dark:text-slate-200 mt-0.5">
+                          <div className="text-[11px] font-bold font-sans tabular-nums text-slate-800 dark:text-slate-200 mt-0.5">
                             {heightVal}cm / {weightVal}kg
                           </div>
                         </div>
@@ -6382,7 +6395,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           <div className="text-[9px] font-bold text-slate-400 uppercase">
                             18 Yaş Boy
                           </div>
-                          <div className="text-[11px] font-bold font-mono text-blue-600 dark:text-blue-400 mt-0.5">
+                          <div className="text-[11px] font-bold font-sans tabular-nums text-blue-600 dark:text-blue-400 mt-0.5">
                             {rep.predictedAdultHeight} cm
                           </div>
                         </div>
@@ -6390,7 +6403,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           <div className="text-[9px] font-bold text-slate-400 uppercase">
                             VO2peak
                           </div>
-                          <div className="text-[11px] font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
+                          <div className="text-[11px] font-bold font-sans tabular-nums text-emerald-600 dark:text-emerald-400 mt-0.5">
                             {rep.cardio.test3Vo2}
                           </div>
                         </div>
@@ -6398,7 +6411,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           <div className="text-[9px] font-bold text-slate-400 uppercase">
                             Ölçüm Tarihi
                           </div>
-                          <div className="text-[11px] font-bold font-mono text-slate-700 dark:text-slate-300 mt-0.5">
+                          <div className="text-[11px] font-bold font-sans tabular-nums text-slate-700 dark:text-slate-300 mt-0.5">
                             {rep.date3}
                           </div>
                         </div>
@@ -6521,7 +6534,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <span className="text-[11px] font-extrabold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">
                   Genel Performans Sentezi &amp; Gelişim Yönü
                 </span>
-                <span className="text-[11px] font-mono text-slate-400">
+                <span className="text-[11px] font-sans tabular-nums text-slate-400">
                   Son Analiz: {activeAiAnalysis.generatedAt}
                 </span>
               </div>
@@ -6539,7 +6552,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Atletik Hazırlık &amp; Gelişim Endeksi
                 </div>
-                <div className="text-3xl font-black font-mono text-emerald-400 mt-1">
+                <div className="text-3xl font-black font-sans tabular-nums text-emerald-400 mt-1">
                   %{activeAiAnalysis.readinessScore}
                 </div>
                 <p className="text-[11px] text-slate-300 mt-1">
@@ -6548,7 +6561,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               </div>
               <div className="mt-3 pt-2.5 border-t border-slate-700 flex items-center justify-between text-[11px]">
                 <span className="text-slate-400">Gelişime Açık Alan:</span>
-                <span className="font-mono font-bold text-amber-400">
+                <span className="font-sans tabular-nums font-bold text-amber-400">
                   {activeAiAnalysis.improvementAreas.length} Kritik Metrik
                 </span>
               </div>
@@ -6561,7 +6574,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             <div className="lg:col-span-7 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-xs font-extrabold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded bg-rose-600 text-white font-mono text-[10px] font-black">
+                  <span className="px-2 py-0.5 rounded bg-rose-600 text-white font-sans tabular-nums text-[10px] font-black">
                     10. BÖLÜM
                   </span>
                   <span>Öncelikli Gelişim Alanları &amp; İlk Bakışta Odak Planı</span>
@@ -6594,7 +6607,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-mono font-black uppercase ${
+                            className={`px-2 py-0.5 rounded text-[10px] font-sans tabular-nums font-black uppercase ${
                               idx === 0
                                 ? 'bg-rose-600 text-white'
                                 : idx === 1
@@ -6612,7 +6625,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-2 text-xs font-mono">
+                        <div className="flex items-center gap-2 text-xs font-sans tabular-nums">
                           <span className="bg-white dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
                             Mevcut: <strong className="text-slate-900 dark:text-white font-black">{item.currentValue}</strong>
                           </span>
@@ -6641,7 +6654,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           <strong className="text-indigo-700 dark:text-indigo-400 font-extrabold">Odaklanılacak Antrenman Reçetesi: </strong>
                           {item.drillRecommendation}
                         </div>
-                        <div className="font-mono font-extrabold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1 rounded-md border border-indigo-200 dark:border-indigo-800 shrink-0">
+                        <div className="font-sans tabular-nums font-extrabold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1 rounded-md border border-indigo-200 dark:border-indigo-800 shrink-0">
                            {item.weeklyFrequency}
                         </div>
                       </div>
@@ -6667,7 +6680,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     >
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-bold text-slate-900 dark:text-white">{st.metricName}</span>
-                        <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
+                        <span className="font-sans tabular-nums font-bold text-emerald-700 dark:text-emerald-400">
                           {st.currentValue} · %{st.percentile} Yüzdelik
                         </span>
                       </div>
@@ -6700,7 +6713,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           <li key={dIdx}>· {d}</li>
                         ))}
                       </ul>
-                      <div className="mt-1.5 pt-1 border-t border-slate-100 dark:border-slate-700 text-[10px] font-mono text-slate-500 dark:text-slate-400">
+                      <div className="mt-1.5 pt-1 border-t border-slate-100 dark:border-slate-700 text-[10px] font-sans tabular-nums text-slate-500 dark:text-slate-400">
                         Yüklenme: {block.loadNote}
                       </div>
                     </div>
@@ -6725,7 +6738,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             <div>
               <div className="text-xs sm:text-sm font-extrabold tracking-tight flex items-center gap-2">
                 <span>A4 PDF Önizleme Modu — {currentReport.athleteName}</span>
-                <span className="text-[11px] font-mono font-normal text-slate-300">
+                <span className="text-[11px] font-sans tabular-nums font-normal text-slate-300">
                   (210 × 297 mm · 5 Sayfa · Baskıya Hazır)
                 </span>
               </div>
@@ -6743,7 +6756,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   key={z}
                   type="button"
                   onClick={() => setPdfZoom(z)}
-                  className={`px-2.5 py-1 rounded-lg font-mono font-bold transition-colors cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-lg font-sans tabular-nums font-bold transition-colors cursor-pointer ${
                     pdfZoom === z ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'
                   }`}
                 >
@@ -6867,7 +6880,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     {currentReport.sportBranch} · {effectiveClubName}
                   </div>
                 </div>
-                <div className="text-right font-mono">
+                <div className="text-right font-sans tabular-nums">
                   <div className="text-[10px] text-slate-400 uppercase">3. Ölçüm Puanı</div>
                   <div className="text-sm font-black text-emerald-600">
                     %{currentReport.scoreHistory.p3Score}
@@ -7102,7 +7115,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           ageYears: parseFloat(e.target.value) || 10,
                         })
                       }
-                      className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
+                      className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-sans tabular-nums"
                     />
                   </div>
                 </div>
@@ -7192,7 +7205,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           ageYears: parseFloat(e.target.value) || 10,
                         })
                       }
-                      className="w-1/2 px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
+                      className="w-1/2 px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-sans tabular-nums"
                     />
                   </div>
                 </div>
@@ -7212,7 +7225,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         phvAge: parseFloat(e.target.value) || 12.8,
                       })
                     }
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-mono text-slate-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-sans tabular-nums text-slate-900"
                   />
                 </div>
                 <div>
@@ -7227,7 +7240,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         phvHeight: parseFloat(e.target.value) || 165.8,
                       })
                     }
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-mono text-slate-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-sans tabular-nums text-slate-900"
                   />
                 </div>
                 <div>
@@ -7242,7 +7255,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         predictedAdultHeight: parseFloat(e.target.value) || 172.7,
                       })
                     }
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-mono text-slate-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-sans tabular-nums text-slate-900"
                   />
                 </div>
                 <div>
@@ -7259,7 +7272,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         },
                       })
                     }
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-mono text-slate-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-sans tabular-nums text-slate-900"
                   />
                 </div>
               </div>
@@ -7280,7 +7293,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         },
                       })
                     }
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-mono text-slate-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-sans tabular-nums text-slate-900"
                   />
                 </div>
                 <div>
@@ -7297,7 +7310,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         },
                       })
                     }
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-mono text-slate-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-sans tabular-nums text-slate-900"
                   />
                 </div>
                 <div>
@@ -7314,7 +7327,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         },
                       })
                     }
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-mono text-slate-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-sans tabular-nums text-slate-900"
                   />
                 </div>
                 <div>
@@ -7331,7 +7344,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         },
                       })
                     }
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-mono text-slate-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-sans tabular-nums text-slate-900"
                   />
                 </div>
               </div>

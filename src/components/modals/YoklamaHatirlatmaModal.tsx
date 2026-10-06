@@ -424,7 +424,7 @@ export const YoklamaHatirlatmaModal: React.FC<YoklamaHatirlatmaModalProps> = ({
                   className="w-full p-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none"
                 />
                 <p className="text-[10px] text-slate-400 mt-1">
-                  Otomatik değişkenler: <code className="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-blue-600 font-mono">&#123;sporcu_adi&#125;</code> otomatik olarak ilgili alıcının ismi ile yer değiştirir.
+                  Otomatik değişkenler: <code className="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-blue-600 font-sans tabular-nums">&#123;sporcu_adi&#125;</code> otomatik olarak ilgili alıcının ismi ile yer değiştirir.
                 </p>
               </div>
             </div>
@@ -570,7 +570,7 @@ export const YoklamaHatirlatmaModal: React.FC<YoklamaHatirlatmaModalProps> = ({
                       <span>Tetikleyen: {log.triggeredBy}</span>
                       <div className="flex items-center gap-1">
                         {log.channels.map((c, i) => (
-                          <span key={i} className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-slate-700 dark:text-slate-200 font-mono">
+                          <span key={i} className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-slate-700 dark:text-slate-200 font-sans tabular-nums">
                             {c}
                           </span>
                         ))}

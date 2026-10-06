@@ -180,7 +180,7 @@ export const DynamicQrAttendanceModal: React.FC<DynamicQrAttendanceModalProps> =
             <QrCodeDisplay value={qrPayload} size={240} className="relative shadow-2xl" />
 
             {/* Live Refresh Badge */}
-            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-slate-950 text-slate-300 px-3.5 py-1 rounded-full border border-slate-700 text-xs font-mono font-bold flex items-center gap-2 shadow-lg">
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-slate-950 text-slate-300 px-3.5 py-1 rounded-full border border-slate-700 text-xs font-sans tabular-nums font-bold flex items-center gap-2 shadow-lg">
               <RefreshCw className="w-3.5 h-3.5 text-blue-400 animate-spin" />
               <span>Dinamik Kod: <strong className="text-white">{tokenCounter}s</strong></span>
             </div>
@@ -247,7 +247,7 @@ export const DynamicQrAttendanceModal: React.FC<DynamicQrAttendanceModalProps> =
             <span>Resmi Sportsfly Güvenli Yoklama Protokolü v3.2</span>
           </div>
 
-          <div className="font-mono text-[11px] text-slate-500">
+          <div className="font-sans tabular-nums text-[11px] text-slate-500">
             Jeton: {sessionToken}
           </div>
         </div>

@@ -454,7 +454,7 @@ export const YoklamaView: React.FC = () => {
                           )}
                         </div>
                         <div className="flex items-center gap-2 mt-0.5 text-xs">
-                          <span className="text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-mono text-[11px]">#{member.code}</span>
+                          <span className="text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-sans tabular-nums text-[11px]">#{member.code}</span>
                           <span className="text-slate-400 truncate">{member.phone}</span>
                           <span className="text-[11px] text-emerald-600 font-semibold hidden md:inline">
                             • Haftalık Devam: %100

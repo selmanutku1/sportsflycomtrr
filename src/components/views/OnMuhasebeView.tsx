@@ -1094,7 +1094,7 @@ export const OnMuhasebeView: React.FC<Props> = ({ initialTab = 'genel', onNaviga
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h4 className="font-bold text-slate-900 text-sm">{p.athleteName}</h4>
-                      <p className="text-[11px] text-slate-500 font-mono">Kod: {p.athleteCode}</p>
+                      <p className="text-[11px] text-slate-500 font-sans tabular-nums">Kod: {p.athleteCode}</p>
                     </div>
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
@@ -1116,7 +1116,7 @@ export const OnMuhasebeView: React.FC<Props> = ({ initialTab = 'genel', onNaviga
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Taksit:</span>
-                      <span className="font-mono font-bold text-slate-700">{p.installment}</span>
+                      <span className="font-sans tabular-nums font-bold text-slate-700">{p.installment}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Vade:</span>
@@ -1175,11 +1175,11 @@ export const OnMuhasebeView: React.FC<Props> = ({ initialTab = 'genel', onNaviga
                     <tr key={p.id} className="hover:bg-slate-50">
                       <td className="py-3 px-3">
                         <p className="font-bold text-slate-900 cursor-pointer hover:text-blue-600 transition-colors">{p.athleteName}</p>
-                        <p className="text-[11px] text-slate-500 font-mono">Kod: {p.athleteCode}</p>
+                        <p className="text-[11px] text-slate-500 font-sans tabular-nums">Kod: {p.athleteCode}</p>
                       </td>
                       <td className="py-3 px-3 text-slate-800 font-medium">{p.planName}</td>
                       <td className="py-3 px-3">
-                        <span className="px-2 py-0.5 rounded bg-slate-100 font-mono font-bold text-slate-700 text-[11px]">
+                        <span className="px-2 py-0.5 rounded bg-slate-100 font-sans tabular-nums font-bold text-slate-700 text-[11px]">
                           {p.installment}
                         </span>
                       </td>
@@ -1238,7 +1238,7 @@ export const OnMuhasebeView: React.FC<Props> = ({ initialTab = 'genel', onNaviga
             <div>
               <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
                 <span>Sporcu Ödeme Planları</span>
-                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold font-mono">
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold font-sans tabular-nums">
                   {filteredOdemePlanlari.length} / {odemePlanlari.length}
                 </span>
               </h3>
@@ -1394,7 +1394,7 @@ export const OnMuhasebeView: React.FC<Props> = ({ initialTab = 'genel', onNaviga
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <h4 className="font-black text-slate-900 text-sm">{plan.athleteName}</h4>
-                        <p className="text-[11px] text-slate-500 font-mono font-medium">Kod: #{plan.athleteCode}</p>
+                        <p className="text-[11px] text-slate-500 font-sans tabular-nums font-medium">Kod: #{plan.athleteCode}</p>
                       </div>
                       <span
                         className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
@@ -1416,7 +1416,7 @@ export const OnMuhasebeView: React.FC<Props> = ({ initialTab = 'genel', onNaviga
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-500">Taksit:</span>
-                        <span className="font-mono font-bold text-slate-800">{plan.installment}</span>
+                        <span className="font-sans tabular-nums font-bold text-slate-800">{plan.installment}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-500">Son Ödeme:</span>
@@ -1477,9 +1477,9 @@ export const OnMuhasebeView: React.FC<Props> = ({ initialTab = 'genel', onNaviga
                   {filteredOdemePlanlari.map((plan) => (
                     <tr key={plan.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="py-3 px-4 font-bold text-slate-900">{plan.athleteName}</td>
-                      <td className="py-3 px-4 font-mono font-semibold text-slate-500">#{plan.athleteCode}</td>
+                      <td className="py-3 px-4 font-sans tabular-nums font-semibold text-slate-500">#{plan.athleteCode}</td>
                       <td className="py-3 px-4 font-medium text-slate-800">{plan.planName}</td>
-                      <td className="py-3 px-4 font-mono font-bold text-slate-700">{plan.installment}</td>
+                      <td className="py-3 px-4 font-sans tabular-nums font-bold text-slate-700">{plan.installment}</td>
                       <td className="py-3 px-4 text-slate-600">{plan.dueDate}</td>
                       <td className="py-3 px-4 text-right font-black text-slate-900">
                         {plan.amount.toLocaleString('tr-TR')} ₺
@@ -1922,7 +1922,7 @@ export const OnMuhasebeView: React.FC<Props> = ({ initialTab = 'genel', onNaviga
                   </div>
                   <div>
                     <span className="text-slate-500">Belge No:</span>{' '}
-                    <span className="font-mono font-bold text-slate-900">
+                    <span className="font-sans tabular-nums font-bold text-slate-900">
                       {receiptDocType === 'makbuz' ? 'MAK' : 'FAT'}-2026-{selectedReceiptPlan.receiptNumber || selectedReceiptPlan.id.replace(/\D/g, '').padStart(6, '0')}
                     </span>
                   </div>
@@ -1939,7 +1939,7 @@ export const OnMuhasebeView: React.FC<Props> = ({ initialTab = 'genel', onNaviga
                   <div className="space-y-1">
                     <p className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Sporcu / Alıcı Bilgileri</p>
                     <p className="font-black text-slate-900 text-sm">{selectedReceiptPlan.athleteName}</p>
-                    <p className="text-[11px] text-slate-600 font-mono font-semibold">Sporcu Kod: #{selectedReceiptPlan.athleteCode}</p>
+                    <p className="text-[11px] text-slate-600 font-sans tabular-nums font-semibold">Sporcu Kod: #{selectedReceiptPlan.athleteCode}</p>
                     <p className="text-[11px] text-slate-500">Ödeme Yöntemi: Banka Havalesi / EFT / Kredi Kartı</p>
                   </div>
 
@@ -1947,7 +1947,7 @@ export const OnMuhasebeView: React.FC<Props> = ({ initialTab = 'genel', onNaviga
                     <p className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Plan &amp; Taksit Detayı</p>
                     <p className="font-bold text-slate-900 text-xs">{selectedReceiptPlan.planName}</p>
                     <p className="text-[11px] text-slate-700 font-medium">
-                      Taksit Dönemi: <span className="font-mono font-bold text-slate-900">{selectedReceiptPlan.installment}</span>
+                      Taksit Dönemi: <span className="font-sans tabular-nums font-bold text-slate-900">{selectedReceiptPlan.installment}</span>
                     </p>
                     <p className="text-[11px] text-slate-500">
                       Son Ödeme Vadesi: {selectedReceiptPlan.dueDate}
@@ -1987,13 +1987,13 @@ export const OnMuhasebeView: React.FC<Props> = ({ initialTab = 'genel', onNaviga
                   <div className="bg-slate-50 p-3.5 border-t border-slate-200 space-y-1.5 text-xs">
                     <div className="flex justify-between text-slate-600 font-medium">
                       <span>Ara Toplam (KDV Hariç):</span>
-                      <span className="font-mono font-bold text-slate-800">
+                      <span className="font-sans tabular-nums font-bold text-slate-800">
                         {(selectedReceiptPlan.amount * 0.8333).toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ₺
                       </span>
                     </div>
                     <div className="flex justify-between text-slate-600 font-medium">
                       <span>KDV (%20):</span>
-                      <span className="font-mono font-bold text-slate-800">
+                      <span className="font-sans tabular-nums font-bold text-slate-800">
                         {(selectedReceiptPlan.amount * 0.1667).toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ₺
                       </span>
                     </div>

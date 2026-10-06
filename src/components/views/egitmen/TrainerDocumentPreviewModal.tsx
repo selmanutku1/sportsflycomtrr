@@ -120,7 +120,7 @@ export const TrainerDocumentPreviewModal: React.FC<TrainerDocumentPreviewModalPr
 
               <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
                 <span className="text-slate-400 font-medium">Dosya Boyutu:</span>
-                <span className="font-mono text-slate-700 dark:text-slate-300">{document.size}</span>
+                <span className="font-sans tabular-nums text-slate-700 dark:text-slate-300">{document.size}</span>
               </div>
 
               <div className="flex justify-between py-1">
@@ -152,7 +152,7 @@ export const TrainerDocumentPreviewModal: React.FC<TrainerDocumentPreviewModalPr
 
               <div className="text-center">
                 <div className="w-28 border-b-2 border-slate-300 dark:border-slate-600 mx-auto pb-6">
-                  <span className="text-[11px] font-serif italic text-slate-600 dark:text-slate-300 font-bold">Kulüp Yönetimi</span>
+                  <span className="text-[11px] font-sans italic text-slate-600 dark:text-slate-300 font-bold">Kulüp Yönetimi</span>
                 </div>
                 <span className="text-[10px] text-slate-400 block mt-1">Yetkili İmza &amp; Kaşe</span>
               </div>

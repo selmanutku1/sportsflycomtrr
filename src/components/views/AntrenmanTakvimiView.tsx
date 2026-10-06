@@ -1893,7 +1893,7 @@ export const AntrenmanTakvimiView: React.FC = () => {
                       <tr key={att.id} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'}>
                         <td className="py-2 px-3 text-center font-bold text-slate-400">{index + 1}</td>
                         <td className="py-2 px-3 font-bold text-slate-900">{att.name}</td>
-                        <td className="py-2 px-3 text-slate-500 font-mono text-[11px]">{att.phone || '+90 53X XXX XX XX'}</td>
+                        <td className="py-2 px-3 text-slate-500 font-sans tabular-nums text-[11px]">{att.phone || '+90 53X XXX XX XX'}</td>
                         <td className="py-2 px-3 text-center">
                           {att.present ? (
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">

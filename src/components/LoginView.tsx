@@ -946,7 +946,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 <span className="font-bold text-slate-900">{maskedPhoneDisplay}</span> numaralı telefonunuza 6 haneli SMS doğrulama kodu gönderildi.
               </div>
               <span
-                className={`px-2.5 py-1 rounded-lg text-xs font-mono font-extrabold shrink-0 ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-sans tabular-nums font-extrabold shrink-0 ${
                   smsCountdown <= 20
                     ? 'bg-rose-100 text-rose-700'
                     : 'bg-blue-100 text-blue-800'
@@ -976,7 +976,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                     onPaste={handleOtpPaste}
-                    className="w-full h-12 text-center text-lg font-extrabold font-mono text-slate-900 bg-slate-50 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
+                    className="w-full h-12 text-center text-lg font-extrabold font-sans tabular-nums text-slate-900 bg-slate-50 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
                   />
                 ))}
               </div>
@@ -2132,7 +2132,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 Yetkilendirilecek Alan Adınız (Domain)
               </label>
               <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-200">
-                <code className="text-xs font-mono font-bold text-slate-800 flex-1 truncate">
+                <code className="text-xs font-sans tabular-nums font-bold text-slate-800 flex-1 truncate">
                   {unauthorizedDomainHost || (typeof window !== 'undefined' ? window.location.hostname : 'sportsflyplus.vercel.app')}
                 </code>
                 <button
@@ -2169,7 +2169,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                   Sayfadaki <strong>Authorized domains (Yetkili alan adları)</strong> tablosunu bulun.
                 </li>
                 <li>
-                  <strong>Add domain (Alan Adı Ekle)</strong> butonuna tıklayıp kopyaladığınız alan adını veya <code className="px-1.5 py-0.5 rounded bg-slate-200 font-mono text-[11px]">vercel.app</code> yazarak kaydedin.
+                  <strong>Add domain (Alan Adı Ekle)</strong> butonuna tıklayıp kopyaladığınız alan adını veya <code className="px-1.5 py-0.5 rounded bg-slate-200 font-sans tabular-nums text-[11px]">vercel.app</code> yazarak kaydedin.
                 </li>
               </ol>
             </div>

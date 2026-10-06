@@ -770,7 +770,7 @@ export const KulupSozlesmeleriView: React.FC = () => {
                     placeholder="TRXX XXXX XXXX XXXX XXXX XXXX XX"
                     value={formData.iban}
                     onChange={(e) => handleInputChange('iban', e.target.value)}
-                    className="w-full h-11 px-3.5 border border-slate-300 rounded-lg text-sm text-slate-800 font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full h-11 px-3.5 border border-slate-300 rounded-lg text-sm text-slate-800 font-sans tabular-nums placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
               </div>
@@ -834,7 +834,7 @@ export const KulupSozlesmeleriView: React.FC = () => {
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <span className="text-[10px] font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded">
+                    <span className="text-[10px] font-sans tabular-nums text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded">
                       {item.sozlesmeNo}
                     </span>
                     <h3 className="font-bold text-slate-900 text-sm mt-1">{item.firmaUnvani}</h3>
@@ -872,7 +872,7 @@ export const KulupSozlesmeleriView: React.FC = () => {
                     <span className="text-slate-400">Telefon:</span>
                     <span>{item.telefon}</span>
                   </div>
-                  <div className="flex justify-between pt-1 border-t border-slate-200 font-mono text-[11px]">
+                  <div className="flex justify-between pt-1 border-t border-slate-200 font-sans tabular-nums text-[11px]">
                     <span className="text-slate-400">IBAN:</span>
                     <span className="truncate max-w-[200px]">{item.iban}</span>
                   </div>
@@ -916,12 +916,12 @@ export const KulupSozlesmeleriView: React.FC = () => {
               <tbody className="divide-y divide-slate-100">
                 {filteredSozlesmeler.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="py-3.5 px-3 font-mono font-bold text-blue-600">
+                    <td className="py-3.5 px-3 font-sans tabular-nums font-bold text-blue-600">
                       {item.sozlesmeNo}
                     </td>
                     <td className="py-3.5 px-3">
                       <div className="font-bold text-slate-900 text-xs">{item.firmaUnvani}</div>
-                      <div className="text-[11px] text-slate-500 font-mono">
+                      <div className="text-[11px] text-slate-500 font-sans tabular-nums">
                         VD: {item.vergiDairesi}
                       </div>
                     </td>
@@ -1011,7 +1011,7 @@ export const KulupSozlesmeleriView: React.FC = () => {
                   <h3 className="font-bold text-slate-900 text-base">
                     Kulüp Sözleşme Belgesi
                   </h3>
-                  <p className="text-xs text-slate-500 font-mono">
+                  <p className="text-xs text-slate-500 font-sans tabular-nums">
                     Ref: {selectedContract.sozlesmeNo} • {selectedContract.createdAt}
                   </p>
                 </div>
@@ -1047,7 +1047,7 @@ export const KulupSozlesmeleriView: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[11px]">T.C. Kimlik No:</span>
-                  <span className="font-mono text-slate-800">{selectedContract.tcKimlik}</span>
+                  <span className="font-sans tabular-nums text-slate-800">{selectedContract.tcKimlik}</span>
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[11px]">Doğum Tarihi:</span>
@@ -1073,7 +1073,7 @@ export const KulupSozlesmeleriView: React.FC = () => {
                 </div>
                 <div className="col-span-2 pt-2 border-t border-slate-200">
                   <span className="text-slate-400 block text-[11px]">IBAN / Hesap Ünvanı:</span>
-                  <span className="font-mono font-bold text-slate-900 block">{selectedContract.iban}</span>
+                  <span className="font-sans tabular-nums font-bold text-slate-900 block">{selectedContract.iban}</span>
                   <span className="text-slate-500 text-[11px] block mt-0.5">Ünvan: {selectedContract.ibanUnvan}</span>
                 </div>
               </div>

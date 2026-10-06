@@ -1357,11 +1357,11 @@ export const YetkilendirmelerView: React.FC = () => {
                       <Activity className="w-3.5 h-3.5" />
                       Canlı Güvenlik Denetim İzi (SIEM Audit Log)
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400">
+                    <span className="text-[10px] font-sans tabular-nums text-slate-400">
                       Son {Math.min(4, auditEvents.length)} Kayıt
                     </span>
                   </div>
-                  <div className="space-y-1.5 max-h-28 overflow-y-auto font-mono text-[10px]">
+                  <div className="space-y-1.5 max-h-28 overflow-y-auto font-sans tabular-nums text-[10px]">
                     {auditEvents.slice(0, 4).map((ev) => (
                       <div key={ev.id} className="flex items-center justify-between gap-2 py-1 border-b border-slate-800 last:border-0">
                         <span className="text-emerald-300 font-bold shrink-0">[{ev.category}]</span>

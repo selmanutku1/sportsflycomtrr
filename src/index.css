@@ -5,6 +5,8 @@
 @theme {
   /* Minimal & Crisp SaaS Typography Hierarchy - Plus Jakarta Sans */
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   /* Refined typography scale with 5% increased line-height for enhanced corporate readability */
   --text-2xs: 0.65rem;
@@ -139,10 +141,19 @@
     line-height: 1.55;
   }
 
-  button, input, select, textarea {
+  button, input, select, textarea, code, kbd, samp, pre {
     font-family: inherit;
     font-feature-settings: inherit;
     letter-spacing: -0.01em;
+  }
+
+  .font-mono {
+    font-family: var(--font-sans) !important;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .font-serif {
+    font-family: var(--font-sans) !important;
   }
 
   button {

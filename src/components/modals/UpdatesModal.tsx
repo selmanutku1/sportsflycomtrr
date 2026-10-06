@@ -142,7 +142,7 @@ export const UpdatesModal: React.FC<UpdatesModalProps> = ({
                 <h3 className="text-lg sm:text-xl font-extrabold tracking-tight">
                   Sistem Güncellemeleri &amp; Yenilikler
                 </h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-white/20 text-white border border-white/30 font-mono">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-white/20 text-white border border-white/30 font-sans tabular-nums">
                   v2.8.5
                 </span>
               </div>
@@ -310,7 +310,7 @@ export const UpdatesModal: React.FC<UpdatesModalProps> = ({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-xs font-mono">
+                    <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-xs font-sans tabular-nums">
                       <span className="font-bold text-slate-700 dark:text-slate-300">{item.version}</span>
                       <span>&bull;</span>
                       <span>{item.date}</span>

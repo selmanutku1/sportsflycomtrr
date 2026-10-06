@@ -1004,7 +1004,7 @@ export const EnvanterYonetimiView: React.FC<EnvanterYonetimiViewProps> = ({
                             {/* Malzeme Adı & Kod */}
                             <td className="py-3 px-4">
                               <div className="font-semibold text-slate-900 dark:text-white">{item.name}</div>
-                              <div className="text-[11px] text-slate-400 font-mono mt-0.5">{item.code}</div>
+                              <div className="text-[11px] text-slate-400 font-sans tabular-nums mt-0.5">{item.code}</div>
                             </td>
 
                             {/* Şube & Dolap */}
@@ -1233,7 +1233,7 @@ export const EnvanterYonetimiView: React.FC<EnvanterYonetimiViewProps> = ({
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {transfers.map((log) => (
                       <tr key={log.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
-                        <td className="py-2.5 px-3 font-mono text-slate-500">{log.transferDate}</td>
+                        <td className="py-2.5 px-3 font-sans tabular-nums text-slate-500">{log.transferDate}</td>
                         <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">{log.itemName}</td>
                         <td className="py-2.5 px-3">
                           <span className="text-slate-700 dark:text-slate-300">{log.fromSubeAd}</span>
@@ -1335,7 +1335,7 @@ export const EnvanterYonetimiView: React.FC<EnvanterYonetimiViewProps> = ({
           <div className="bg-white dark:bg-[#111c2e] rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800">
             <div className="p-4 bg-slate-50 dark:bg-[#162238] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-mono text-slate-400">{selectedItemDetail.code}</span>
+                <span className="text-[11px] font-sans tabular-nums text-slate-400">{selectedItemDetail.code}</span>
                 <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">{selectedItemDetail.name}</h3>
               </div>
               <button
