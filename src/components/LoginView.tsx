@@ -91,17 +91,18 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  // Two-Factor Authentication (2FA: SMS & Authenticator) State
+  // Two-Factor Authentication (2FA: E-posta, SMS & Authenticator) State
   const [require2FA, setRequire2FA] = useState(true);
   const [is2FAStepActive, setIs2FAStepActive] = useState(false);
-  const [twoFactorMethod, setTwoFactorMethod] = useState<'sms' | 'authenticator' | 'backup'>('sms');
+  const [twoFactorMethod, setTwoFactorMethod] = useState<'email' | 'sms' | 'authenticator' | 'backup'>('email');
   const [pendingLoginRole, setPendingLoginRole] = useState<string>('Kulüp Yöneticisi');
   const [pendingIdentifier, setPendingIdentifier] = useState<string>('');
   const [challengeId, setChallengeId] = useState<string>('');
   const [maskedPhoneDisplay, setMaskedPhoneDisplay] = useState<string>('+90 532 ••• •• 67');
+  const [maskedEmailDisplay, setMaskedEmailDisplay] = useState<string>('');
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [backupCodeInput, setBackupCodeInput] = useState<string>('');
-  const [smsCountdown, setSmsCountdown] = useState<number>(120);
+  const [smsCountdown, setSmsCountdown] = useState<number>(180);
   const [trustThisDevice, setTrustThisDevice] = useState<boolean>(true);
   const [showTotpSetupInfo, setShowTotpSetupInfo] = useState<boolean>(false);
   const [sandboxDelivery, setSandboxDelivery] = useState<{
@@ -226,11 +227,17 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
   const initiateTwoFactorChallenge = async (
     targetRole: string,
     identifier: string,
-    preferredMethod: 'sms' | 'authenticator' = 'sms'
+    preferredMethod?: 'email' | 'sms' | 'authenticator'
   ) => {
+    const isEmail = identifier.includes('@') || loginMode === 'email';
+    const chosenMethod: 'email' | 'sms' | 'authenticator' =
+      preferredMethod || (isEmail ? 'email' : 'sms');
+
     setIsLoading(true);
     setLoadingText(
-      preferredMethod === 'sms'
+      chosenMethod === 'email'
+        ? 'SportsFly doğrulama kodu e-posta adresinize gönderiliyor...'
+        : chosenMethod === 'sms'
         ? 'SMS doğrulama kodu telefonunuza gönderiliyor...'
         : 'Authenticator (TOTP) doğrulama oturumu hazırlanıyor...'
     );
@@ -239,11 +246,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     setPendingIdentifier(identifier);
 
     try {
-      const fullPhone = loginMode === 'phone' && phone ? `${countryCode} ${phone.replace(/\s+/g, '')}` : identifier;
-      const digits = fullPhone.replace(/\D/g, '');
+      const fullPhone = loginMode === 'phone' && phone ? `${countryCode} ${phone.replace(/\s+/g, '')}` : (!isEmail ? identifier : undefined);
+      const digits = fullPhone ? fullPhone.replace(/\D/g, '') : '';
       const dynamicMaskedPhone = digits.length >= 10
         ? `${countryCode} ${digits.slice(-10, -7)} ••• •• ${digits.slice(-2)}`
-        : fullPhone;
+        : fullPhone || '';
 
       const res = await secureFetch('/api/auth/2fa/send-challenge', {
         method: 'POST',
@@ -251,20 +258,23 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         body: JSON.stringify({
           identifier,
           phone: fullPhone,
-          method: preferredMethod,
+          method: chosenMethod,
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
         setChallengeId(data.challengeId);
-        setMaskedPhoneDisplay(dynamicMaskedPhone || data.maskedPhone);
-        setSmsCountdown(data.expiresInSeconds || 120);
+        setTwoFactorMethod(data.method || chosenMethod);
+        setMaskedPhoneDisplay(dynamicMaskedPhone || data.maskedPhone || '');
+        setMaskedEmailDisplay(data.maskedEmail || identifier);
+        setSmsCountdown(data.expiresInSeconds || 180);
         setSandboxDelivery({
-          smsOtpCode: data.sandboxDelivery?.smsOtpCode || '482915',
+          smsOtpCode: data.sandboxDelivery?.emailOtpCode || data.sandboxDelivery?.smsOtpCode || data.sandboxDelivery?.otpCode || '482915',
           smsMessage:
+            data.sandboxDelivery?.emailSubject ||
             data.sandboxDelivery?.smsMessage ||
-            `SPORTSFLY: Güvenli giriş için tek kullanımlık SMS doğrulama kodunuz: 482915.`,
+            `SPORTSFLY: Güvenli giriş için tek kullanımlık doğrulama kodunuz: 482915.`,
           totpCurrentCode: data.sandboxDelivery?.totpCurrentCode || '739204',
           totpRemainingSeconds: data.sandboxDelivery?.totpRemainingSeconds || 30,
           backupRecoveryHint: data.sandboxDelivery?.backupRecoveryHint || '84921049',
@@ -274,11 +284,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         // Fallback local challenge if server unreachable
         const fallbackCode = String(Math.floor(100000 + Math.random() * 900000));
         setChallengeId(`local_2fa_${Date.now()}`);
-        setSmsCountdown(120);
+        setTwoFactorMethod(chosenMethod);
+        setSmsCountdown(180);
         setMaskedPhoneDisplay(dynamicMaskedPhone);
+        setMaskedEmailDisplay(identifier);
         setSandboxDelivery({
           smsOtpCode: fallbackCode,
-          smsMessage: `SPORTSFLY: Güvenli giriş için tek kullanımlık SMS doğrulama kodunuz: ${fallbackCode}.`,
+          smsMessage: `SPORTSFLY: Güvenli giriş için tek kullanımlık doğrulama kodunuz: ${fallbackCode}.`,
           totpCurrentCode: '619402',
           totpRemainingSeconds: 28,
           backupRecoveryHint: '84921049',
@@ -288,14 +300,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
 
       setOtpDigits(['', '', '', '', '', '']);
       setBackupCodeInput('');
-      setTwoFactorMethod(preferredMethod);
       setIs2FAStepActive(true);
       setShowSmsToastBanner(true);
 
       recordSecurityAuditEvent(
         'AUTH',
         'INFO',
-        `2FA (${preferredMethod.toUpperCase()}) doğrulama kodu gönderildi`,
+        `2FA (${chosenMethod.toUpperCase()}) doğrulama kodu gönderildi`,
         `Hedef: ${identifier} (${targetRole})`
       );
 
@@ -792,8 +803,8 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           setIsLoading(false);
           initiateTwoFactorChallenge(
             authResult.user?.role || 'Kulüp Yöneticisi',
-            sanitizeInputString(identifier, 80),
-            'sms'
+            sanitizeInputString(authResult.user?.email || identifier, 80),
+            'email'
           );
           return;
         }
@@ -884,8 +895,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     } catch (e) {}
 
     if (require2FA) {
-      const identifier = loginMode === 'phone' ? `${countryCode} ${phone}` : email;
-      initiateTwoFactorChallenge(roleName, sanitizeInputString(identifier, 80), 'sms');
+      const isEmail = loginMode === 'email' || email.includes('@');
+      const identifier = loginMode === 'phone' ? `${countryCode} ${phone}` : (email || 'admin@sportsfly.com');
+      initiateTwoFactorChallenge(roleName, sanitizeInputString(identifier, 80), isEmail ? 'email' : 'sms');
       return;
     }
 
@@ -966,7 +978,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
               {is2FAStepActive
-                ? 'Hesap güvenliğiniz için SMS veya Authenticator kodunu doğrulayın.'
+                ? twoFactorMethod === 'email'
+                  ? 'Hesap güvenliğiniz için e-posta adresinize gönderilen doğrulama kodunu girin.'
+                  : 'Hesap güvenliğiniz için SMS veya Authenticator kodunu doğrulayın.'
                 : 'Devam etmek için aşağıdaki adımları takip edin.'}
             </p>
           </div>
@@ -1021,13 +1035,28 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         )}
 
         {/* ========================================================================= */}
-        {/* 🔐 STEP 2: TWO-FACTOR AUTHENTICATION (SMS OTP)                            */}
+        {/* 🔐 STEP 2: TWO-FACTOR AUTHENTICATION (EMAIL / SMS OTP)                    */}
         {/* ========================================================================= */}
         {is2FAStepActive ? (
           <div className="space-y-4 text-left animate-in fade-in duration-200">
             <div className="p-3.5 rounded-xl bg-blue-50/80 border border-blue-200 flex items-center justify-between gap-2">
-              <div className="text-xs text-slate-700 leading-relaxed">
-                <span className="font-bold text-slate-900">{maskedPhoneDisplay}</span> numaralı telefonunuza 6 haneli SMS doğrulama kodu gönderildi.
+              <div className="text-xs text-slate-700 leading-relaxed flex items-center gap-2">
+                {twoFactorMethod === 'email' ? (
+                  <Mail className="w-4 h-4 text-blue-600 shrink-0" />
+                ) : (
+                  <Smartphone className="w-4 h-4 text-blue-600 shrink-0" />
+                )}
+                <div>
+                  {twoFactorMethod === 'email' ? (
+                    <>
+                      <span className="font-bold text-slate-900">{maskedEmailDisplay || pendingIdentifier}</span> e-posta adresinize 6 haneli SportsFly doğrulama kodu gönderildi.
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-bold text-slate-900">{maskedPhoneDisplay}</span> numaralı telefonunuza 6 haneli SMS doğrulama kodu gönderildi.
+                    </>
+                  )}
+                </div>
               </div>
               <span
                 className={`px-2.5 py-1 rounded-lg text-xs font-sans tabular-nums font-extrabold shrink-0 ${
@@ -1041,10 +1070,34 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               </span>
             </div>
 
+            {/* Email Dispatch Info Badge for Transparency */}
+            {twoFactorMethod === 'email' && sandboxDelivery && (
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-600 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 truncate">
+                  <span className="font-bold text-slate-800">Gönderici:</span>
+                  <span className="text-slate-500 truncate">SportsFly Doğrulama Servisi &lt;noreply@sportsfly.com.tr&gt;</span>
+                </div>
+                {sandboxDelivery.smsOtpCode && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const code = sandboxDelivery.smsOtpCode;
+                      if (code && code.length === 6) {
+                        setOtpDigits(code.split(''));
+                      }
+                    }}
+                    className="px-2 py-0.5 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-800 font-extrabold text-[10px] shrink-0 cursor-pointer transition-colors"
+                  >
+                    Kodu Doldur ({sandboxDelivery.smsOtpCode})
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* 6-Digit OTP Input Boxes */}
             <div className="space-y-2">
               <label className="block text-[11px] font-bold text-slate-700">
-                6 Haneli SMS Doğrulama Kodu
+                {twoFactorMethod === 'email' ? '6 Haneli E-Posta Doğrulama Kodu' : '6 Haneli SMS Doğrulama Kodu'}
               </label>
               <div className="grid grid-cols-6 gap-2">
                 {otpDigits.map((digit, idx) => (
@@ -1066,7 +1119,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               </div>
             </div>
 
-            {/* Trust Device Checkbox & Resend SMS */}
+            {/* Trust Device Checkbox & Resend */}
             <div className="flex items-center justify-between gap-2 pt-1">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -1083,12 +1136,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               <button
                 type="button"
                 onClick={() =>
-                  initiateTwoFactorChallenge(pendingLoginRole, pendingIdentifier, 'sms')
+                  initiateTwoFactorChallenge(pendingLoginRole, pendingIdentifier, twoFactorMethod)
                 }
                 className="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer"
               >
                 <RefreshCw className="w-3 h-3" />
-                <span>Tekrar SMS Gönder</span>
+                <span>{twoFactorMethod === 'email' ? 'Tekrar E-Posta Gönder' : 'Tekrar SMS Gönder'}</span>
               </button>
             </div>
 
@@ -1955,6 +2008,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 <span className="text-slate-500 font-medium">Spor Okulu Adı:</span>
                 <span className="font-extrabold text-slate-900">{pendingApprovalInfo.clubName}</span>
               </div>
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
+                <span className="text-slate-500 font-medium">Kayıtlı E-Posta:</span>
+                <span className="font-bold text-slate-800">{pendingApprovalInfo.email}</span>
+              </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-500 font-medium">İletişim Telefonu:</span>
                 <span className="font-bold text-slate-800">{pendingApprovalInfo.phone}</span>
@@ -1962,9 +2019,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
             </div>
 
             <div className="p-3.5 rounded-xl bg-blue-50/80 border border-blue-200/80 text-left text-[11px] text-blue-900 leading-relaxed flex items-start gap-2.5">
-              <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <Mail className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
               <div>
-                Kurumsal üyelik ve yetkilendirme süreçlerinizin tamamlanmasının ardından spor okulu hesabınız aktif edilecek olup, erişim bilgileriniz tarafınıza <strong>SMS</strong> ve <strong>e-posta</strong> yoluyla iletilecektir.
+                Kurumsal üyelik başvurunuz onaylandıktan sonra spor okulu hesabınız anında aktif edilecek olup, erişim ve onay bilgilendirmesi <strong>{pendingApprovalInfo.email}</strong> e-posta adresinize <strong>SportsFly</strong> tarafından iletilecektir.
               </div>
             </div>
 

@@ -242,6 +242,37 @@ export async function fetchAndMergeGoogleUsersFromFirestore(): Promise<GoogleUse
       }
     });
 
+    // Also merge registered_users from Firestore so all email registrations persist in panel
+    try {
+      const regSnap = await getDocs(collection(db, 'registered_users'));
+      regSnap.docs.forEach((d) => {
+        const data = d.data();
+        if (data && data.email) {
+          const key = data.email.trim().toLowerCase();
+          if (!map.has(key)) {
+            const isAdmin = key === ADMIN_GOOGLE_EMAIL;
+            const isApproved = data.status === 'onaylandi';
+            map.set(key, {
+              id: d.id,
+              uid: `user-${d.id}`,
+              name: data.managerName || 'Kurumsal Yönetici',
+              email: data.email.trim(),
+              clubName: data.clubName || 'Spor Okulu',
+              phone: data.phone || '',
+              firstLoginAt: data.createdAt || '01.10.2026 10:00',
+              lastLoginAt: data.lastLoginAt || '01.10.2026 10:00',
+              assignedPlan: (data.selectedPlan as PackagePlanType) || 'Kulüp & Akademi',
+              allowedPages: isApproved
+                ? ['anasayfa', 'sporcular', 'gruplar', 'egitmenler', 'yoklama', 'sporcu-karnesi', 'on-muhasebe', 'paketler', 'yetkilendirmeler']
+                : ['paketler'],
+              isFullAccess: isApproved,
+              notes: `E-posta / Şifre Kaydı (${data.status === 'onaylandi' ? 'Onaylandı' : data.status === 'reddedildi' ? 'Reddedildi' : 'Onay Bekliyor'})`,
+            });
+          }
+        }
+      });
+    } catch {}
+
     const merged = Array.from(map.values());
     saveStoredGoogleUsers(merged);
     return merged;

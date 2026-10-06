@@ -424,43 +424,48 @@ export async function authenticateWithEmailPassword(
     return { ok: false, code: 'NOT_FOUND', message: 'Lütfen geçerli bir e-posta adresi giriniz.' };
   }
 
-  // 1. Check local cached registered users
-  let allUsers = getStoredRegisteredUsers();
-  let foundUser = allUsers.find((u) => normalizeEmail(u.email) === cleanEmail);
-
-  // 2. If not found locally, try fetching directly from Firestore
-  if (!foundUser) {
-    try {
-      const docId = getEmailDocId(cleanEmail);
-      const docRef = doc(db, 'registered_users', docId);
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        const data = snap.data();
-        foundUser = {
-          id: snap.id,
-          email: normalizeEmail(data.email || cleanEmail),
-          password: data.password || '',
-          clubName: data.clubName || 'Spor Kulübü',
-          managerName: data.managerName || 'Kulüp Yetkilisi',
-          phone: data.phone || '',
-          city: data.city || 'İstanbul',
-          district: data.district || '',
-          branches: data.branches || ['Basketbol'],
-          role: data.role || 'Kulüp Yöneticisi',
-          status: data.status || 'onay_bekliyor',
-          selectedPlan: data.selectedPlan || 'Kulüp & Akademi',
-          createdAt: typeof data.createdAt === 'string' ? data.createdAt : new Date().toISOString(),
-          approvedAt: data.approvedAt,
-          approvedBy: data.approvedBy,
-          rejectionReason: data.rejectionReason,
-          authProvider: 'email_password',
-        };
-        // Add to local store
-        saveStoredRegisteredUsers([foundUser, ...allUsers]);
-      }
-    } catch (err) {
-      console.warn('[RegisteredUsers] Firestore lookup error:', err);
+  // 1. Check directly from Firestore first for the most up-to-date approval status (ensures instant login after admin approval)
+  let foundUser: RegisteredUser | undefined = undefined;
+  try {
+    const docId = getEmailDocId(cleanEmail);
+    const docRef = doc(db, 'registered_users', docId);
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      foundUser = {
+        id: snap.id,
+        email: normalizeEmail(data.email || cleanEmail),
+        password: data.password || '',
+        clubName: data.clubName || 'Spor Kulübü',
+        managerName: data.managerName || 'Kulüp Yetkilisi',
+        phone: data.phone || '',
+        city: data.city || 'İstanbul',
+        district: data.district || '',
+        branches: Array.isArray(data.branches) ? data.branches : ['Basketbol'],
+        role: data.role || 'Kulüp Yöneticisi',
+        status: data.status || 'onay_bekliyor',
+        selectedPlan: data.selectedPlan || 'Kulüp & Akademi',
+        createdAt: typeof data.createdAt === 'string' ? data.createdAt : new Date().toISOString(),
+        approvedAt: data.approvedAt || undefined,
+        approvedBy: data.approvedBy || undefined,
+        rejectionReason: data.rejectionReason || undefined,
+        lastLoginAt: data.lastLoginAt || undefined,
+        authProvider: data.authProvider || 'email_password',
+        notes: data.notes || '',
+      };
     }
+  } catch (err) {
+    console.warn('[RegisteredUsers] Firestore lookup error, falling back to local storage:', err);
+  }
+
+  // 2. Fallback to local storage if offline or not in Firestore
+  let allUsers = getStoredRegisteredUsers();
+  if (foundUser) {
+    // Update local store with latest verified data from Firestore
+    const filtered = allUsers.filter((u) => normalizeEmail(u.email) !== cleanEmail);
+    saveStoredRegisteredUsers([foundUser, ...filtered]);
+  } else {
+    foundUser = allUsers.find((u) => normalizeEmail(u.email) === cleanEmail);
   }
 
   // 3. Fallback for built-in admin & demo accounts
@@ -501,7 +506,7 @@ export async function authenticateWithEmailPassword(
       ok: false,
       code: 'PENDING_APPROVAL',
       user: foundUser,
-      message: `Sayın ${foundUser.managerName}, "${foundUser.clubName}" için oluşturduğunuz hesap başvurunuz onay aşamasındadır. Yöneticilerimiz tarafından incelendikten sonra SMS ve e-posta ile bilgilendirileceksiniz.`,
+      message: `Sayın ${foundUser.managerName}, "${foundUser.clubName}" için oluşturduğunuz hesap başvurunuz onay aşamasındadır. Yöneticilerimiz tarafından incelenip onaylandıktan sonra SportsFly tarafından kayıtlı ${foundUser.email} e-posta adresinize bilgilendirme iletilecektir.`,
     };
   }
 

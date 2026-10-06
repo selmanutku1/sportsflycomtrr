@@ -533,8 +533,9 @@ app.post(
 interface TwoFactorChallengeRecord {
   challengeId: string;
   identifier: string;
-  maskedPhone: string;
-  method: 'sms' | 'authenticator';
+  maskedPhone?: string;
+  maskedEmail?: string;
+  method: 'email' | 'sms' | 'authenticator';
   smsCodeHash: string;
   totpSecret: string;
   createdAt: number;
@@ -599,6 +600,65 @@ function maskDestinationPhone(rawPhone: string): string {
   return '+90 5XX ••• •• XX';
 }
 
+function maskDestinationEmail(rawEmail: string): string {
+  const clean = String(rawEmail || '').trim().toLowerCase();
+  if (!clean.includes('@')) return clean;
+  const [userPart, domainPart] = clean.split('@');
+  if (userPart.length <= 2) {
+    return `${userPart.charAt(0)}***@${domainPart}`;
+  }
+  const first = userPart.slice(0, 2);
+  const last = userPart.slice(-1);
+  return `${first}***${last}@${domainPart}`;
+}
+
+function generateSportsFlyVerificationEmailHtml(code: string, email: string): string {
+  return `<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>SportsFly Güvenlik Doğrulama Kodu</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; }
+    .container { max-width: 520px; margin: 30px auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05); }
+    .header { background: #0f172a; padding: 26px 20px; text-align: center; color: #ffffff; }
+    .logo-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+    .content { padding: 32px 28px; }
+    .title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .desc { font-size: 13px; color: #64748b; line-height: 1.55; margin-bottom: 24px; }
+    .code-box { background: #f8fafc; border: 2px dashed #93c5fd; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px; }
+    .code { font-size: 34px; font-weight: 900; letter-spacing: 8px; color: #1d4ed8; }
+    .warn { font-size: 11px; color: #64748b; margin-top: 8px; font-weight: 600; }
+    .info-list { font-size: 12px; color: #475569; line-height: 1.6; border-top: 1px solid #f1f5f9; padding-top: 16px; }
+    .footer { background: #f8fafc; padding: 18px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-text">SportsFly <span style="color:#38bdf8;">LAB</span></div>
+      <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Spor Okulu & Kulüp Yönetim Sistemi</div>
+    </div>
+    <div class="content">
+      <div class="title">E-posta Giriş Doğrulama Kodu</div>
+      <div class="desc">Sayın Kullanıcımız, <strong>${email}</strong> hesabınızla SportsFly sistemine güvenli giriş yapmak için aşağıdaki tek kullanımlık doğrulama kodunu kullanınız:</div>
+      <div class="code-box">
+        <div class="code">${code}</div>
+        <div class="warn">⏱️ Bu kod 3 dakika boyunca geçerlidir.</div>
+      </div>
+      <div class="info-list">
+        • Bu kodu güvenliğiniz için kimseyle paylaşmayınız.<br />
+        • Bu işlemi siz başlatmadıysanız lütfen bu e-postayı dikkate almayınız veya kulüp yöneticinizle iletişime geçiniz.
+      </div>
+    </div>
+    <div class="footer">
+      © ${new Date().getFullYear()} SportsFly • webapp.sportsfly.com.tr
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
 // SMS Gateway & Credit Status Endpoints
 app.get('/api/sms/credit-status', async (_req: Request, res: Response) => {
   const result = await getMutlucellCreditStatus();
@@ -630,20 +690,29 @@ app.post(
   twoFactorRateLimiter,
   async (req: Request, res: Response) => {
     const { identifier, phone, method } = req.body || {};
-    const selectedMethod: 'sms' | 'authenticator' =
-      method === 'authenticator' ? 'authenticator' : 'sms';
+    const rawIdentifier = String(identifier || '').trim();
+    const isEmail = rawIdentifier.includes('@') || method === 'email';
+
+    const selectedMethod: 'email' | 'sms' | 'authenticator' =
+      method === 'authenticator'
+        ? 'authenticator'
+        : isEmail
+        ? 'email'
+        : 'sms';
 
     const challengeId = `2fa_ch_${crypto.randomBytes(12).toString('hex')}`;
-    const smsOtpCode = String(crypto.randomInt(100000, 999999));
+    const otpCode = String(crypto.randomInt(100000, 999999));
     const now = Date.now();
-    const expiresAt = now + 2 * 60 * 1000; // 2 minutes validity
-    const maskedPhone = maskDestinationPhone(phone || '+905321234567');
-    const smsCodeHash = hashOtpCode(smsOtpCode, challengeId);
+    const expiresAt = now + 3 * 60 * 1000; // 3 minutes validity
+    const maskedPhone = !isEmail ? maskDestinationPhone(phone || rawIdentifier || '+905321234567') : undefined;
+    const maskedEmail = isEmail ? maskDestinationEmail(rawIdentifier || 'kullanici@sportsfly.com') : undefined;
+    const smsCodeHash = hashOtpCode(otpCode, challengeId);
 
     const record: TwoFactorChallengeRecord = {
       challengeId,
-      identifier: String(identifier || 'kullanici@sportsfly.com').slice(0, 120),
-      maskedPhone,
+      identifier: rawIdentifier.slice(0, 120),
+      maskedPhone: maskedPhone || '',
+      maskedEmail: maskedEmail || '',
       method: selectedMethod,
       smsCodeHash,
       totpSecret: DEFAULT_TOTP_SECRET,
@@ -655,10 +724,21 @@ app.post(
 
     twoFactorChallengeStore.set(challengeId, record);
 
-    const smsMessage = `SPORTSFLY: Güvenli giriş için tek kullanımlık SMS doğrulama kodunuz: ${smsOtpCode}. Kod 2 dakika geçerlidir. Kimseyle paylaşmayınız. B002`;
+    let emailDispatchResult = null;
+    let smsDispatchResult = null;
 
-    // Dispatch via Mutlucell SMS Gateway if credentials configured
-    const mutlucellDispatch = await sendMutlucellSms(phone || '05321234567', smsMessage);
+    if (selectedMethod === 'email') {
+      const emailHtml = generateSportsFlyVerificationEmailHtml(otpCode, rawIdentifier);
+      emailDispatchResult = await sendEmailNotification({
+        to: rawIdentifier,
+        subject: `SportsFly — Güvenlik Doğrulama Kodunuz: ${otpCode}`,
+        html: emailHtml,
+        fromName: 'SportsFly Güvenlik Doğrulama',
+      });
+    } else if (selectedMethod === 'sms') {
+      const smsMessage = `SPORTSFLY: Güvenli giriş için tek kullanımlık SMS doğrulama kodunuz: ${otpCode}. Kod 3 dakika geçerlidir. Kimseyle paylaşmayınız. B002`;
+      smsDispatchResult = await sendMutlucellSms(phone || rawIdentifier || '05321234567', smsMessage);
+    }
 
     const totpNow = computeTotpCodeForWindow(DEFAULT_TOTP_SECRET, 0);
 
@@ -666,15 +746,21 @@ app.post(
       challengeId,
       method: selectedMethod,
       maskedPhone,
-      expiresInSeconds: 120,
-      smsGateway: 'Mutlucell Kurumsal SMS API (Başlık: SPORTSFLY)',
-      mutlucellDelivery: mutlucellDispatch,
+      maskedEmail,
+      expiresInSeconds: 180,
+      senderName: 'SportsFly Güvenlik',
+      senderEmail: 'noreply@sportsfly.com.tr',
+      smsGateway: selectedMethod === 'sms' ? 'Mutlucell Kurumsal SMS API (Başlık: SPORTSFLY)' : undefined,
+      mutlucellDelivery: smsDispatchResult,
+      emailDelivery: emailDispatchResult,
       totpIssuer: 'SportsFly Bulut v2.4',
       totpSecretKey: 'JBSW Y3DP EHPK 3PXP',
-      // Dispatched SMS / TOTP preview for immediate verification in preview environment
       sandboxDelivery: {
-        smsOtpCode,
-        smsMessage,
+        otpCode,
+        smsOtpCode: otpCode,
+        emailOtpCode: otpCode,
+        emailSubject: `SportsFly — Güvenlik Doğrulama Kodunuz: ${otpCode}`,
+        smsMessage: `SPORTSFLY: Güvenli giriş için tek kullanımlık SMS doğrulama kodunuz: ${otpCode}.`,
         totpCurrentCode: totpNow.code,
         totpRemainingSeconds: totpNow.remainingSeconds,
         backupRecoveryHint: '84921049',
