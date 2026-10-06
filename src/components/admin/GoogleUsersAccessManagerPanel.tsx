@@ -35,6 +35,7 @@ import {
   saveStoredUserProfile,
 } from '../../data/userProfile';
 import { setActiveSessionPlan } from '../../data/packagePermissions';
+import { approveRegisteredUser } from '../../services/registeredUsersService';
 
 interface GoogleUsersAccessManagerPanelProps {
   onNavigate?: (page: NavPage) => void;
@@ -340,6 +341,7 @@ export const GoogleUsersAccessManagerPanel: React.FC<GoogleUsersAccessManagerPan
     setUsers(nextList);
     saveStoredGoogleUsers(nextList);
     syncGoogleUserToFirestore(newRecord);
+    approveRegisteredUser(cleanEmail, 'Süper Admin').catch(() => {});
     setSelectedUserId(newRecord.id);
     setNewName('');
     setNewEmail('');

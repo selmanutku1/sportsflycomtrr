@@ -38,6 +38,12 @@ import {
 import { signInWithPopup, GoogleAuthProvider, User, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase';
 import { basvurularService } from '../services/firestoreService';
+import {
+  registerNewUser,
+  authenticateWithEmailPassword,
+  getStoredRegisteredUsers,
+  fetchRegisteredUsersFromFirestore,
+} from '../services/registeredUsersService';
 import { LEGAL_TEXTS, LegalDoc } from '../data/legalTexts';
 import { useLanguage } from '../i18n/LanguageContext';
 import { getStoredUserProfile, saveStoredUserProfile, ADMIN_GOOGLE_EMAIL } from '../data/userProfile';
@@ -161,12 +167,30 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     return () => clearInterval(poll);
   }, [is2FAStepActive, twoFactorMethod]);
 
-  // Check if phone or email exists in registered database (Sporcular, Yöneticiler, Eğitmenler)
+  // Initial sync of registered users from Firestore
+  useEffect(() => {
+    fetchRegisteredUsersFromFirestore().catch((err) =>
+      console.warn('fetchRegisteredUsersFromFirestore error:', err)
+    );
+  }, []);
+
+  // Check if phone or email exists in registered database (Registered Users, Sporcular, Yöneticiler, Eğitmenler)
   const isIdentifierRegisteredInDb = (idVal: string, mode: 'phone' | 'email') => {
     const rawVal = idVal.trim().toLowerCase();
     const digits = idVal.replace(/\D/g, '');
 
     if (!rawVal || rawVal === '+90' || rawVal === '+90 ') return false;
+
+    // 0. Check Persistent Registered Users (Firestore + Local)
+    try {
+      const regList = getStoredRegisteredUsers();
+      const matchedReg = regList.some((u) => {
+        if (mode === 'email') return u.email?.toLowerCase() === rawVal;
+        const uPhoneDigits = (u.phone || '').replace(/\D/g, '');
+        return digits.length >= 7 && (uPhoneDigits.includes(digits.slice(-7)) || digits.includes(uPhoneDigits.slice(-7)));
+      });
+      if (matchedReg) return true;
+    } catch (e) {}
 
     // 1. Check Sporcular (localStorage & INITIAL_SPORCULAR)
     try {
@@ -706,8 +730,8 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     }
   };
 
-  // Handle Standard Login
-  const handleStandardLogin = (e?: React.FormEvent) => {
+  // Handle Standard Login (Email & Password or Phone)
+  const handleStandardLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
     const rawInput = loginMode === 'phone' ? phone : email;
@@ -729,13 +753,73 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
       return;
     }
 
-    // Check database registration
-    const isRegistered = isIdentifierRegisteredInDb(rawInput, loginMode);
+    // 1. If Email Login Mode -> Authenticate directly with Firestore / Local registered users
+    if (loginMode === 'email') {
+      setIsLoading(true);
+      setLoadingText('Kullanıcı hesabı ve şifre doğrulanıyor...');
+      setLoginError(null);
+
+      try {
+        const authResult = await authenticateWithEmailPassword(email, password);
+
+        if (!authResult.ok) {
+          setIsLoading(false);
+          if (authResult.code === 'PENDING_APPROVAL') {
+            setPendingApprovalInfo({
+              clubName: authResult.user?.clubName || 'Spor Okulu',
+              email: authResult.user?.email || email,
+              phone: authResult.user?.phone || '',
+              applicationId: authResult.user?.id || 'reg_pending',
+            });
+            setLoginError(
+              authResult.message || 'Hesap başvurunuz henüz onay aşamasındadır. Yönetici onayından sonra giriş yapabilirsiniz.'
+            );
+          } else {
+            setLoginError(authResult.message || 'Giriş yapılamadı.');
+          }
+          return;
+        }
+
+        // Authentication Success (Approved User)
+        recordSecurityAuditEvent(
+          'AUTH',
+          'INFO',
+          'Kullanıcı oturumu başarıyla doğrulandı',
+          sanitizeInputString(identifier, 80)
+        );
+
+        if (require2FA) {
+          setIsLoading(false);
+          initiateTwoFactorChallenge(
+            authResult.user?.role || 'Kulüp Yöneticisi',
+            sanitizeInputString(identifier, 80),
+            'sms'
+          );
+          return;
+        }
+
+        setTimeout(() => {
+          setIsLoading(false);
+          onLoginSuccess({
+            role: authResult.user?.role || 'Kulüp Yöneticisi',
+            email: authResult.user?.email || email,
+            name: authResult.user?.managerName || 'Kulüp Yöneticisi',
+            clubName: authResult.user?.clubName || 'Spor Kulübü',
+          });
+        }, 500);
+        return;
+      } catch (err) {
+        setIsLoading(false);
+        setLoginError('Oturum açma sırasında bir hata oluştu. Lütfen tekrar deneyiniz.');
+        return;
+      }
+    }
+
+    // 2. If Phone Login Mode -> Verify Phone registration
+    const isRegistered = isIdentifierRegisteredInDb(rawInput, 'phone');
     if (!isRegistered) {
       setLoginError(
-        loginMode === 'phone'
-          ? `Girdiğiniz (${countryCode} ${phone}) telefon numarası kulüp veritabanımızda kayıtlı bulunamadı. Lütfen kulüp yöneticinizle iletişime geçin veya 'Hemen Kayıt Olun' seçeneğini kullanın.`
-          : `Girdiğiniz (${email}) e-posta adresi kulüp veritabanımızda kayıtlı bulunamadı. Lütfen kulüp yöneticinizle iletişime geçin.`
+        `Girdiğiniz (${countryCode} ${phone}) telefon numarası kulüp veritabanımızda kayıtlı bulunamadı. Lütfen kulüp yöneticinizle iletişime geçin veya 'Hemen Kayıt Olun' seçeneğini kullanın.`
       );
       return;
     }
@@ -759,7 +843,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     setTimeout(() => {
       setIsLoading(false);
       onLoginSuccess('Kulüp Yöneticisi');
-    }, 700);
+    }, 600);
   };
 
   // Role Quick Select Handlers
@@ -1641,70 +1725,95 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
 
             {/* Registration Form (Sports School / Club Manager) */}
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 const form = e.currentTarget;
                 const clubInput = (form.elements.namedItem('regClubName') as HTMLInputElement)?.value || 'Yeni Spor Okulu';
                 const emailInput = (form.elements.namedItem('regEmail') as HTMLInputElement)?.value || 'kulup@sportsfly.com';
                 const phoneInput = (form.elements.namedItem('regPhone') as HTMLInputElement)?.value || '0532 000 0000';
+                const managerInput = (form.elements.namedItem('regManagerName') as HTMLInputElement)?.value || 'Kulüp Kurucusu';
+                const passwordInput = (form.elements.namedItem('regPassword') as HTMLInputElement)?.value || '';
                 const appId = `reg_${Date.now().toString().slice(-4)}`;
 
-                const newEntry = {
-                  id: appId,
-                  requestType: 'spor_okulu_basvurusu' as const,
-                  source: 'webapp.sportsfly.com.tr',
-                  clubName: clubInput,
-                  managerName: 'Kulüp Kurucusu',
-                  email: emailInput,
-                  phone: phoneInput,
-                  city: 'İstanbul',
-                  district: 'Merkez',
-                  branches: ['Basketbol', 'Voleybol'],
-                  selectedPlan: 'Kulüp & Akademi',
-                  createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
-                  status: 'onay_bekliyor' as const,
-                  notes: 'webapp.sportsfly.com.tr kayıt ekranı üzerinden yeni spor okulu başvurusu yapıldı.',
-                };
+                setIsLoading(true);
+                setLoadingText('Kurumsal üyelik kaydınız veritabanına oluşturuluyor...');
 
-                // Persist new application to Firestore (/spor-okulu-basvurulari)
-                basvurularService.add({
-                  id: appId,
-                  clubName: clubInput,
-                  managerName: 'Kulüp Kurucusu',
-                  email: emailInput,
-                  phone: phoneInput,
-                  city: 'İstanbul',
-                  district: 'Merkez',
-                  selectedPlan: 'Kulüp & Akademi',
-                  status: 'onay_bekliyor',
-                }).catch((e) => console.warn('[Firestore] Spor okulu başvurusu Firestore kayıt uyarısı:', e));
-
-                // Save new application to localStorage & POST to /api/demo-requests for Super Admin approval
                 try {
-                  const stored = localStorage.getItem('sportsfly_club_applications_v3');
-                  const existing = stored ? JSON.parse(stored) : [];
-                  const updated = [newEntry, ...existing];
-                  localStorage.setItem('sportsfly_club_applications_v3', JSON.stringify(updated));
-                  if (typeof BroadcastChannel !== 'undefined') {
-                    const bc = new BroadcastChannel('sportsfly_demo_requests_live');
-                    bc.postMessage({ type: 'created', record: newEntry, items: updated });
-                    bc.close();
-                  }
-                } catch (err) {}
+                  // 1. Persist registered user with email & password into Firestore (registered_users collection) and LocalStore
+                  const createdUser = await registerNewUser({
+                    email: emailInput,
+                    password: passwordInput,
+                    clubName: clubInput,
+                    managerName: managerInput,
+                    phone: phoneInput,
+                    city: 'İstanbul',
+                    district: 'Merkez',
+                    branches: ['Basketbol', 'Voleybol'],
+                    selectedPlan: 'Kulüp & Akademi',
+                    role: 'Kulüp Yöneticisi',
+                    notes: 'webapp.sportsfly.com.tr kayıt ekranı üzerinden yeni spor okulu başvurusu yapıldı.',
+                  });
 
-                fetch('/api/demo-requests', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(newEntry),
-                }).catch(() => {});
+                  // 2. Persist application into Firestore /spor-okulu-basvurulari for admin dashboard
+                  basvurularService.add({
+                    id: createdUser.id || appId,
+                    clubName: clubInput,
+                    managerName: managerInput,
+                    email: emailInput,
+                    phone: phoneInput,
+                    city: 'İstanbul',
+                    district: 'Merkez',
+                    selectedPlan: 'Kulüp & Akademi',
+                    status: createdUser.status,
+                  }).catch((err) => console.warn('[Firestore] Spor okulu başvurusu Firestore kayıt uyarısı:', err));
 
-                setShowRegisterModal(false);
-                setPendingApprovalInfo({
-                  clubName: clubInput,
-                  email: emailInput,
-                  phone: phoneInput,
-                  applicationId: appId,
-                });
+                  const newEntry = {
+                    id: createdUser.id || appId,
+                    requestType: 'spor_okulu_basvurusu' as const,
+                    source: 'webapp.sportsfly.com.tr',
+                    clubName: clubInput,
+                    managerName: managerInput,
+                    email: emailInput,
+                    phone: phoneInput,
+                    city: 'İstanbul',
+                    district: 'Merkez',
+                    branches: ['Basketbol', 'Voleybol'],
+                    selectedPlan: 'Kulüp & Akademi',
+                    createdAt: createdUser.createdAt,
+                    status: createdUser.status,
+                    notes: 'webapp.sportsfly.com.tr kayıt ekranı üzerinden yeni spor okulu başvurusu yapıldı.',
+                  };
+
+                  try {
+                    const stored = localStorage.getItem('sportsfly_club_applications_v3');
+                    const existing = stored ? JSON.parse(stored) : [];
+                    const updated = [newEntry, ...existing];
+                    localStorage.setItem('sportsfly_club_applications_v3', JSON.stringify(updated));
+                    if (typeof BroadcastChannel !== 'undefined') {
+                      const bc = new BroadcastChannel('sportsfly_demo_requests_live');
+                      bc.postMessage({ type: 'created', record: newEntry, items: updated });
+                      bc.close();
+                    }
+                  } catch (err) {}
+
+                  setShowRegisterModal(false);
+                  setIsLoading(false);
+                  setPendingApprovalInfo({
+                    clubName: clubInput,
+                    email: emailInput,
+                    phone: phoneInput,
+                    applicationId: createdUser.id || appId,
+                  });
+                } catch (err) {
+                  setIsLoading(false);
+                  setShowRegisterModal(false);
+                  setPendingApprovalInfo({
+                    clubName: clubInput,
+                    email: emailInput,
+                    phone: phoneInput,
+                    applicationId: appId,
+                  });
+                }
               }}
               className="space-y-3 text-xs text-left"
             >
@@ -1717,6 +1826,20 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                   name="regClubName"
                   required
                   placeholder="Örn: Kadıköy Basketbol Akademisi"
+                  className="w-full bg-slate-50 border border-slate-300 text-slate-900 px-3 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-600 focus:bg-white focus:outline-none font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Yetkili Adı Soyadı
+                </label>
+                <input
+                  type="text"
+                  name="regManagerName"
+                  required
+                  placeholder="Örn: Ahmet Yılmaz"
+                  defaultValue=""
                   className="w-full bg-slate-50 border border-slate-300 text-slate-900 px-3 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-600 focus:bg-white focus:outline-none font-medium"
                 />
               </div>
@@ -1748,6 +1871,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 <label className="block font-bold text-slate-700 mb-1">Şifre Belirleyin</label>
                 <input
                   type="password"
+                  name="regPassword"
                   required
                   placeholder="En az 6 karakter"
                   className="w-full bg-slate-50 border border-slate-300 text-slate-900 px-3 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-600 focus:bg-white focus:outline-none"

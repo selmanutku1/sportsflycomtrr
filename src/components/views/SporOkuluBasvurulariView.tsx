@@ -24,6 +24,7 @@ import { getStoredUserProfile } from '../../data/userProfile';
 import { isSuperAdminUser } from '../../data/packagePermissions';
 import { fetchWithTimeout } from '../../utils/networkResilience';
 import { basvurularService, FirestoreSporOkuluBasvurusuDoc } from '../../services/firestoreService';
+import { approveRegisteredUser, rejectRegisteredUser } from '../../services/registeredUsersService';
 
 export interface ClubRegistrationRequest {
   id: string;
@@ -330,6 +331,11 @@ export const SporOkuluBasvurulariView: React.FC = () => {
 
       saveRequestsToStorage(updated);
 
+      // Synchronize approval with persistent registered users database
+      approveRegisteredUser(target.email || target.id, 'Süper Admin').catch((err) =>
+        console.warn('approveRegisteredUser error:', err)
+      );
+
       try {
         await fetchWithTimeout(`/api/demo-requests/${id}`, {
           method: 'PATCH',
@@ -379,6 +385,11 @@ export const SporOkuluBasvurulariView: React.FC = () => {
 
       saveRequestsToStorage(updated);
       setIsRejectionModalOpen(false);
+
+      // Sync rejection with persistent registered users database
+      rejectRegisteredUser(selectedRequest.email || selectedRequest.id, reason).catch((err) =>
+        console.warn('rejectRegisteredUser error:', err)
+      );
 
       try {
         await fetchWithTimeout(`/api/demo-requests/${targetId}`, {

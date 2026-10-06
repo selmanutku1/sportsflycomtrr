@@ -69,22 +69,22 @@ export const RotaSportsFlyHeaderBadge: React.FC<RotaSportsFlyHeaderBadgeProps> =
           <SportsFlyVectorMark className="w-5 h-5 shrink-0" />
           <div className="text-left">
             <div
-              className={`text-[7.5px] font-sans font-extrabold uppercase tracking-wider leading-none ${
-                isDark ? 'text-white/60' : 'text-slate-400'
+              className={`text-[9.5px] font-sans font-extrabold uppercase tracking-wider leading-none ${
+                isDark ? 'text-white/70' : 'text-slate-500'
               }`}
             >
               Powered by
             </div>
-            <div className="flex items-center gap-0.5 leading-tight mt-0.5">
+            <div className="flex items-center gap-1 leading-tight mt-0.5">
               <span
-                className={`text-[10px] font-black tracking-tight ${
+                className={`text-[12px] font-black tracking-tight ${
                   isDark ? 'text-white' : 'text-slate-900'
                 }`}
               >
                 SportsFly
               </span>
               <span
-                className="text-[9px] font-black tracking-wider uppercase"
+                className="text-[11px] font-black tracking-wider uppercase"
                 style={{ color: isDark ? (effectiveSecondaryHex || '#38bdf8') : '#0284c7' }}
               >
                 LAB
@@ -135,7 +135,7 @@ export const RotaSportsFlyFooterBadge: React.FC<RotaSportsFlyFooterBadgeProps> =
               />
             </div>
             <div>
-              <div className="text-[10.5px] font-black tracking-tight text-slate-900 leading-tight">
+              <div className="text-[12px] font-black tracking-tight text-slate-900 leading-tight">
                 ROTA <span className="text-cyan-600">PERFORMANS</span>
               </div>
             </div>
@@ -157,11 +157,11 @@ export const RotaSportsFlyFooterBadge: React.FC<RotaSportsFlyFooterBadgeProps> =
               <SportsFlyVectorMark className="w-4 h-4" />
             </div>
             <div>
-              <div className="flex items-center gap-1 leading-tight">
-                <span className="text-[8px] font-sans font-bold text-slate-400 uppercase">
+              <div className="flex items-center gap-1.5 leading-tight">
+                <span className="text-[9.5px] font-sans font-bold text-slate-500 uppercase">
                   Powered by
                 </span>
-                <span className="text-[10px] font-black tracking-tight text-slate-900">
+                <span className="text-[12px] font-black tracking-tight text-slate-900">
                   SportsFly <span style={{ color: primaryHex }}>LAB</span>
                 </span>
               </div>
@@ -172,15 +172,15 @@ export const RotaSportsFlyFooterBadge: React.FC<RotaSportsFlyFooterBadgeProps> =
 
       {/* Right: Verification & Page Index */}
       {(clubName || athleteCode || pageText) && (
-        <div className="flex items-center justify-between sm:justify-end print:justify-end gap-2.5 text-[10px] shrink-0 font-sans">
+        <div className="flex items-center justify-between sm:justify-end print:justify-end gap-2.5 text-[11px] shrink-0 font-sans">
           {clubName && (
-            <div className="text-right hidden sm:block print:block font-bold text-slate-700 uppercase tracking-tight">
+            <div className="text-right hidden sm:block print:block font-bold text-slate-700 uppercase tracking-tight text-[11px]">
               {clubName}
             </div>
           )}
           {athleteCode && pageText && (
             <div
-              className="font-bold px-2 py-0.5 rounded-lg text-white text-[10px]"
+              className="font-bold px-2.5 py-1 rounded-lg text-white text-[11px]"
               style={{ backgroundColor: primaryHex }}
             >
               {athleteCode} · {pageText}

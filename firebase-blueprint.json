@@ -605,6 +605,34 @@
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "uid", "name", "email", "allowedPages", "isFullAccess"]
+    },
+    "RegisteredUser": {
+      "title": "RegisteredUser",
+      "description": "User account registered via Email and Password, requiring Admin approval for active access.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 160 },
+        "password": { "type": "string" },
+        "clubName": { "type": "string", "maxLength": 140 },
+        "managerName": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 32 },
+        "city": { "type": "string" },
+        "district": { "type": "string" },
+        "branches": { "type": "array", "items": { "type": "string" } },
+        "role": { "type": "string" },
+        "status": { "type": "string", "enum": ["onay_bekliyor", "onaylandi", "reddedildi"] },
+        "selectedPlan": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "approvedAt": { "type": "string" },
+        "approvedBy": { "type": "string" },
+        "rejectionReason": { "type": "string" },
+        "lastLoginAt": { "type": "string" },
+        "authProvider": { "type": "string" },
+        "notes": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "email", "clubName", "managerName", "phone", "role", "status", "createdAt"]
     }
   },
   "firestore": {
@@ -647,6 +675,10 @@
     "/googleUsers/{userId}": {
       "schema": { "$ref": "#/entities/GoogleUserAccessRecord" },
       "description": "Google login users and their active module permissions managed by Admin."
+    },
+    "/registered_users/{userId}": {
+      "schema": { "$ref": "#/entities/RegisteredUser" },
+      "description": "Registered email accounts with approval lifecycle stored persistently in Firestore."
     }
   }
 }

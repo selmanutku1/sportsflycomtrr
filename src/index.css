@@ -8,33 +8,33 @@
   --font-mono: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-serif: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
-  /* Refined typography scale with 5% increased line-height for enhanced corporate readability */
-  --text-2xs: 0.65rem;
-  --text-2xs--line-height: 0.9rem;
+  /* Enhanced corporate readability typography scale with generous sizing and line-heights */
+  --text-2xs: 0.75rem;
+  --text-2xs--line-height: 1.05rem;
 
-  --text-xs: 0.725rem;
-  --text-xs--line-height: 1.05rem;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.175rem;
 
-  --text-sm: 0.8125rem;
-  --text-sm--line-height: 1.225rem;
+  --text-sm: 0.8875rem;
+  --text-sm--line-height: 1.325rem;
 
-  --text-base: 0.875rem;
-  --text-base--line-height: 1.375rem;
+  --text-base: 0.95rem;
+  --text-base--line-height: 1.475rem;
 
-  --text-lg: 0.975rem;
-  --text-lg--line-height: 1.5rem;
+  --text-lg: 1.075rem;
+  --text-lg--line-height: 1.6rem;
 
-  --text-xl: 1.125rem;
-  --text-xl--line-height: 1.6rem;
+  --text-xl: 1.225rem;
+  --text-xl--line-height: 1.75rem;
 
-  --text-2xl: 1.275rem;
-  --text-2xl--line-height: 1.75rem;
+  --text-2xl: 1.425rem;
+  --text-2xl--line-height: 1.9rem;
 
-  --text-3xl: 1.5rem;
-  --text-3xl--line-height: 1.95rem;
+  --text-3xl: 1.7rem;
+  --text-3xl--line-height: 2.15rem;
 
-  --text-4xl: 1.75rem;
-  --text-4xl--line-height: 2.225rem;
+  --text-4xl: 2.05rem;
+  --text-4xl--line-height: 2.45rem;
 
   /* SportsFly Professional Blue-Gray Tone */
   --color-blue-50: #f0f4f8;
@@ -92,18 +92,18 @@
 
 @layer base {
   html {
-    font-size: 14px; /* Minimal, clean dashboard scale baseline */
+    font-size: 15px; /* Clean, bold, highly legible dashboard scale baseline */
   }
 
   body {
     font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.52; /* ~5% increased line-height for optimal corporate reading flow */
+    font-size: 0.95rem;
+    line-height: 1.58; /* Enhanced line-height for optimal corporate reading flow */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01', 'ss02';
-    letter-spacing: -0.011em;
+    letter-spacing: -0.01em;
   }
 
   /* Distinct Hierarchical Font Weight Definitions for Headings & Body Elements */
