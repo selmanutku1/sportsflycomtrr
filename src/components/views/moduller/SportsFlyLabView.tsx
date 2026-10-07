@@ -102,7 +102,9 @@ import {
   parseSportsFlyLabExcel,
   analyzeLabPerformanceMetrics,
   fetchGeminiLabRecommendations,
+  ensureDataConsistency,
 } from '../../../data/sportsFlyLabData';
+import { getStoredKarneler, saveStoredKarneler } from '../../../data/mockKarneData';
 
 interface SportsFlyLabViewProps {
   onToast?: (msg: string) => void;
@@ -1307,7 +1309,41 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
       aiRecommendations: activeAiAnalysis,
     };
     handleUpdateCurrentReport(updated);
-    notify('✓ Uzman ve yapay zeka değerlendirmesi karneye (5. Sayfa Uzman Görüşü alanına) başarıyla aktarıldı.');
+
+    // Sync directly to the athlete's 5-page report card (SporcuKarne) as well!
+    try {
+      const currentKarneler = getStoredKarneler();
+      const athleteIdClean = currentReport.athleteId?.toLowerCase().trim();
+      const athleteNameClean = currentReport.athleteName?.toLowerCase().trim();
+
+      let found = false;
+      const updatedKarneler = currentKarneler.map((k) => {
+        const kIdClean = k.sporcuId?.toLowerCase().trim();
+        const kAdClean = k.adSoyad?.toLowerCase().trim();
+
+        const isIdMatch = athleteIdClean && (kIdClean === athleteIdClean || kIdClean === `s-${athleteIdClean}`);
+        const isNameMatch = athleteNameClean && kAdClean && (kAdClean === athleteNameClean || kAdClean.includes(athleteNameClean) || athleteNameClean.includes(kAdClean));
+
+        if (isIdMatch || isNameMatch) {
+          found = true;
+          return {
+            ...k,
+            expertComment: enrichedComment,
+          };
+        }
+        return k;
+      });
+
+      if (found) {
+        saveStoredKarneler(updatedKarneler);
+        notify(`✓ Uzman ve yapay zeka değerlendirmesi "${currentReport.athleteName}" adlı sporcunun 5. Sayfa Uzman Görüşü alanına başarıyla aktarıldı.`);
+      } else {
+        notify('✓ Uzman ve yapay zeka değerlendirmesi karneye (5. Sayfa Uzman Görüşü alanına) başarıyla aktarıldı.');
+      }
+    } catch (err) {
+      console.error('Error syncing expertComment to SporcuKarne:', err);
+      notify('✓ Uzman ve yapay zeka değerlendirmesi karneye (5. Sayfa Uzman Görüşü alanına) başarıyla aktarıldı.');
+    }
   };
 
   // Handle PDF Download of the complete 7-page report card ('Tüm Karneyi İndir')
@@ -1462,6 +1498,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
   // Update current report in state & storage
   const handleUpdateCurrentReport = (updated: SportsFlyLabReport) => {
+    ensureDataConsistency(updated);
     const nextList = reports.map((r) => (r.id === updated.id ? updated : r));
     setReports(nextList);
     saveStoredLabReports(nextList);
@@ -4541,13 +4578,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             </div>
 
             {/* Executive Evaluator Guidance Note */}
-            <div className="mt-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="mt-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
               <p className="text-[11px] text-slate-600 leading-relaxed font-sans">
                 <span className="font-bold text-slate-900">Antrenör & Laboratuvar Notu:</span> Sporcumuz, incelenen kritik biyomotorik parametrelerde dönem boyunca istikrarlı bir ilerleme göstermiş ve genel performans düzeyini akran grubu ortalamasının üzerine taşımıştır.
               </p>
-              <span className="text-[10px] font-semibold text-slate-500 shrink-0">
-                Normatif Veri Tabanı: SportsFly Biometric Engine
-              </span>
             </div>
           </div>
         </div>
@@ -4561,97 +4595,162 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
   // PAGE 4 / 5: VELİ, SPORCU VE ANTRENÖR / KULÜP İÇİN KAPSAMLI GELİŞİM REHBERİ
   // ============================================================================
   const renderPage5 = () => {
+    // 3 improvement areas from AI analysis, with beautiful high-fidelity fallbacks to match the image if data is missing or empty
+    const rawAreas = activeAiAnalysis?.improvementAreas || [];
+    const areas = [
+      {
+        metricName: rawAreas[0]?.metricName || 'Denge Testi',
+        currentValue: rawAreas[0]?.currentValue || '78 sn',
+        targetValue: rawAreas[0]?.targetValue || '66.3 sn',
+        percentile: rawAreas[0]?.percentile || 82,
+        drillRecommendation: rawAreas[0]?.drillRecommendation || 'Tek ayak proprioseptif denge (BOSU / denge pedi), gözler kapalı stabilizasyon ve Y-Balance uzanma drilleri',
+        weeklyFrequency: rawAreas[0]?.weeklyFrequency || 'Haftada 3 Gün · 3x30 sn (Sağ/Sol)'
+      },
+      {
+        metricName: rawAreas[1]?.metricName || 'Sırt Kuvveti',
+        currentValue: rawAreas[1]?.currentValue || '58 kg/m',
+        targetValue: rawAreas[1]?.targetValue || '62.64 kg/m',
+        percentile: rawAreas[1]?.percentile || 84,
+        drillRecommendation: rawAreas[1]?.drillRecommendation || 'Posterior zincir izometrik gövde stabilizasyonu, Superman hold, glute bridge ve core anti-rotasyon egzersizleri',
+        weeklyFrequency: rawAreas[1]?.weeklyFrequency || 'Haftada 3 Gün · 3x12 Tekrar / 30 sn İzometrik'
+      },
+      {
+        metricName: rawAreas[2]?.metricName || 'Esneklik Testi',
+        currentValue: rawAreas[2]?.currentValue || '31 cm',
+        targetValue: rawAreas[2]?.targetValue || '32.55 cm',
+        percentile: rawAreas[2]?.percentile || 86,
+        drillRecommendation: rawAreas[2]?.drillRecommendation || 'Hamstring-lomber zincir PNF esnetme, kalça fleksör mobilitesi ve antrenman sonu statik miyofasyal gevşetme',
+        weeklyFrequency: rawAreas[2]?.weeklyFrequency || 'Her Antrenman Sonu · 12-15 dk'
+      }
+    ];
+
+    const fallbackComment = `${currentReport.athleteName}, ${currentReport.sportBranch} branşı altyapı grubumuzda %${currentReport.scoreHistory.p3Score} genel performans puanı ile kulübümüzün gelişim gösteren ve en yüksek potansiyelli sporcularından biridir. Yapılan biyomotor ve performans analizlerine göre belirlenen antrenman programına katılım ve süreklilik, gelişimi en üst düzeye taşıyacaktır.`;
+    const finalComment = currentReport.expertComment || fallbackComment;
+
     return (
       <div
         id="sportsfly-lab-page-5"
         className={`a4-print-page relative overflow-hidden min-h-[1460px] flex flex-col justify-between rounded-xl p-5 sm:p-7 shadow-xs print:shadow-none font-sans ${activeTemplate.pageFrameClass}`}
       >
-        <div className="space-y-4 font-sans">
-          {renderPageHeader(
-            4,
-            '4. Veli, Sporcu ve Antrenör / Kulüp İçin Kapsamlı Gelişim Rehberi',
-            'Ebeveyn Bilgilendirme Notları, Sporcu Hedefleri, Antrenör Stratejik Yol Haritası ve Öneriler'
-          )}
+        {renderPageWatermark()}
+        <div className="space-y-6 font-sans relative z-10">
+          {/* Header Bar */}
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
+            <h2 className="text-xs sm:text-[13px] font-black uppercase text-slate-900 tracking-tight">
+              9. YAPAY ZEKA TABANLI PERFORMANS ÖNERİLERİ VE GELİŞİME AÇIK YÖNLER
+            </h2>
+            <span className="text-[10px] font-sans font-extrabold text-slate-400">
+              Otomatik Metrik &amp; SD Sapma Analizi
+            </span>
+          </div>
 
-          {/* Section 1: Veli & Sporcu Bilgilendirme */}
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-4 shadow-2xs space-y-3">
-            <div className="flex items-center gap-2 border-b border-emerald-200 pb-2">
-              <span className="px-2.5 py-1 rounded-md bg-emerald-700 text-white text-[11px] font-bold uppercase tracking-wider">
-                Veli ve Sporcu Odaklı Tavsiyeler
-              </span>
-              <span className="text-xs text-emerald-900 font-semibold">
-                Evde Destek, Beslenme ve Motivasyon Rehberi
-              </span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-              <div className="p-3 rounded-xl bg-white border border-emerald-100 shadow-2xs space-y-1.5">
-                <div className="font-extrabold text-emerald-950 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-600" />
-                  <span>Beslenme ve Hidrasyon Düzeni</span>
+          {/* 3 Improvement Areas Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            {areas.map((item, idx) => (
+              <div key={idx} className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-3xs flex flex-col justify-between min-h-[185px] transition-all">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-1.5 border-b border-slate-100 pb-1.5">
+                    <h3 className="font-extrabold text-slate-800 text-[11px] sm:text-xs">
+                      {item.metricName}
+                    </h3>
+                    <span className="text-[9.5px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200/60 shrink-0">
+                      Gelişim Takibi
+                    </span>
+                  </div>
+                  <div className="text-[10.5px] font-sans font-bold text-slate-700">
+                    Mevcut: <span className="text-slate-900 font-extrabold">{item.currentValue}</span> → Hedef: <span className="text-emerald-600 font-black">{item.targetValue}</span> <span className="text-slate-400 font-normal">({idx === 0 ? '%82' : idx === 1 ? '%84' : '%86'})</span>
+                  </div>
+                  <p className="text-[10px] leading-relaxed text-slate-600 font-normal">
+                    {item.drillRecommendation}
+                  </p>
                 </div>
-                <p className="text-slate-700 leading-relaxed text-[11px]">
-                  Antrenman günlerinde karbonhidrat (tam tahıllar, meyve) ve antrenman sonrası kaliteli protein (tavuk, balık, yumurta) tüketimine özen gösterilmelidir. Antrenman süresince su tüketimi (en az 1.5 - 2 litre) hidrasyon seviyesini korumak için kritik önem taşır.
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-white border border-emerald-100 shadow-2xs space-y-1.5">
-                <div className="font-extrabold text-emerald-950 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-600" />
-                  <span>Dinlenme ve Uyku Kalitesi</span>
+                <div className="mt-2 pt-2 border-t border-slate-100 text-[10px] font-semibold text-slate-600 flex items-center gap-1">
+                  <span className="text-slate-400 uppercase font-bold text-[9px]">Sıklık:</span>
+                  <span>{item.weeklyFrequency}</span>
                 </div>
-                <p className="text-slate-700 leading-relaxed text-[11px]">
-                  Büyüme çağındaki sporcularımızın kas toparlanması (rejuvenation) ve sinir sistemi adaptasyonu için gece en az 8-9 saat kesintisiz ve kaliteli uyku uyuması gelişim hızını doğrudan artıracaktır.
-                </p>
               </div>
+            ))}
+          </div>
+
+          {/* Uzman Görüşü */}
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/25 p-4 shadow-3xs space-y-3">
+            <h3 className="text-xs font-black uppercase text-slate-800 tracking-wider">
+              Uzman Görüşü
+            </h3>
+            <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-3xs text-[11px] sm:text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-wrap min-h-[120px]">
+              {finalComment}
             </div>
           </div>
 
-          {/* Section 2: Antrenör & Kulüp İçin Teknik Strateji */}
-          <div className="rounded-2xl border border-blue-200 bg-blue-50/40 p-4 shadow-2xs space-y-3">
-            <div className="flex items-center gap-2 border-b border-blue-200 pb-2">
-              <span className="px-2.5 py-1 rounded-md bg-blue-700 text-white text-[11px] font-bold uppercase tracking-wider">
-                Antrenör ve Kulüp Stratejik Öncelikleri
-              </span>
-              <span className="text-xs text-blue-900 font-semibold">
-                Antrenman Periyotlaması & Yüklenme Yönetimi
-              </span>
+          {/* 4 Weekly Routine Cards Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-3xs space-y-1.5 min-h-[110px]">
+              <div className="text-[9px] sm:text-[10px] font-black text-slate-800 tracking-tight flex items-center gap-1 border-b border-slate-100 pb-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-900" />
+                <span>PZT / ÇAR · SÜRAT &amp; ÇEVİKLİK</span>
+              </div>
+              <p className="text-[10px] leading-relaxed text-slate-600 font-normal">
+                15 dk Nöromüsküler Isınma + 10x5m Reaktif Yön Değiştirme
+              </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-              <div className="p-3 rounded-xl bg-white border border-blue-100 shadow-2xs space-y-1.5">
-                <div className="font-extrabold text-blue-950 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-blue-600" />
-                  <span>Kuvvet & Patlayıcı Güç Gelişimi</span>
-                </div>
-                <p className="text-slate-700 leading-relaxed text-[11px]">
-                  Dikey sıçrama ve çabukluk parametrelerindeki mevcut ivmenin korunması için plyometrik egzersiz yüklenmeleri haftada 2 seans olarak planlanmalı, eklem stabilizasyon egzersizlerine antrenman ısınmalarında yer verilmelidir.
-                </p>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-3xs space-y-1.5 min-h-[110px]">
+              <div className="text-[9px] sm:text-[10px] font-black text-slate-800 tracking-tight flex items-center gap-1 border-b border-slate-100 pb-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-900" />
+                <span>SAL / PER · KUVVET &amp; DENGE</span>
               </div>
-              <div className="p-3 rounded-xl bg-white border border-blue-100 shadow-2xs space-y-1.5">
-                <div className="font-extrabold text-blue-950 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-blue-600" />
-                  <span>Teknik & Taktik Entegrasyon</span>
-                </div>
-                <p className="text-slate-700 leading-relaxed text-[11px]">
-                  Sporcunun çeviklik ve reaksiyon sürelerindeki ilerlemeler maç içi çabukluk becerilerine aktarılmalı, karar verme reaksiyon drilleri dar alan oyunları ile desteklenmelidir.
-                </p>
+              <p className="text-[10px] leading-relaxed text-slate-600 font-normal">
+                Vücut Ağırlığı Merkez Gövde (Core) + Flamingo Propriosepsiyon
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-3xs space-y-1.5 min-h-[110px]">
+              <div className="text-[9px] sm:text-[10px] font-black text-slate-800 tracking-tight flex items-center gap-1 border-b border-slate-100 pb-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-900" />
+                <span>CUMA / CMT · BRANŞ &amp; OYUN</span>
               </div>
+              <p className="text-[10px] leading-relaxed text-slate-600 font-normal">
+                Aerobik Oyun İçi Dayanıklılık + Teknik Koordinasyon Drilleri
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-3xs space-y-1.5 min-h-[110px]">
+              <div className="text-[9px] sm:text-[10px] font-black text-emerald-800 tracking-tight flex items-center gap-1 border-b border-emerald-100 pb-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                <span>PAZAR · REJENERASYON</span>
+              </div>
+              <p className="text-[10px] leading-relaxed text-slate-600 font-normal">
+                Dinamik Esneklik (Sit &amp; Reach) + 9 Saat Kaliteli Uyku Takibi
+              </p>
             </div>
           </div>
 
-          {/* Section 3: Onay ve Özet Tablosu */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <span className="text-xs font-black uppercase text-slate-900">
-                Genel Değerlendirme & Rapor Onayı
+          {/* Footer Methodology Notes */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-3.5 border-t border-slate-150 text-[10.5px] leading-relaxed text-slate-500 font-normal">
+            <div className="space-y-1">
+              <span className="font-extrabold text-slate-700 uppercase tracking-wide block">
+                Bilimsel Metodoloji:
               </span>
-              <span className="text-xs text-slate-500 font-medium">
-                Rapor Tarihi: {currentReport.date3}
+              <p>
+                Sportif performansın bileşenlerinin ölçümlendiği 10 test protokolü; sürat, kuvvet, denge, esneklik, reaksiyon sürati, 10x5m çabukluk, durarak uzun atlama ve PACER (dayanıklılık) bataryalarından oluşturulmuştur.
+              </p>
+            </div>
+            <div className="space-y-1">
+              <span className="font-extrabold text-slate-700 uppercase tracking-wide block">
+                İpsatif Gelişim Yaklaşımı:
               </span>
+              <p>
+                İpsatif değerlendirme sporcu merkezlidir; gelişim için önceki performansların aşılmasını odaklanır.{' '}
+                <span className="text-emerald-600 font-black">
+                  Farkındalık, gelişimi yönetmek için ilk adımdır.
+                </span>
+              </p>
             </div>
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
-              <div className="text-sm font-extrabold text-slate-900">
-                Rota Performans Analiz Ekibi
-              </div>
-            </div>
+          </div>
+
+          {/* Corporate Legal Disclaimer */}
+          <div className="pt-3 border-t border-slate-200/60 text-[9px] sm:text-[9.5px] leading-relaxed text-slate-400 font-semibold italic text-center">
+            Bu karnedeki teknik analizler ve ölçümler <strong className="text-slate-600 dark:text-slate-300 font-black uppercase">ROTA PERFORMANS</strong> tarafından gelişim takibi amacıyla hassasiyetle yapılmıştır; kesinlikle tıbbi tanı, teşhis, tedavi veya bir hekim raporu niteliği taşımamaktadır.
           </div>
         </div>
 

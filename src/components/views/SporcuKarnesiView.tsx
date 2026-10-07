@@ -154,6 +154,7 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
   const [isDownloading, setIsDownloading] = useState(false);
   const [isPdfPreviewMode, setIsPdfPreviewMode] = useState(false);
   const [showPerformanceCharts, setShowPerformanceCharts] = useState(true);
+  const [isSimplifiedView, setIsSimplifiedView] = useState(false);
   const [pdfZoom, setPdfZoom] = useState(100);
   const [isVeliModalOpen, setIsVeliModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -693,6 +694,20 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                   <BarChart3 className="w-4 h-4 shrink-0" />
                   <span>Performans Grafikleri</span>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsSimplifiedView(prev => !prev)}
+                  className={`col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer whitespace-nowrap ${
+                    isSimplifiedView
+                      ? 'bg-amber-100 border border-amber-300 text-amber-800 font-extrabold'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                  }`}
+                  title="Karnedeki yoğun/renkli panelleri sadeleştirip minimal şık tasarıma geçirir"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                  <span>{isSimplifiedView ? 'Sade Görünüm: Açık' : 'Sade Görünüm'}</span>
+                </button>
               </div>
 
               {/* Right Group: PDF / Print / Parent Share Actions */}
@@ -971,85 +986,126 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
 
                     {/* Dinamik SporPuan & Karne Dengesi Canlı Paneli */}
                     {sporpuanImpact && (
-                      <div className="mx-6 md:mx-8 mt-5 p-4 md:p-5 bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-blue-500/10 rounded-2xl border border-amber-200/80">
-                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-slate-950 font-black flex items-center justify-center shadow-md shrink-0">
-                              <Zap className="w-6 h-6 fill-slate-950 text-slate-950" />
+                      isSimplifiedView ? (
+                        <div className="mx-6 md:mx-8 mt-5 p-4 bg-slate-50/70 border border-slate-200/80 rounded-xl">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-2">
+                              <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
+                              <div>
+                                <span className="text-xs font-bold text-slate-800">Sporpuan &amp; Karne Dengesi (Sade Özet)</span>
+                                <p className="text-[10px] text-slate-500">Antrenör puanları ve devamlılık durumu</p>
+                              </div>
                             </div>
-                            <div>
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h3 className="font-extrabold text-slate-900 text-sm md:text-base flex items-center gap-1.5">
-                                  Sporpuan &amp; Karne Dinamik Dengesi
-                                </h3>
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                                  Canlı Senkronize
+                            
+                            <div className="flex items-center gap-5 text-xs">
+                              <div>
+                                <span className="text-slate-400 font-semibold mr-1">TOPLAM:</span>
+                                <strong className="text-amber-600 font-extrabold">{sporpuanImpact.totalSP} SP</strong>
+                              </div>
+                              <div className="w-px h-4 bg-slate-200" />
+                              <div>
+                                <span className="text-slate-400 font-semibold mr-1">KATKI:</span>
+                                <strong className="text-emerald-600 font-extrabold flex items-center gap-0.5 inline-flex">
+                                  <TrendingUp className="w-3.5 h-3.5" />
+                                  +{sporpuanImpact.bonuses.genelOrtalamaBonus} Not
+                                </strong>
+                              </div>
+                              <div className="w-px h-4 bg-slate-200" />
+                              <div>
+                                <span className="text-slate-400 font-semibold mr-1">KATILIM:</span>
+                                <strong className="text-slate-700 font-extrabold">%{activeKarne.katilimYuzdesi}</strong>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setIsQuickPointModalOpen(true)}
+                                className="print:hidden text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer transition-colors"
+                              >
+                                + Hızlı Puan Ver
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mx-6 md:mx-8 mt-5 p-4 md:p-5 bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-blue-500/10 rounded-2xl border border-amber-200/80">
+                          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-slate-950 font-black flex items-center justify-center shadow-md shrink-0">
+                                <Zap className="w-6 h-6 fill-slate-950 text-slate-950" />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h3 className="font-extrabold text-slate-900 text-sm md:text-base flex items-center gap-1.5">
+                                    Sporpuan &amp; Karne Dinamik Dengesi
+                                  </h3>
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                                    Canlı Senkronize
+                                  </span>
+                                </div>
+                                <p className="text-xs text-slate-600 mt-0.5">
+                                  Antrenörün verdiği hızlı puanlar ve devamlılık puanları sporcu karnesine dinamik not artışı olarak yansır.
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 flex-wrap">
+                              <div className="bg-white/90 border border-amber-200 px-3.5 py-2 rounded-xl text-center shadow-2xs">
+                                <span className="text-[10px] uppercase font-bold text-slate-500 block">Toplam Sporpuan</span>
+                                <span className="text-base font-black text-amber-600">
+                                  {sporpuanImpact.totalSP} SP
                                 </span>
                               </div>
-                              <p className="text-xs text-slate-600 mt-0.5">
-                                Antrenörün verdiği hızlı puanlar ve devamlılık puanları sporcu karnesine dinamik not artışı olarak yansır.
-                              </p>
+
+                              <div className="bg-white/90 border border-emerald-200 px-3.5 py-2 rounded-xl text-center shadow-2xs">
+                                <span className="text-[10px] uppercase font-bold text-slate-500 block">Karne Not Katkısı</span>
+                                <span className="text-base font-black text-emerald-600 flex items-center justify-center gap-0.5">
+                                  <TrendingUp className="w-3.5 h-3.5" />
+                                  +{sporpuanImpact.bonuses.genelOrtalamaBonus} Not
+                                </span>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => setIsQuickPointModalOpen(true)}
+                                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95 print:hidden"
+                              >
+                                <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                                <span>+ Hızlı Puan Ver</span>
+                              </button>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <div className="bg-white/90 border border-amber-200 px-3.5 py-2 rounded-xl text-center shadow-2xs">
-                              <span className="text-[10px] uppercase font-bold text-slate-500 block">Toplam Sporpuan</span>
-                              <span className="text-base font-black text-amber-600">
-                                {sporpuanImpact.totalSP} SP
+                          <div className="mt-4 pt-3 border-t border-amber-200/60 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                            <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
+                              <span className="text-[10px] font-bold text-slate-500 block">Davranış &amp; Fair-Play</span>
+                              <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.davranis} SP</span>
+                              <span className="text-[10px] text-indigo-600 font-bold ml-1">
+                                (+{sporpuanImpact.bonuses.davranisBonus})
                               </span>
                             </div>
-
-                            <div className="bg-white/90 border border-emerald-200 px-3.5 py-2 rounded-xl text-center shadow-2xs">
-                              <span className="text-[10px] uppercase font-bold text-slate-500 block">Karne Not Katkısı</span>
-                              <span className="text-base font-black text-emerald-600 flex items-center justify-center gap-0.5">
-                                <TrendingUp className="w-3.5 h-3.5" />
-                                +{sporpuanImpact.bonuses.genelOrtalamaBonus} Not
+                            <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
+                              <span className="text-[10px] font-bold text-slate-500 block">Teknik &amp; Gelişim</span>
+                              <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.gelisim} SP</span>
+                              <span className="text-[10px] text-blue-600 font-bold ml-1">
+                                (+{sporpuanImpact.bonuses.teknikBonus})
                               </span>
                             </div>
-
-                            <button
-                              type="button"
-                              onClick={() => setIsQuickPointModalOpen(true)}
-                              className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95 print:hidden"
-                            >
-                              <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                              <span>+ Hızlı Puan Ver</span>
-                            </button>
+                            <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
+                              <span className="text-[10px] font-bold text-slate-500 block">Liderlik &amp; Zihin</span>
+                              <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.liderlik} SP</span>
+                              <span className="text-[10px] text-amber-600 font-bold ml-1">
+                                (+{sporpuanImpact.bonuses.zihinselBonus})
+                              </span>
+                            </div>
+                            <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
+                              <span className="text-[10px] font-bold text-slate-500 block">Antrenman Devamı</span>
+                              <span className="font-black text-emerald-700">{sporpuanImpact.categoryPoints.devam} SP</span>
+                              <span className="text-[10px] text-emerald-600 font-bold ml-1">
+                                (%{activeKarne.katilimYuzdesi})
+                              </span>
+                            </div>
                           </div>
                         </div>
-
-                        <div className="mt-4 pt-3 border-t border-amber-200/60 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                          <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
-                            <span className="text-[10px] font-bold text-slate-500 block">Davranış &amp; Fair-Play</span>
-                            <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.davranis} SP</span>
-                            <span className="text-[10px] text-indigo-600 font-bold ml-1">
-                              (+{sporpuanImpact.bonuses.davranisBonus})
-                            </span>
-                          </div>
-                          <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
-                            <span className="text-[10px] font-bold text-slate-500 block">Teknik &amp; Gelişim</span>
-                            <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.gelisim} SP</span>
-                            <span className="text-[10px] text-blue-600 font-bold ml-1">
-                              (+{sporpuanImpact.bonuses.teknikBonus})
-                            </span>
-                          </div>
-                          <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
-                            <span className="text-[10px] font-bold text-slate-500 block">Liderlik &amp; Zihin</span>
-                            <span className="font-black text-slate-800">{sporpuanImpact.categoryPoints.liderlik} SP</span>
-                            <span className="text-[10px] text-amber-600 font-bold ml-1">
-                              (+{sporpuanImpact.bonuses.zihinselBonus})
-                            </span>
-                          </div>
-                          <div className="p-2 bg-white/70 rounded-lg border border-slate-200/60">
-                            <span className="text-[10px] font-bold text-slate-500 block">Antrenman Devamı</span>
-                            <span className="font-black text-emerald-700">{sporpuanImpact.categoryPoints.devam} SP</span>
-                            <span className="text-[10px] text-emerald-600 font-bold ml-1">
-                              (%{activeKarne.katilimYuzdesi})
-                            </span>
-                          </div>
-                        </div>
-                      </div>
+                      )
                     )}
 
                     {/* Attendance & Group Comparison & Trainer Summary */}
@@ -1085,41 +1141,73 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                       </div>
 
                       {/* Grup Karşılaştırması */}
-                      <div className="bg-indigo-50/40 border border-indigo-200 rounded-xl p-4 space-y-2.5">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div>
-                            <h4 className="font-bold text-indigo-950 text-xs sm:text-sm">Grup Karşılaştırması &amp; Genel Konum</h4>
-                            <p className="text-[11px] text-slate-600">
-                              Sporcunun kendi yaş ve branş grubu içerisindeki başarı dengesi
-                            </p>
+                      {isSimplifiedView ? (
+                        <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-2.5 mb-2.5">
+                            <div>
+                              <h4 className="font-bold text-slate-800 text-xs">Grup Karşılaştırması &amp; Genel Konum</h4>
+                              <p className="text-[10px] text-slate-500">
+                                Sporcunun kendi yaş ve branş grubu içerisindeki başarı dengesi
+                              </p>
+                            </div>
+                            <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
+                              Grup İçi Konum: %94
+                            </span>
                           </div>
-                          <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-extrabold">
-                            Grup İçi Konum: %94
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
-                          <div className="bg-white p-2.5 rounded-xl border border-indigo-100 text-center">
-                            <div className="text-[9.5px] font-bold text-slate-500 uppercase">Grup Sporcu Sayısı</div>
-                            <div className="text-base font-black font-sans tabular-nums text-slate-900 mt-0.5">15</div>
-                          </div>
-                          <div className="bg-white p-2.5 rounded-xl border border-amber-200 text-center">
-                            <div className="text-[9.5px] font-bold text-amber-800 uppercase">Genel Sıralama</div>
-                            <div className="text-base font-black font-sans tabular-nums text-amber-600 mt-0.5">1.</div>
-                          </div>
-                          <div className="bg-white p-2.5 rounded-xl border border-blue-200 text-center">
-                            <div className="text-[9.5px] font-bold text-blue-800 uppercase">Sportif Performans</div>
-                            <div className="text-base font-black font-sans tabular-nums text-blue-600 mt-0.5">%88</div>
-                          </div>
-                          <div className="bg-white p-2.5 rounded-xl border border-slate-200 text-center">
-                            <div className="text-[9.5px] font-bold text-slate-500 uppercase">Grup Ortalaması</div>
-                            <div className="text-base font-black font-sans tabular-nums text-slate-700 mt-0.5">%72</div>
-                          </div>
-                          <div className="bg-emerald-50 p-2.5 rounded-xl border border-emerald-300 text-center">
-                            <div className="text-[9.5px] font-bold text-emerald-900 uppercase">Grup İçi Konum</div>
-                            <div className="text-base font-black font-sans tabular-nums text-emerald-700 mt-0.5">%94</div>
+                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs text-center">
+                            <div>
+                              <div className="text-[10px] text-slate-400 font-semibold uppercase">Sporcu Sayısı</div>
+                              <div className="text-sm font-extrabold text-slate-700 mt-0.5">15</div>
+                            </div>
+                            <div className="border-l border-slate-200 hidden sm:block h-6 my-auto" />
+                            <div>
+                              <div className="text-[10px] text-amber-600 font-semibold uppercase">Genel Sıralama</div>
+                              <div className="text-sm font-extrabold text-amber-600 mt-0.5">1 / 15</div>
+                            </div>
+                            <div className="border-l border-slate-200 hidden sm:block h-6 my-auto" />
+                            <div>
+                              <div className="text-[10px] text-blue-600 font-semibold uppercase">Performans</div>
+                              <div className="text-sm font-extrabold text-blue-600 mt-0.5">%88</div>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="bg-indigo-50/40 border border-indigo-200 rounded-xl p-4 space-y-2.5">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                              <h4 className="font-bold text-indigo-950 text-xs sm:text-sm">Grup Karşılaştırması &amp; Genel Konum</h4>
+                              <p className="text-[11px] text-slate-600">
+                                Sporcunun kendi yaş ve branş grubu içerisindeki başarı dengesi
+                              </p>
+                            </div>
+                            <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-extrabold">
+                              Grup İçi Konum: %94
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                            <div className="bg-white p-2.5 rounded-xl border border-indigo-100 text-center">
+                              <div className="text-[9.5px] font-bold text-slate-500 uppercase">Grup Sporcu Sayısı</div>
+                              <div className="text-base font-black font-sans tabular-nums text-slate-900 mt-0.5">15</div>
+                            </div>
+                            <div className="bg-white p-2.5 rounded-xl border border-amber-200 text-center">
+                              <div className="text-[9.5px] font-bold text-amber-800 uppercase">Genel Sıralama</div>
+                              <div className="text-base font-black font-sans tabular-nums text-amber-600 mt-0.5">1.</div>
+                            </div>
+                            <div className="bg-white p-2.5 rounded-xl border border-blue-200 text-center">
+                              <div className="text-[9.5px] font-bold text-blue-800 uppercase">Sportif Performans</div>
+                              <div className="text-base font-black font-sans tabular-nums text-blue-600 mt-0.5">%88</div>
+                            </div>
+                            <div className="bg-white p-2.5 rounded-xl border border-slate-200 text-center">
+                              <div className="text-[9.5px] font-bold text-slate-500 uppercase">Grup Ortalaması</div>
+                              <div className="text-base font-black font-sans tabular-nums text-slate-700 mt-0.5">%72</div>
+                            </div>
+                            <div className="bg-emerald-50 p-2.5 rounded-xl border border-emerald-300 text-center">
+                              <div className="text-[9.5px] font-bold text-emerald-900 uppercase">Grup İçi Konum</div>
+                              <div className="text-base font-black font-sans tabular-nums text-emerald-700 mt-0.5">%94</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                   {renderPageFooterBadge(1)}
@@ -1138,19 +1226,35 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                     {renderPageHeaderBadge(2)}
 
                     {/* Sub-header banner */}
-                    <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
-                      <div>
-                        <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-emerald-400 uppercase">
-                          BİYOMOTOR KAPASİTE &amp; KONDİSYON GELİŞİMİ
+                    {isSimplifiedView ? (
+                      <div className="px-6 md:px-8 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 bg-slate-50">
+                        <div>
+                          <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-emerald-600 uppercase">
+                            BİYOMOTOR KAPASİTE &amp; KONDİSYON GELİŞİMİ
+                          </div>
+                          <div className="text-xs sm:text-sm font-extrabold text-slate-800 tracking-tight">
+                            Sayfa 2: Fiziksel Performans &amp; Biyomotor Ölçüm Analizi
+                          </div>
                         </div>
-                        <div className="text-sm sm:text-base font-extrabold tracking-tight">
-                          Sayfa 2: Fiziksel Performans &amp; Biyomotor Ölçüm Analizi
+                        <div className="text-right text-xs font-sans tabular-nums text-slate-500">
+                          {activeKarne.adSoyad} · Genel Fiziksel: <span className="text-emerald-600 font-bold">{activeKarne.fiziksel.ortalama}/10</span>
                         </div>
                       </div>
-                      <div className="text-right text-xs font-sans tabular-nums text-slate-300">
-                        {activeKarne.adSoyad} · Genel Fiziksel: <span className="text-emerald-400 font-bold">{activeKarne.fiziksel.ortalama}/10</span>
+                    ) : (
+                      <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-emerald-400 uppercase">
+                            BİYOMOTOR KAPASİTE &amp; KONDİSYON GELİŞİMİ
+                          </div>
+                          <div className="text-sm sm:text-base font-extrabold tracking-tight">
+                            Sayfa 2: Fiziksel Performans &amp; Biyomotor Ölçüm Analizi
+                          </div>
+                        </div>
+                        <div className="text-right text-xs font-sans tabular-nums text-slate-300">
+                          {activeKarne.adSoyad} · Genel Fiziksel: <span className="text-emerald-400 font-bold">{activeKarne.fiziksel.ortalama}/10</span>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* D3 Radar & Progression Line Charts Panel */}
                     {showPerformanceCharts && (
@@ -1205,19 +1309,35 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                     {renderPageHeaderBadge(3)}
 
                     {/* Sub-header banner */}
-                    <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
-                      <div>
-                        <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-sky-400 uppercase">
-                          BRANŞ BİLGİSİ, OYUN OKUMA &amp; SAHA UYGULAMASI
+                    {isSimplifiedView ? (
+                      <div className="px-6 md:px-8 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 bg-slate-50">
+                        <div>
+                          <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-sky-600 uppercase">
+                            BRANŞ BİLGİSİ, OYUN OKUMA &amp; SAHA UYGULAMASI
+                          </div>
+                          <div className="text-xs sm:text-sm font-extrabold text-slate-800 tracking-tight">
+                            Sayfa 3: Teknik Gelişim &amp; Taktiksel Oyun Zekası
+                          </div>
                         </div>
-                        <div className="text-sm sm:text-base font-extrabold tracking-tight">
-                          Sayfa 3: Teknik Gelişim &amp; Taktiksel Oyun Zekası
+                        <div className="text-right text-xs font-sans tabular-nums text-slate-500">
+                          Teknik: <span className="text-blue-600 font-bold">{activeKarne.teknik.ortalama}/10</span> · Taktik: <span className="text-purple-600 font-bold">{activeKarne.taktiksel.ortalama}/10</span>
                         </div>
                       </div>
-                      <div className="text-right text-xs font-sans tabular-nums text-slate-300">
-                        Teknik: <span className="text-blue-400 font-bold">{activeKarne.teknik.ortalama}/10</span> · Taktik: <span className="text-purple-400 font-bold">{activeKarne.taktiksel.ortalama}/10</span>
+                    ) : (
+                      <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-sky-400 uppercase">
+                            BRANŞ BİLGİSİ, OYUN OKUMA &amp; SAHA UYGULAMASI
+                          </div>
+                          <div className="text-sm sm:text-base font-extrabold tracking-tight">
+                            Sayfa 3: Teknik Gelişim &amp; Taktiksel Oyun Zekası
+                          </div>
+                        </div>
+                        <div className="text-right text-xs font-sans tabular-nums text-slate-300">
+                          Teknik: <span className="text-blue-400 font-bold">{activeKarne.teknik.ortalama}/10</span> · Taktik: <span className="text-purple-400 font-bold">{activeKarne.taktiksel.ortalama}/10</span>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     <div className="p-6 md:p-8 space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1306,19 +1426,35 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                     {renderPageHeaderBadge(4)}
 
                     {/* Sub-header banner */}
-                    <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
-                      <div>
-                        <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-indigo-400 uppercase">
-                          FAIR-PLAY, DİSİPLİN &amp; KULÜP KÜLTÜRÜ
+                    {isSimplifiedView ? (
+                      <div className="px-6 md:px-8 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 bg-slate-50">
+                        <div>
+                          <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-indigo-600 uppercase">
+                            FAIR-PLAY, DİSİPLİN &amp; KULÜP KÜLTÜRÜ
+                          </div>
+                          <div className="text-xs sm:text-sm font-extrabold text-slate-800 tracking-tight">
+                            Sayfa 4: Davranışsal Gelişim, Karakter &amp; Rozetler
+                          </div>
                         </div>
-                        <div className="text-sm sm:text-base font-extrabold tracking-tight">
-                          Sayfa 4: Davranışsal Gelişim, Karakter &amp; Rozetler
+                        <div className="text-right text-xs font-sans tabular-nums text-slate-500">
+                          Davranış: <span className="text-indigo-600 font-bold">{activeKarne.davranissal?.kriterler.ortalama || 9}/10</span> · Rozet: <span className="text-amber-600 font-bold">{activeKarne.davranissal?.kazanimlar.length || 0} Adet</span>
                         </div>
                       </div>
-                      <div className="text-right text-xs font-sans tabular-nums text-slate-300">
-                        Davranış: <span className="text-indigo-400 font-bold">{activeKarne.davranissal?.kriterler.ortalama || 9}/10</span> · Rozet: <span className="text-amber-400 font-bold">{activeKarne.davranissal?.kazanimlar.length || 0} Adet</span>
+                    ) : (
+                      <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-indigo-400 uppercase">
+                            FAIR-PLAY, DİSİPLİN &amp; KULÜP KÜLTÜRÜ
+                          </div>
+                          <div className="text-sm sm:text-base font-extrabold tracking-tight">
+                            Sayfa 4: Davranışsal Gelişim, Karakter &amp; Rozetler
+                          </div>
+                        </div>
+                        <div className="text-right text-xs font-sans tabular-nums text-slate-300">
+                          Davranış: <span className="text-indigo-400 font-bold">{activeKarne.davranissal?.kriterler.ortalama || 9}/10</span> · Rozet: <span className="text-amber-400 font-bold">{activeKarne.davranissal?.kazanimlar.length || 0} Adet</span>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {activeKarne.davranissal && (
                       <div className="p-6 md:p-8 space-y-6">
@@ -1526,19 +1662,35 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                     {renderPageHeaderBadge(5)}
 
                     {/* Sub-header banner */}
-                    <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
-                      <div>
-                        <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-amber-400 uppercase">
-                          ZİHİNSEL DİSİPLİN, ALIŞKANLIKLAR &amp; AKADEMİ ONAYI
+                    {isSimplifiedView ? (
+                      <div className="px-6 md:px-8 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 bg-slate-50">
+                        <div>
+                          <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-amber-600 uppercase">
+                            ZİHİNSEL DİSİPLİN, ALIŞKANLIKLAR &amp; AKADEMİ ONAYI
+                          </div>
+                          <div className="text-xs sm:text-sm font-extrabold text-slate-800 tracking-tight">
+                            Sayfa 5: Gelişim Alanları, Metodoloji &amp; Resmi Onay
+                          </div>
                         </div>
-                        <div className="text-sm sm:text-base font-extrabold tracking-tight">
-                          Sayfa 5: Gelişim Alanları, Metodoloji &amp; Resmi Onay
+                        <div className="text-right text-xs font-sans tabular-nums text-slate-500">
+                          Zihinsel: <span className="text-amber-600 font-bold">{activeKarne.zihinsel.ortalama}/10</span> · Genel Not: <span className="text-sky-600 font-bold">{genelOrtalama}/10</span>
                         </div>
                       </div>
-                      <div className="text-right text-xs font-sans tabular-nums text-slate-300">
-                        Zihinsel: <span className="text-amber-400 font-bold">{activeKarne.zihinsel.ortalama}/10</span> · Genel Not: <span className="text-sky-400 font-bold">{genelOrtalama}/10</span>
+                    ) : (
+                      <div className="bg-slate-900 text-white px-6 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <div className="text-[10px] font-sans tabular-nums font-bold tracking-widest text-amber-400 uppercase">
+                            ZİHİNSEL DİSİPLİN, ALIŞKANLIKLAR &amp; AKADEMİ ONAYI
+                          </div>
+                          <div className="text-sm sm:text-base font-extrabold tracking-tight">
+                            Sayfa 5: Gelişim Alanları, Metodoloji &amp; Resmi Onay
+                          </div>
+                        </div>
+                        <div className="text-right text-xs font-sans tabular-nums text-slate-300">
+                          Zihinsel: <span className="text-amber-400 font-bold">{activeKarne.zihinsel.ortalama}/10</span> · Genel Not: <span className="text-sky-400 font-bold">{genelOrtalama}/10</span>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     <div className="p-6 md:p-8 space-y-5">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -1631,6 +1783,16 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                         </div>
                       )}
 
+                      {/* Uzman Görüşü Bölümü */}
+                      <div className="bg-slate-50/70 border border-slate-200/90 rounded-2xl p-4 shadow-2xs space-y-2">
+                        <span className="text-xs font-black text-slate-800 uppercase tracking-wider block border-b border-slate-200 pb-2">
+                          Uzman Görüşü
+                        </span>
+                        <div className="text-[11px] sm:text-xs text-slate-700 leading-relaxed whitespace-pre-wrap">
+                          {activeKarne.expertComment || 'Bu sporcu için henüz uzman görüşü aktarılmamıştır. SportsFly Lab modülünden "Karne Uzman Görüşüne Aktar" butonu ile buraya veri aktarabilirsiniz.'}
+                        </div>
+                      </div>
+
                       {/* 12. Referans ve Metodoloji Bölümü */}
                       <div className="bg-slate-50/80 border border-slate-200/80 rounded-xl p-3 text-[10.5px] text-slate-500 leading-relaxed">
                         <span className="font-bold text-slate-700 uppercase tracking-wider block mb-0.5">
@@ -1640,16 +1802,23 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                       </div>
 
                       {/* Footer Signature Area */}
-                      <div className="bg-slate-50/90 rounded-xl p-4 border border-slate-200 flex items-center justify-around pt-5 pb-3">
-                        <div className="text-center">
-                          <div className="w-36 h-px bg-slate-400 mb-2 mx-auto"></div>
-                          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Değerlendiren Antrenör</div>
-                          <div className="text-xs text-slate-900 font-bold mt-0.5">{activeKarne.antrenor}</div>
+                      <div className="bg-slate-50/90 rounded-xl p-4 border border-slate-200 flex flex-col gap-4 pt-5 pb-3">
+                        <div className="flex items-center justify-around">
+                          <div className="text-center">
+                            <div className="w-36 h-px bg-slate-400 mb-2 mx-auto"></div>
+                            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Değerlendiren Antrenör</div>
+                            <div className="text-xs text-slate-900 font-bold mt-0.5">{activeKarne.antrenor}</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="w-36 h-px bg-slate-400 mb-2 mx-auto"></div>
+                            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Veli / Sporcu İmza</div>
+                            <div className="text-xs text-slate-700 font-medium mt-0.5">{activeKarne.veliAdSoyad || 'Kayıtlı Veli'}</div>
+                          </div>
                         </div>
-                        <div className="text-center">
-                          <div className="w-36 h-px bg-slate-400 mb-2 mx-auto"></div>
-                          <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Veli / Sporcu İmza</div>
-                          <div className="text-xs text-slate-700 font-medium mt-0.5">{activeKarne.veliAdSoyad || 'Kayıtlı Veli'}</div>
+
+                        {/* Rota Performans Corporate Disclaimer */}
+                        <div className="pt-3 border-t border-slate-200/60 text-[9px] sm:text-[9.5px] leading-relaxed text-slate-400 font-semibold italic text-center">
+                          Bu karnedeki teknik analizler ve ölçümler <strong className="text-slate-600 font-black uppercase">ROTA PERFORMANS</strong> tarafından gelişim takibi amacıyla hassasiyetle yapılmıştır; kesinlikle tıbbi tanı, teşhis, tedavi veya bir hekim raporu niteliği taşımamaktadır.
                         </div>
                       </div>
                     </div>

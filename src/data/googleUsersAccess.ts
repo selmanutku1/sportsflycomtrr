@@ -18,6 +18,7 @@ export const ALL_CONFIGURABLE_SYSTEM_AREAS: ConfigurableAreaItem[] = [
   { page: 'subeler', label: 'Şube & Tesis Yönetimi', category: 'Temel Yönetim', description: 'Çoklu şube, saha ve tesis tanımlama alanı' },
   { page: 'sube-ozet', label: 'Şube Özet & Analitik', category: 'Temel Yönetim', description: 'Şubeler arası karşılaştırmalı performans ve finans özeti' },
   { page: 'destek', label: 'Destek & Yardım Masası', category: 'Temel Yönetim', description: '7/24 teknik destek biletleri ve yardım merkezi' },
+  { page: 'eposta-servis-yapilandirmasi', label: 'E-Posta Servis Yapılandırması (SMTP)', category: 'Temel Yönetim', description: 'Kayıt, 2FA ve bildirimler için kurumsal SMTP e-posta sunucu ayarları' },
 
   // Kadro & Branş
   { page: 'sporcular', label: 'Sporcular', category: 'Kadro & Branş', description: 'Kayıtlı sporcu profilleri, veli bilgileri ve lisans takibi' },

@@ -184,7 +184,6 @@ export function getDynamicKarne(karne: SporcuKarne): SporcuKarne & { sporpuanImp
   const clamp = (val: number, max = 10) => Math.min(max, Math.max(1, Number(val.toFixed(1))));
 
   // Dynamic Technical
-  const dynTeknikOrt = clamp(karne.teknik.ortalama + impact.bonuses.teknikBonus);
   const dynTeknik = {
     ...karne.teknik,
     topKontrolu: karne.teknik.topKontrolu !== undefined ? clamp(karne.teknik.topKontrolu + impact.bonuses.teknikBonus) : undefined,
@@ -192,40 +191,73 @@ export function getDynamicKarne(karne: SporcuKarne): SporcuKarne & { sporpuanImp
     sut: karne.teknik.sut !== undefined ? clamp(karne.teknik.sut + impact.bonuses.teknikBonus) : undefined,
     topSurme: karne.teknik.topSurme !== undefined ? clamp(karne.teknik.topSurme + impact.bonuses.teknikBonus) : undefined,
     savunma: karne.teknik.savunma !== undefined ? clamp(karne.teknik.savunma + impact.bonuses.teknikBonus) : undefined,
-    ortalama: dynTeknikOrt,
+    ortalama: 0, // Calculated below
   };
+  const presentTeknik = [
+    dynTeknik.topKontrolu,
+    dynTeknik.pasBasarisi,
+    dynTeknik.sut,
+    dynTeknik.topSurme,
+    dynTeknik.savunma
+  ].filter((v): v is number => v !== undefined);
+  dynTeknik.ortalama = presentTeknik.length > 0
+    ? clamp(presentTeknik.reduce((a, b) => a + b, 0) / presentTeknik.length)
+    : clamp(karne.teknik.ortalama + impact.bonuses.teknikBonus);
 
   // Dynamic Physical
-  const dynFizikselOrt = clamp(karne.fiziksel.ortalama + impact.bonuses.fizikselBonus);
   const dynFiziksel = {
     ...karne.fiziksel,
     hiz: karne.fiziksel.hiz !== undefined ? clamp(karne.fiziksel.hiz + impact.bonuses.fizikselBonus) : undefined,
     dayaniklilik: karne.fiziksel.dayaniklilik !== undefined ? clamp(karne.fiziksel.dayaniklilik + impact.bonuses.fizikselBonus) : undefined,
     guc: karne.fiziksel.guc !== undefined ? clamp(karne.fiziksel.guc + impact.bonuses.fizikselBonus) : undefined,
     ceviklik: karne.fiziksel.ceviklik !== undefined ? clamp(karne.fiziksel.ceviklik + impact.bonuses.fizikselBonus) : undefined,
-    ortalama: dynFizikselOrt,
+    ortalama: 0, // Calculated below
   };
+  const presentFiziksel = [
+    dynFiziksel.hiz,
+    dynFiziksel.dayaniklilik,
+    dynFiziksel.guc,
+    dynFiziksel.ceviklik
+  ].filter((v): v is number => v !== undefined);
+  dynFiziksel.ortalama = presentFiziksel.length > 0
+    ? clamp(presentFiziksel.reduce((a, b) => a + b, 0) / presentFiziksel.length)
+    : clamp(karne.fiziksel.ortalama + impact.bonuses.fizikselBonus);
 
   // Dynamic Tactical
-  const dynTaktikselOrt = clamp(karne.taktiksel.ortalama + impact.bonuses.taktikselBonus);
   const dynTaktiksel = {
     ...karne.taktiksel,
     oyunZekasi: karne.taktiksel.oyunZekasi !== undefined ? clamp(karne.taktiksel.oyunZekasi + impact.bonuses.taktikselBonus) : undefined,
     pozisyonAlma: karne.taktiksel.pozisyonAlma !== undefined ? clamp(karne.taktiksel.pozisyonAlma + impact.bonuses.taktikselBonus) : undefined,
     kararVerme: karne.taktiksel.kararVerme !== undefined ? clamp(karne.taktiksel.kararVerme + impact.bonuses.taktikselBonus) : undefined,
-    ortalama: dynTaktikselOrt,
+    ortalama: 0, // Calculated below
   };
+  const presentTaktiksel = [
+    dynTaktiksel.oyunZekasi,
+    dynTaktiksel.pozisyonAlma,
+    dynTaktiksel.kararVerme
+  ].filter((v): v is number => v !== undefined);
+  dynTaktiksel.ortalama = presentTaktiksel.length > 0
+    ? clamp(presentTaktiksel.reduce((a, b) => a + b, 0) / presentTaktiksel.length)
+    : clamp(karne.taktiksel.ortalama + impact.bonuses.taktikselBonus);
 
   // Dynamic Mental
-  const dynZihinselOrt = clamp(karne.zihinsel.ortalama + impact.bonuses.zihinselBonus);
   const dynZihinsel = {
     ...karne.zihinsel,
     disiplin: karne.zihinsel.disiplin !== undefined ? clamp(karne.zihinsel.disiplin + impact.bonuses.zihinselBonus) : undefined,
     ozguven: karne.zihinsel.ozguven !== undefined ? clamp(karne.zihinsel.ozguven + impact.bonuses.zihinselBonus) : undefined,
     takimUyumu: karne.zihinsel.takimUyumu !== undefined ? clamp(karne.zihinsel.takimUyumu + impact.bonuses.zihinselBonus) : undefined,
     liderlik: karne.zihinsel.liderlik !== undefined ? clamp(karne.zihinsel.liderlik + impact.bonuses.zihinselBonus) : undefined,
-    ortalama: dynZihinselOrt,
+    ortalama: 0, // Calculated below
   };
+  const presentZihinsel = [
+    dynZihinsel.disiplin,
+    dynZihinsel.ozguven,
+    dynZihinsel.takimUyumu,
+    dynZihinsel.liderlik
+  ].filter((v): v is number => v !== undefined);
+  dynZihinsel.ortalama = presentZihinsel.length > 0
+    ? clamp(presentZihinsel.reduce((a, b) => a + b, 0) / presentZihinsel.length)
+    : clamp(karne.zihinsel.ortalama + impact.bonuses.zihinselBonus);
 
   // Dynamic Behavioral
   const baseKriterler = karne.davranissal?.kriterler || {
@@ -237,7 +269,6 @@ export function getDynamicKarne(karne: SporcuKarne): SporcuKarne & { sporpuanImp
     ortalama: 8,
   };
 
-  const dynDavranisOrt = clamp(baseKriterler.ortalama + impact.bonuses.davranisBonus);
   const dynDavranissalKriterler = {
     ...baseKriterler,
     fairPlay: clamp(baseKriterler.fairPlay + impact.bonuses.davranisBonus),
@@ -245,8 +276,18 @@ export function getDynamicKarne(karne: SporcuKarne): SporcuKarne & { sporpuanImp
     saygiIletisim: clamp(baseKriterler.saygiIletisim + impact.bonuses.davranisBonus),
     yonergeyeUyum: clamp(baseKriterler.yonergeyeUyum + (impact.bonuses.davranisBonus * 0.7)),
     duyguKontrolu: clamp(baseKriterler.duyguKontrolu + (impact.bonuses.davranisBonus * 0.9)),
-    ortalama: dynDavranisOrt,
+    ortalama: 0, // Calculated below
   };
+  const presentDavranis = [
+    dynDavranissalKriterler.fairPlay,
+    dynDavranissalKriterler.sorumlulukEkipman,
+    dynDavranissalKriterler.saygiIletisim,
+    dynDavranissalKriterler.yonergeyeUyum,
+    dynDavranissalKriterler.duyguKontrolu
+  ].filter((v): v is number => v !== undefined);
+  dynDavranissalKriterler.ortalama = presentDavranis.length > 0
+    ? clamp(presentDavranis.reduce((a, b) => a + b, 0) / presentDavranis.length)
+    : clamp(baseKriterler.ortalama + impact.bonuses.davranisBonus);
 
   return {
     ...karne,

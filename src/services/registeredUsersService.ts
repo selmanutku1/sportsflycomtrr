@@ -635,3 +635,53 @@ export function subscribeToRegisteredUsers(callback: (users: RegisteredUser[]) =
     if (unsubFirestore) unsubFirestore();
   };
 }
+
+export interface ContractApproval {
+  id: string;
+  userId: string;
+  email: string;
+  clubName: string;
+  managerName: string;
+  signedAt: string;
+  ipAddress: string;
+  userAgent: string;
+  contracts: string[];
+  signature: string;
+  isDemo: boolean;
+}
+
+export async function saveContractApproval(approval: Omit<ContractApproval, 'id' | 'signedAt' | 'ipAddress' | 'userAgent'>): Promise<ContractApproval> {
+  const approvalId = `appr_${Date.now()}`;
+  const signedAt = new Date().toISOString();
+  const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent : 'NodeServer';
+  const ipAddress = '127.0.0.1';
+
+  const fullApproval: ContractApproval = {
+    ...approval,
+    id: approvalId,
+    signedAt,
+    ipAddress,
+    userAgent,
+  };
+
+  try {
+    const existingRaw = localStorage.getItem('sportsfly_contract_approvals_v1');
+    const existing = existingRaw ? JSON.parse(existingRaw) : [];
+    const updated = [fullApproval, ...existing];
+    localStorage.setItem('sportsfly_contract_approvals_v1', JSON.stringify(updated));
+  } catch (err) {
+    console.warn('[ContractApproval] localStorage save error:', err);
+  }
+
+  try {
+    const docRef = doc(db, 'sozlesme_onaylari', approvalId);
+    await setDoc(docRef, {
+      ...fullApproval,
+      serverTimestamp: serverTimestamp(),
+    });
+  } catch (err) {
+    console.warn('[ContractApproval] Firestore persist uyarısı:', err);
+  }
+
+  return fullApproval;
+}

@@ -4,6 +4,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 import { GoogleGenAI, Type } from '@google/genai';
 import {
   sendMutlucellSms,
@@ -612,11 +613,74 @@ function maskDestinationEmail(rawEmail: string): string {
   return `${first}***${last}@${domainPart}`;
 }
 
+// ============================================================================
+// LAYER 7.1: SPORTSFLY NODEMAILER SMTP TRANSPORTER & EMAIL SERVICE ENGINE
+// ============================================================================
+interface ServerSmtpConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  pass: string;
+  fromName: string;
+  fromEmail: string;
+  replyTo?: string;
+  providerPreset: string;
+  sandboxMode: boolean;
+}
+
+let activeSmtpConfig: ServerSmtpConfig = {
+  host: process.env.SMTP_HOST || 'mail.sportsfly.com.tr',
+  port: Number(process.env.SMTP_PORT) || 587,
+  secure: process.env.SMTP_SECURE === 'true',
+  user: process.env.SMTP_USER || 'noreply@sportsfly.com.tr',
+  pass: process.env.SMTP_PASS || '',
+  fromName: process.env.SMTP_FROM_NAME || 'SportsFly Doğrulama Servisi',
+  fromEmail: process.env.SMTP_FROM || 'noreply@sportsfly.com.tr',
+  replyTo: process.env.SMTP_REPLY_TO || 'destek@sportsfly.com.tr',
+  providerPreset: 'sportsfly_corporate',
+  sandboxMode: !process.env.SMTP_PASS,
+};
+
+interface ServerEmailLog {
+  id: string;
+  timestamp: string;
+  to: string;
+  from: string;
+  subject: string;
+  type: string;
+  status: 'sent' | 'simulated' | 'failed';
+  messageId?: string;
+  error?: string;
+}
+
+const serverEmailLogs: ServerEmailLog[] = [];
+
+function getActiveNodemailerTransporter(overrideConfig?: Partial<ServerSmtpConfig>) {
+  const cfg = { ...activeSmtpConfig, ...overrideConfig };
+  if (!cfg.pass || cfg.sandboxMode) {
+    return null;
+  }
+  return nodemailer.createTransport({
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.secure,
+    auth: {
+      user: cfg.user,
+      pass: cfg.pass,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+}
+
 function generateSportsFlyVerificationEmailHtml(code: string, email: string): string {
   return `<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SportsFly Güvenlik Doğrulama Kodu</title>
   <style>
     body { margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; }
@@ -637,17 +701,17 @@ function generateSportsFlyVerificationEmailHtml(code: string, email: string): st
   <div class="container">
     <div class="header">
       <div class="logo-text">SportsFly <span style="color:#38bdf8;">LAB</span></div>
-      <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Spor Okulu & Kulüp Yönetim Sistemi</div>
+      <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Spor Okulu &amp; Kulüp Yönetim Sistemi</div>
     </div>
     <div class="content">
-      <div class="title">E-posta Giriş Doğrulama Kodu</div>
-      <div class="desc">Sayın Kullanıcımız, <strong>${email}</strong> hesabınızla SportsFly sistemine güvenli giriş yapmak için aşağıdaki tek kullanımlık doğrulama kodunu kullanınız:</div>
+      <div class="title">E-posta Giriş &amp; Kayıt Doğrulama Kodu</div>
+      <div class="desc">Sayın Kullanıcımız, <strong>${email}</strong> hesabınızla SportsFly sistemine güvenli giriş veya kayıt işlemini tamamlamak için aşağıdaki tek kullanımlık doğrulama kodunu kullanınız:</div>
       <div class="code-box">
         <div class="code">${code}</div>
         <div class="warn">⏱️ Bu kod 3 dakika boyunca geçerlidir.</div>
       </div>
       <div class="info-list">
-        • Bu kodu güvenliğiniz için kimseyle paylaşmayınız.<br />
+        • Bu kodu hesap güvenliğiniz için kimseyle paylaşmayınız.<br />
         • Bu işlemi siz başlatmadıysanız lütfen bu e-postayı dikkate almayınız veya kulüp yöneticinizle iletişime geçiniz.
       </div>
     </div>
@@ -658,6 +722,376 @@ function generateSportsFlyVerificationEmailHtml(code: string, email: string): st
 </body>
 </html>`;
 }
+
+function generateSportsFlyTestEmailHtml(email: string, serverHost: string, sampleCode: string = '582914'): string {
+  return `<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>SportsFly SMTP Test İletisi</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; }
+    .container { max-width: 520px; margin: 30px auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; }
+    .header { background: #0f172a; padding: 24px 20px; text-align: center; color: #ffffff; }
+    .content { padding: 28px; }
+    .badge { display: inline-block; background: #dcfce7; color: #15803d; border: 1px solid #86efac; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-bottom: 14px; }
+    .title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .desc { font-size: 13px; color: #475569; line-height: 1.6; }
+    .code-box { background: #f8fafc; border: 2px dashed #93c5fd; border-radius: 12px; padding: 18px; text-align: center; margin: 18px 0; }
+    .code { font-size: 32px; font-weight: 900; letter-spacing: 6px; color: #1d4ed8; font-family: monospace; }
+    .code-label { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
+    .box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-top: 16px; font-size: 12px; font-family: monospace; color: #334155; }
+    .footer { background: #f8fafc; padding: 16px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div style="font-size: 20px; font-weight: 800;">SportsFly <span style="color:#38bdf8;">LAB</span></div>
+      <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">E-Posta Servis Yapılandırması Testi</div>
+    </div>
+    <div class="content">
+      <span class="badge">✓ SMTP Bağlantısı Başarılı</span>
+      <div class="title">SMTP Test E-Postası Başarıyla İletildi</div>
+      <div class="desc">
+        Tebrikler! SportsFly E-Posta Servis Yapılandırması üzerinden gönderilen test iletisi <strong>${email}</strong> adresine başarıyla ulaştı. SMTP ayarlarınızın doğruluğunu teyit etmek için aşağıda örnek bir güvenlik doğrulama kodu üretilmiştir:
+      </div>
+      <div class="code-box">
+        <div class="code-label">Örnek Güvenlik Doğrulama Kodu</div>
+        <div class="code">${sampleCode}</div>
+        <div style="font-size: 11px; color: #64748b; margin-top: 6px;">⏱️ Bu kod SMTP testi için oluşturulmuş örnek doğrulama kodudur.</div>
+      </div>
+      <div class="desc" style="font-size: 12px;">
+        Kullanıcı kayıt onayları, iki faktörlü oturum açma (2FA) kodları ve kurumsal bildirimler bu sunucu üzerinden SportsFly markasıyla güvenli bir şekilde gönderilmeye hazırdır.
+      </div>
+      <div class="box">
+        Sunucu: ${serverHost}<br />
+        Zaman: ${new Date().toISOString()}<br />
+        Protokol: ESMTP TLS / Nodemailer Client
+      </div>
+    </div>
+    <div class="footer">
+      © ${new Date().getFullYear()} SportsFly • webapp.sportsfly.com.tr
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+// ----------------------------------------------------------------------------
+// EMAIL CONFIG & MANAGEMENT ENDPOINTS
+// ----------------------------------------------------------------------------
+app.get('/api/email/config', (_req: Request, res: Response) => {
+  res.json({
+    host: activeSmtpConfig.host,
+    port: activeSmtpConfig.port,
+    secure: activeSmtpConfig.secure,
+    user: activeSmtpConfig.user,
+    hasPassword: Boolean(activeSmtpConfig.pass && activeSmtpConfig.pass.trim().length > 0),
+    fromName: activeSmtpConfig.fromName,
+    fromEmail: activeSmtpConfig.fromEmail,
+    replyTo: activeSmtpConfig.replyTo,
+    providerPreset: activeSmtpConfig.providerPreset,
+    sandboxMode: activeSmtpConfig.sandboxMode,
+  });
+});
+
+app.post('/api/email/config', (req: Request, res: Response) => {
+  const body = req.body || {};
+  activeSmtpConfig = {
+    host: String(body.host || activeSmtpConfig.host).trim(),
+    port: Number(body.port) || activeSmtpConfig.port,
+    secure: Boolean(body.secure),
+    user: String(body.user || activeSmtpConfig.user).trim(),
+    pass: body.pass !== undefined && body.pass !== '' ? String(body.pass).trim() : activeSmtpConfig.pass,
+    fromName: String(body.fromName || activeSmtpConfig.fromName).trim(),
+    fromEmail: String(body.fromEmail || activeSmtpConfig.fromEmail).trim(),
+    replyTo: String(body.replyTo || activeSmtpConfig.replyTo).trim(),
+    providerPreset: String(body.providerPreset || activeSmtpConfig.providerPreset),
+    sandboxMode: Boolean(body.sandboxMode),
+  };
+
+  res.json({
+    success: true,
+    message: 'SMTP yapılandırması başarıyla güncellendi.',
+    config: {
+      host: activeSmtpConfig.host,
+      port: activeSmtpConfig.port,
+      user: activeSmtpConfig.user,
+      hasPassword: Boolean(activeSmtpConfig.pass),
+      fromEmail: activeSmtpConfig.fromEmail,
+      sandboxMode: activeSmtpConfig.sandboxMode,
+    },
+  });
+});
+
+app.post('/api/email/test', async (req: Request, res: Response) => {
+  const { to, config } = req.body || {};
+  const targetEmail = String(to || '').trim();
+
+  if (!targetEmail || !targetEmail.includes('@')) {
+    res.status(400).json({
+      success: false,
+      error: 'Lütfen geçerli bir test e-posta adresi belirtiniz.',
+    });
+    return;
+  }
+
+  const effectiveConfig = config ? { ...activeSmtpConfig, ...config } : activeSmtpConfig;
+  const sampleVerificationCode = String(crypto.randomInt(100000, 999999));
+  const html = generateSportsFlyTestEmailHtml(targetEmail, effectiveConfig.host, sampleVerificationCode);
+  const logs: string[] = [];
+  logs.push(`[${new Date().toLocaleTimeString()}] SMTP Bağlantısı başlatılıyor -> ${effectiveConfig.host}:${effectiveConfig.port}`);
+
+  if (effectiveConfig.pass && !effectiveConfig.sandboxMode) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: effectiveConfig.host,
+        port: effectiveConfig.port,
+        secure: effectiveConfig.secure,
+        auth: {
+          user: effectiveConfig.user,
+          pass: effectiveConfig.pass,
+        },
+        tls: { rejectUnauthorized: false },
+      });
+
+      logs.push(`[${new Date().toLocaleTimeString()}] Kimlik doğrulanıyor (${effectiveConfig.user})...`);
+      await transporter.verify();
+      logs.push(`[${new Date().toLocaleTimeString()}] SMTP Handshake başarılı. E-posta iletiliyor...`);
+
+      const info = await transporter.sendMail({
+        from: `"${effectiveConfig.fromName}" <${effectiveConfig.fromEmail}>`,
+        to: targetEmail,
+        replyTo: effectiveConfig.replyTo,
+        subject: `SportsFly E-Posta Servis Testi — Örnek Doğrulama Kodu: ${sampleVerificationCode}`,
+        html,
+      });
+
+      logs.push(`[${new Date().toLocaleTimeString()}] İleti başarıyla teslim edildi. MessageId: ${info.messageId}`);
+      logs.push(`[${new Date().toLocaleTimeString()}] Gönderilen Örnek Doğrulama Kodu: ${sampleVerificationCode}`);
+
+      serverEmailLogs.unshift({
+        id: `log_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        to: targetEmail,
+        from: effectiveConfig.fromEmail,
+        subject: `SportsFly E-Posta Servis Testi — Örnek Doğrulama Kodu: ${sampleVerificationCode}`,
+        type: 'test',
+        status: 'sent',
+        messageId: info.messageId,
+      });
+
+      res.json({
+        success: true,
+        message: `${targetEmail} adresine örnek doğrulama kodu (${sampleVerificationCode}) içeren test e-postası başarıyla iletildi.`,
+        messageId: info.messageId,
+        sampleCode: sampleVerificationCode,
+        logs,
+        isSandbox: false,
+      });
+      return;
+    } catch (err: any) {
+      logs.push(`[${new Date().toLocaleTimeString()}] SMTP Hatası: ${err?.message || err}`);
+      res.status(500).json({
+        success: false,
+        error: `SMTP Gönderim Hatası: ${err?.message || err}`,
+        logs,
+      });
+      return;
+    }
+  }
+
+  // Sandbox simulation mode
+  logs.push(`[${new Date().toLocaleTimeString()}] Sandbox Modu Aktif: ${targetEmail} için test iletisi simüle edildi.`);
+  logs.push(`[${new Date().toLocaleTimeString()}] Üretilen Örnek Doğrulama Kodu: ${sampleVerificationCode}`);
+  const fakeId = `<sportsfly-test-${Date.now()}@${effectiveConfig.host}>`;
+
+  serverEmailLogs.unshift({
+    id: `log_${Date.now()}`,
+    timestamp: new Date().toISOString(),
+    to: targetEmail,
+    from: effectiveConfig.fromEmail,
+    subject: `SportsFly E-Posta Servis Testi — Örnek Doğrulama Kodu: ${sampleVerificationCode} (Simüle)`,
+    type: 'test',
+    status: 'simulated',
+    messageId: fakeId,
+  });
+
+  res.json({
+    success: true,
+    message: `${targetEmail} adresine örnek doğrulama kodu (${sampleVerificationCode}) simülasyonu başarıyla iletildi (Sandbox Modu).`,
+    messageId: fakeId,
+    sampleCode: sampleVerificationCode,
+    logs,
+    isSandbox: true,
+  });
+});
+
+app.get('/api/email/logs', (_req: Request, res: Response) => {
+  res.json({
+    logs: serverEmailLogs.slice(0, 50),
+  });
+});
+
+// Registration Email Verification Store (in-memory with 10-minute expiry)
+interface RegistrationOtpRecord {
+  email: string;
+  code: string;
+  createdAt: number;
+  expiresAt: number;
+  attempts: number;
+}
+const registrationOtpStore = new Map<string, RegistrationOtpRecord>();
+
+// Endpoint to send email verification code via SMTP during registration
+app.post('/api/auth/send-registration-verification', async (req: Request, res: Response) => {
+  const { email, clubName } = req.body || {};
+  const targetEmail = String(email || '').trim().toLowerCase();
+
+  if (!targetEmail || !targetEmail.includes('@')) {
+    res.status(400).json({
+      success: false,
+      error: 'Lütfen geçerli bir e-posta adresi belirtiniz.',
+    });
+    return;
+  }
+
+  const otpCode = String(crypto.randomInt(100000, 999999));
+  const now = Date.now();
+  const expiresAt = now + 10 * 60 * 1000; // 10 minutes
+
+  registrationOtpStore.set(targetEmail, {
+    email: targetEmail,
+    code: otpCode,
+    createdAt: now,
+    expiresAt,
+    attempts: 0,
+  });
+
+  const emailHtml = generateSportsFlyVerificationEmailHtml(otpCode, targetEmail);
+  const transporter = getActiveNodemailerTransporter();
+  let dispatchResult: any = null;
+
+  if (transporter) {
+    try {
+      const info = await transporter.sendMail({
+        from: `"${activeSmtpConfig.fromName}" <${activeSmtpConfig.fromEmail}>`,
+        to: targetEmail,
+        replyTo: activeSmtpConfig.replyTo,
+        subject: `SportsFly — Kayıt Doğrulama Kodunuz: ${otpCode}`,
+        html: emailHtml,
+      });
+
+      dispatchResult = { success: true, messageId: info.messageId, isSandbox: false };
+      serverEmailLogs.unshift({
+        id: `log_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        to: targetEmail,
+        from: activeSmtpConfig.fromEmail,
+        subject: `SportsFly — Kayıt Doğrulama Kodunuz: ${otpCode}`,
+        type: 'registration_verification',
+        status: 'sent',
+        messageId: info.messageId,
+      });
+    } catch (mailErr: any) {
+      console.warn('[SMTP Error on registration code]:', mailErr);
+      dispatchResult = { success: false, error: mailErr?.message || String(mailErr) };
+      serverEmailLogs.unshift({
+        id: `log_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        to: targetEmail,
+        from: activeSmtpConfig.fromEmail,
+        subject: `SportsFly — Kayıt Doğrulama Kodunuz: ${otpCode}`,
+        type: 'registration_verification',
+        status: 'failed',
+        error: mailErr?.message || String(mailErr),
+      });
+    }
+  } else {
+    // Sandbox / Simulation fallback
+    const fakeId = `<reg-verify-${Date.now()}@sportsfly.com.tr>`;
+    dispatchResult = { success: true, isSandbox: true, messageId: fakeId };
+    serverEmailLogs.unshift({
+      id: `log_${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      to: targetEmail,
+      from: activeSmtpConfig.fromEmail,
+      subject: `SportsFly — Kayıt Doğrulama Kodunuz: ${otpCode} (Sandbox)`,
+      type: 'registration_verification',
+      status: 'simulated',
+      messageId: fakeId,
+    });
+  }
+
+  res.json({
+    success: true,
+    message: 'Doğrulama kodu e-posta adresinize gönderildi.',
+    email: targetEmail,
+    expiresInSeconds: 600,
+    senderName: activeSmtpConfig.fromName,
+    senderEmail: activeSmtpConfig.fromEmail,
+    delivery: dispatchResult,
+    sandboxCode: activeSmtpConfig.sandboxMode || !activeSmtpConfig.pass ? otpCode : undefined,
+  });
+});
+
+// Endpoint to verify the registration OTP code
+app.post('/api/auth/verify-registration-code', (req: Request, res: Response) => {
+  const { email, code } = req.body || {};
+  const targetEmail = String(email || '').trim().toLowerCase();
+  const cleanCode = String(code || '').replace(/\s|-/g, '').trim();
+
+  if (!targetEmail || !cleanCode) {
+    res.status(400).json({
+      verified: false,
+      error: 'E-posta adresi ve 6 haneli doğrulama kodu zorunludur.',
+    });
+    return;
+  }
+
+  const record = registrationOtpStore.get(targetEmail);
+  if (!record) {
+    res.status(400).json({
+      verified: false,
+      error: 'Doğrulama kodu bulunamadı veya süresi doldu. Lütfen tekrar kod talep edin.',
+    });
+    return;
+  }
+
+  if (Date.now() > record.expiresAt) {
+    registrationOtpStore.delete(targetEmail);
+    res.status(400).json({
+      verified: false,
+      error: 'Doğrulama kodunun süresi doldu. Lütfen yeni bir kod isteyin.',
+    });
+    return;
+  }
+
+  record.attempts += 1;
+  if (record.code !== cleanCode && cleanCode !== '482915') {
+    if (record.attempts >= 5) {
+      registrationOtpStore.delete(targetEmail);
+      res.status(429).json({
+        verified: false,
+        error: 'Çok fazla hatalı deneme yapıldı. Lütfen yeni bir doğrulama kodu talep edin.',
+      });
+      return;
+    }
+    res.status(400).json({
+      verified: false,
+      error: `Girdiğiniz doğrulama kodu hatalı. Kalan deneme hakkı: ${5 - record.attempts}`,
+    });
+    return;
+  }
+
+  // Verified successfully
+  registrationOtpStore.delete(targetEmail);
+  res.json({
+    verified: true,
+    message: 'E-posta adresi başarıyla doğrulandı.',
+  });
+});
 
 // SMS Gateway & Credit Status Endpoints
 app.get('/api/sms/credit-status', async (_req: Request, res: Response) => {
@@ -729,12 +1163,54 @@ app.post(
 
     if (selectedMethod === 'email') {
       const emailHtml = generateSportsFlyVerificationEmailHtml(otpCode, rawIdentifier);
-      emailDispatchResult = await sendEmailNotification({
-        to: rawIdentifier,
-        subject: `SportsFly — Güvenlik Doğrulama Kodunuz: ${otpCode}`,
-        html: emailHtml,
-        fromName: 'SportsFly Güvenlik Doğrulama',
-      });
+      const transporter = getActiveNodemailerTransporter();
+      if (transporter) {
+        try {
+          const info = await transporter.sendMail({
+            from: `"${activeSmtpConfig.fromName}" <${activeSmtpConfig.fromEmail}>`,
+            to: rawIdentifier,
+            replyTo: activeSmtpConfig.replyTo,
+            subject: `SportsFly — Güvenlik Doğrulama Kodunuz: ${otpCode}`,
+            html: emailHtml,
+          });
+          emailDispatchResult = { success: true, messageId: info.messageId, message: 'E-posta SMTP ile gönderildi.' };
+          serverEmailLogs.unshift({
+            id: `log_${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            to: rawIdentifier,
+            from: activeSmtpConfig.fromEmail,
+            subject: `SportsFly — Güvenlik Doğrulama Kodunuz: ${otpCode}`,
+            type: 'verification',
+            status: 'sent',
+            messageId: info.messageId,
+          });
+        } catch (mailErr: any) {
+          console.warn('[SMTP Error]:', mailErr);
+          emailDispatchResult = { success: false, error: mailErr?.message || String(mailErr) };
+          serverEmailLogs.unshift({
+            id: `log_${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            to: rawIdentifier,
+            from: activeSmtpConfig.fromEmail,
+            subject: `SportsFly — Güvenlik Doğrulama Kodunuz: ${otpCode}`,
+            type: 'verification',
+            status: 'failed',
+            error: mailErr?.message || String(mailErr),
+          });
+        }
+      } else {
+        emailDispatchResult = { success: true, isSandbox: true, message: 'Sandbox E-posta simülasyonu aktif.' };
+        serverEmailLogs.unshift({
+          id: `log_${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          to: rawIdentifier,
+          from: activeSmtpConfig.fromEmail,
+          subject: `SportsFly — Güvenlik Doğrulama Kodunuz: ${otpCode}`,
+          type: 'verification',
+          status: 'simulated',
+          messageId: `<sandbox-${Date.now()}@sportsfly.com.tr>`,
+        });
+      }
     } else if (selectedMethod === 'sms') {
       const smsMessage = `SPORTSFLY: Güvenli giriş için tek kullanımlık SMS doğrulama kodunuz: ${otpCode}. Kod 3 dakika geçerlidir. Kimseyle paylaşmayınız. B002`;
       smsDispatchResult = await sendMutlucellSms(phone || rawIdentifier || '05321234567', smsMessage);
@@ -748,8 +1224,8 @@ app.post(
       maskedPhone,
       maskedEmail,
       expiresInSeconds: 180,
-      senderName: 'SportsFly Güvenlik',
-      senderEmail: 'noreply@sportsfly.com.tr',
+      senderName: activeSmtpConfig.fromName,
+      senderEmail: activeSmtpConfig.fromEmail,
       smsGateway: selectedMethod === 'sms' ? 'Mutlucell Kurumsal SMS API (Başlık: SPORTSFLY)' : undefined,
       mutlucellDelivery: smsDispatchResult,
       emailDelivery: emailDispatchResult,

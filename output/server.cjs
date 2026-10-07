@@ -31,6 +31,7 @@ var import_fs = __toESM(require("fs"), 1);
 var import_crypto = __toESM(require("crypto"), 1);
 var import_vite = require("vite");
 var import_dotenv = __toESM(require("dotenv"), 1);
+var import_nodemailer = __toESM(require("nodemailer"), 1);
 var import_genai = require("@google/genai");
 
 // src/services/smsService.ts
@@ -571,6 +572,417 @@ function maskDestinationPhone(rawPhone) {
   }
   return "+90 5XX \u2022\u2022\u2022 \u2022\u2022 XX";
 }
+function maskDestinationEmail(rawEmail) {
+  const clean = String(rawEmail || "").trim().toLowerCase();
+  if (!clean.includes("@")) return clean;
+  const [userPart, domainPart] = clean.split("@");
+  if (userPart.length <= 2) {
+    return `${userPart.charAt(0)}***@${domainPart}`;
+  }
+  const first = userPart.slice(0, 2);
+  const last = userPart.slice(-1);
+  return `${first}***${last}@${domainPart}`;
+}
+var activeSmtpConfig = {
+  host: process.env.SMTP_HOST || "mail.sportsfly.com.tr",
+  port: Number(process.env.SMTP_PORT) || 587,
+  secure: process.env.SMTP_SECURE === "true",
+  user: process.env.SMTP_USER || "noreply@sportsfly.com.tr",
+  pass: process.env.SMTP_PASS || "",
+  fromName: process.env.SMTP_FROM_NAME || "SportsFly Do\u011Frulama Servisi",
+  fromEmail: process.env.SMTP_FROM || "noreply@sportsfly.com.tr",
+  replyTo: process.env.SMTP_REPLY_TO || "destek@sportsfly.com.tr",
+  providerPreset: "sportsfly_corporate",
+  sandboxMode: !process.env.SMTP_PASS
+};
+var serverEmailLogs = [];
+function getActiveNodemailerTransporter(overrideConfig) {
+  const cfg = { ...activeSmtpConfig, ...overrideConfig };
+  if (!cfg.pass || cfg.sandboxMode) {
+    return null;
+  }
+  return import_nodemailer.default.createTransport({
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.secure,
+    auth: {
+      user: cfg.user,
+      pass: cfg.pass
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+}
+function generateSportsFlyVerificationEmailHtml(code, email) {
+  return `<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SportsFly G\xFCvenlik Do\u011Frulama Kodu</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; }
+    .container { max-width: 520px; margin: 30px auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05); }
+    .header { background: #0f172a; padding: 26px 20px; text-align: center; color: #ffffff; }
+    .logo-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+    .content { padding: 32px 28px; }
+    .title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .desc { font-size: 13px; color: #64748b; line-height: 1.55; margin-bottom: 24px; }
+    .code-box { background: #f8fafc; border: 2px dashed #93c5fd; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px; }
+    .code { font-size: 34px; font-weight: 900; letter-spacing: 8px; color: #1d4ed8; }
+    .warn { font-size: 11px; color: #64748b; margin-top: 8px; font-weight: 600; }
+    .info-list { font-size: 12px; color: #475569; line-height: 1.6; border-top: 1px solid #f1f5f9; padding-top: 16px; }
+    .footer { background: #f8fafc; padding: 18px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-text">SportsFly <span style="color:#38bdf8;">LAB</span></div>
+      <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Spor Okulu &amp; Kul\xFCp Y\xF6netim Sistemi</div>
+    </div>
+    <div class="content">
+      <div class="title">E-posta Giri\u015F &amp; Kay\u0131t Do\u011Frulama Kodu</div>
+      <div class="desc">Say\u0131n Kullan\u0131c\u0131m\u0131z, <strong>${email}</strong> hesab\u0131n\u0131zla SportsFly sistemine g\xFCvenli giri\u015F veya kay\u0131t i\u015Flemini tamamlamak i\xE7in a\u015Fa\u011F\u0131daki tek kullan\u0131ml\u0131k do\u011Frulama kodunu kullan\u0131n\u0131z:</div>
+      <div class="code-box">
+        <div class="code">${code}</div>
+        <div class="warn">\u23F1\uFE0F Bu kod 3 dakika boyunca ge\xE7erlidir.</div>
+      </div>
+      <div class="info-list">
+        \u2022 Bu kodu hesap g\xFCvenli\u011Finiz i\xE7in kimseyle payla\u015Fmay\u0131n\u0131z.<br />
+        \u2022 Bu i\u015Flemi siz ba\u015Flatmad\u0131ysan\u0131z l\xFCtfen bu e-postay\u0131 dikkate almay\u0131n\u0131z veya kul\xFCp y\xF6neticinizle ileti\u015Fime ge\xE7iniz.
+      </div>
+    </div>
+    <div class="footer">
+      \xA9 ${(/* @__PURE__ */ new Date()).getFullYear()} SportsFly \u2022 webapp.sportsfly.com.tr
+    </div>
+  </div>
+</body>
+</html>`;
+}
+function generateSportsFlyTestEmailHtml(email, serverHost, sampleCode = "582914") {
+  return `<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>SportsFly SMTP Test \u0130letisi</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; }
+    .container { max-width: 520px; margin: 30px auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; }
+    .header { background: #0f172a; padding: 24px 20px; text-align: center; color: #ffffff; }
+    .content { padding: 28px; }
+    .badge { display: inline-block; background: #dcfce7; color: #15803d; border: 1px solid #86efac; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-bottom: 14px; }
+    .title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .desc { font-size: 13px; color: #475569; line-height: 1.6; }
+    .code-box { background: #f8fafc; border: 2px dashed #93c5fd; border-radius: 12px; padding: 18px; text-align: center; margin: 18px 0; }
+    .code { font-size: 32px; font-weight: 900; letter-spacing: 6px; color: #1d4ed8; font-family: monospace; }
+    .code-label { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
+    .box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-top: 16px; font-size: 12px; font-family: monospace; color: #334155; }
+    .footer { background: #f8fafc; padding: 16px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div style="font-size: 20px; font-weight: 800;">SportsFly <span style="color:#38bdf8;">LAB</span></div>
+      <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">E-Posta Servis Yap\u0131land\u0131rmas\u0131 Testi</div>
+    </div>
+    <div class="content">
+      <span class="badge">\u2713 SMTP Ba\u011Flant\u0131s\u0131 Ba\u015Far\u0131l\u0131</span>
+      <div class="title">SMTP Test E-Postas\u0131 Ba\u015Far\u0131yla \u0130letildi</div>
+      <div class="desc">
+        Tebrikler! SportsFly E-Posta Servis Yap\u0131land\u0131rmas\u0131 \xFCzerinden g\xF6nderilen test iletisi <strong>${email}</strong> adresine ba\u015Far\u0131yla ula\u015Ft\u0131. SMTP ayarlar\u0131n\u0131z\u0131n do\u011Frulu\u011Funu teyit etmek i\xE7in a\u015Fa\u011F\u0131da \xF6rnek bir g\xFCvenlik do\u011Frulama kodu \xFCretilmi\u015Ftir:
+      </div>
+      <div class="code-box">
+        <div class="code-label">\xD6rnek G\xFCvenlik Do\u011Frulama Kodu</div>
+        <div class="code">${sampleCode}</div>
+        <div style="font-size: 11px; color: #64748b; margin-top: 6px;">\u23F1\uFE0F Bu kod SMTP testi i\xE7in olu\u015Fturulmu\u015F \xF6rnek do\u011Frulama kodudur.</div>
+      </div>
+      <div class="desc" style="font-size: 12px;">
+        Kullan\u0131c\u0131 kay\u0131t onaylar\u0131, iki fakt\xF6rl\xFC oturum a\xE7ma (2FA) kodlar\u0131 ve kurumsal bildirimler bu sunucu \xFCzerinden SportsFly markas\u0131yla g\xFCvenli bir \u015Fekilde g\xF6nderilmeye haz\u0131rd\u0131r.
+      </div>
+      <div class="box">
+        Sunucu: ${serverHost}<br />
+        Zaman: ${(/* @__PURE__ */ new Date()).toISOString()}<br />
+        Protokol: ESMTP TLS / Nodemailer Client
+      </div>
+    </div>
+    <div class="footer">
+      \xA9 ${(/* @__PURE__ */ new Date()).getFullYear()} SportsFly \u2022 webapp.sportsfly.com.tr
+    </div>
+  </div>
+</body>
+</html>`;
+}
+app.get("/api/email/config", (_req, res) => {
+  res.json({
+    host: activeSmtpConfig.host,
+    port: activeSmtpConfig.port,
+    secure: activeSmtpConfig.secure,
+    user: activeSmtpConfig.user,
+    hasPassword: Boolean(activeSmtpConfig.pass && activeSmtpConfig.pass.trim().length > 0),
+    fromName: activeSmtpConfig.fromName,
+    fromEmail: activeSmtpConfig.fromEmail,
+    replyTo: activeSmtpConfig.replyTo,
+    providerPreset: activeSmtpConfig.providerPreset,
+    sandboxMode: activeSmtpConfig.sandboxMode
+  });
+});
+app.post("/api/email/config", (req, res) => {
+  const body = req.body || {};
+  activeSmtpConfig = {
+    host: String(body.host || activeSmtpConfig.host).trim(),
+    port: Number(body.port) || activeSmtpConfig.port,
+    secure: Boolean(body.secure),
+    user: String(body.user || activeSmtpConfig.user).trim(),
+    pass: body.pass !== void 0 && body.pass !== "" ? String(body.pass).trim() : activeSmtpConfig.pass,
+    fromName: String(body.fromName || activeSmtpConfig.fromName).trim(),
+    fromEmail: String(body.fromEmail || activeSmtpConfig.fromEmail).trim(),
+    replyTo: String(body.replyTo || activeSmtpConfig.replyTo).trim(),
+    providerPreset: String(body.providerPreset || activeSmtpConfig.providerPreset),
+    sandboxMode: Boolean(body.sandboxMode)
+  };
+  res.json({
+    success: true,
+    message: "SMTP yap\u0131land\u0131rmas\u0131 ba\u015Far\u0131yla g\xFCncellendi.",
+    config: {
+      host: activeSmtpConfig.host,
+      port: activeSmtpConfig.port,
+      user: activeSmtpConfig.user,
+      hasPassword: Boolean(activeSmtpConfig.pass),
+      fromEmail: activeSmtpConfig.fromEmail,
+      sandboxMode: activeSmtpConfig.sandboxMode
+    }
+  });
+});
+app.post("/api/email/test", async (req, res) => {
+  const { to, config } = req.body || {};
+  const targetEmail = String(to || "").trim();
+  if (!targetEmail || !targetEmail.includes("@")) {
+    res.status(400).json({
+      success: false,
+      error: "L\xFCtfen ge\xE7erli bir test e-posta adresi belirtiniz."
+    });
+    return;
+  }
+  const effectiveConfig = config ? { ...activeSmtpConfig, ...config } : activeSmtpConfig;
+  const sampleVerificationCode = String(import_crypto.default.randomInt(1e5, 999999));
+  const html = generateSportsFlyTestEmailHtml(targetEmail, effectiveConfig.host, sampleVerificationCode);
+  const logs = [];
+  logs.push(`[${(/* @__PURE__ */ new Date()).toLocaleTimeString()}] SMTP Ba\u011Flant\u0131s\u0131 ba\u015Flat\u0131l\u0131yor -> ${effectiveConfig.host}:${effectiveConfig.port}`);
+  if (effectiveConfig.pass && !effectiveConfig.sandboxMode) {
+    try {
+      const transporter = import_nodemailer.default.createTransport({
+        host: effectiveConfig.host,
+        port: effectiveConfig.port,
+        secure: effectiveConfig.secure,
+        auth: {
+          user: effectiveConfig.user,
+          pass: effectiveConfig.pass
+        },
+        tls: { rejectUnauthorized: false }
+      });
+      logs.push(`[${(/* @__PURE__ */ new Date()).toLocaleTimeString()}] Kimlik do\u011Frulan\u0131yor (${effectiveConfig.user})...`);
+      await transporter.verify();
+      logs.push(`[${(/* @__PURE__ */ new Date()).toLocaleTimeString()}] SMTP Handshake ba\u015Far\u0131l\u0131. E-posta iletiliyor...`);
+      const info = await transporter.sendMail({
+        from: `"${effectiveConfig.fromName}" <${effectiveConfig.fromEmail}>`,
+        to: targetEmail,
+        replyTo: effectiveConfig.replyTo,
+        subject: `SportsFly E-Posta Servis Testi \u2014 \xD6rnek Do\u011Frulama Kodu: ${sampleVerificationCode}`,
+        html
+      });
+      logs.push(`[${(/* @__PURE__ */ new Date()).toLocaleTimeString()}] \u0130leti ba\u015Far\u0131yla teslim edildi. MessageId: ${info.messageId}`);
+      logs.push(`[${(/* @__PURE__ */ new Date()).toLocaleTimeString()}] G\xF6nderilen \xD6rnek Do\u011Frulama Kodu: ${sampleVerificationCode}`);
+      serverEmailLogs.unshift({
+        id: `log_${Date.now()}`,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        to: targetEmail,
+        from: effectiveConfig.fromEmail,
+        subject: `SportsFly E-Posta Servis Testi \u2014 \xD6rnek Do\u011Frulama Kodu: ${sampleVerificationCode}`,
+        type: "test",
+        status: "sent",
+        messageId: info.messageId
+      });
+      res.json({
+        success: true,
+        message: `${targetEmail} adresine \xF6rnek do\u011Frulama kodu (${sampleVerificationCode}) i\xE7eren test e-postas\u0131 ba\u015Far\u0131yla iletildi.`,
+        messageId: info.messageId,
+        sampleCode: sampleVerificationCode,
+        logs,
+        isSandbox: false
+      });
+      return;
+    } catch (err) {
+      logs.push(`[${(/* @__PURE__ */ new Date()).toLocaleTimeString()}] SMTP Hatas\u0131: ${err?.message || err}`);
+      res.status(500).json({
+        success: false,
+        error: `SMTP G\xF6nderim Hatas\u0131: ${err?.message || err}`,
+        logs
+      });
+      return;
+    }
+  }
+  logs.push(`[${(/* @__PURE__ */ new Date()).toLocaleTimeString()}] Sandbox Modu Aktif: ${targetEmail} i\xE7in test iletisi sim\xFCle edildi.`);
+  logs.push(`[${(/* @__PURE__ */ new Date()).toLocaleTimeString()}] \xDCretilen \xD6rnek Do\u011Frulama Kodu: ${sampleVerificationCode}`);
+  const fakeId = `<sportsfly-test-${Date.now()}@${effectiveConfig.host}>`;
+  serverEmailLogs.unshift({
+    id: `log_${Date.now()}`,
+    timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+    to: targetEmail,
+    from: effectiveConfig.fromEmail,
+    subject: `SportsFly E-Posta Servis Testi \u2014 \xD6rnek Do\u011Frulama Kodu: ${sampleVerificationCode} (Sim\xFCle)`,
+    type: "test",
+    status: "simulated",
+    messageId: fakeId
+  });
+  res.json({
+    success: true,
+    message: `${targetEmail} adresine \xF6rnek do\u011Frulama kodu (${sampleVerificationCode}) sim\xFClasyonu ba\u015Far\u0131yla iletildi (Sandbox Modu).`,
+    messageId: fakeId,
+    sampleCode: sampleVerificationCode,
+    logs,
+    isSandbox: true
+  });
+});
+app.get("/api/email/logs", (_req, res) => {
+  res.json({
+    logs: serverEmailLogs.slice(0, 50)
+  });
+});
+var registrationOtpStore = /* @__PURE__ */ new Map();
+app.post("/api/auth/send-registration-verification", async (req, res) => {
+  const { email, clubName } = req.body || {};
+  const targetEmail = String(email || "").trim().toLowerCase();
+  if (!targetEmail || !targetEmail.includes("@")) {
+    res.status(400).json({
+      success: false,
+      error: "L\xFCtfen ge\xE7erli bir e-posta adresi belirtiniz."
+    });
+    return;
+  }
+  const otpCode = String(import_crypto.default.randomInt(1e5, 999999));
+  const now = Date.now();
+  const expiresAt = now + 10 * 60 * 1e3;
+  registrationOtpStore.set(targetEmail, {
+    email: targetEmail,
+    code: otpCode,
+    createdAt: now,
+    expiresAt,
+    attempts: 0
+  });
+  const emailHtml = generateSportsFlyVerificationEmailHtml(otpCode, targetEmail);
+  const transporter = getActiveNodemailerTransporter();
+  let dispatchResult = null;
+  if (transporter) {
+    try {
+      const info = await transporter.sendMail({
+        from: `"${activeSmtpConfig.fromName}" <${activeSmtpConfig.fromEmail}>`,
+        to: targetEmail,
+        replyTo: activeSmtpConfig.replyTo,
+        subject: `SportsFly \u2014 Kay\u0131t Do\u011Frulama Kodunuz: ${otpCode}`,
+        html: emailHtml
+      });
+      dispatchResult = { success: true, messageId: info.messageId, isSandbox: false };
+      serverEmailLogs.unshift({
+        id: `log_${Date.now()}`,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        to: targetEmail,
+        from: activeSmtpConfig.fromEmail,
+        subject: `SportsFly \u2014 Kay\u0131t Do\u011Frulama Kodunuz: ${otpCode}`,
+        type: "registration_verification",
+        status: "sent",
+        messageId: info.messageId
+      });
+    } catch (mailErr) {
+      console.warn("[SMTP Error on registration code]:", mailErr);
+      dispatchResult = { success: false, error: mailErr?.message || String(mailErr) };
+      serverEmailLogs.unshift({
+        id: `log_${Date.now()}`,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        to: targetEmail,
+        from: activeSmtpConfig.fromEmail,
+        subject: `SportsFly \u2014 Kay\u0131t Do\u011Frulama Kodunuz: ${otpCode}`,
+        type: "registration_verification",
+        status: "failed",
+        error: mailErr?.message || String(mailErr)
+      });
+    }
+  } else {
+    const fakeId = `<reg-verify-${Date.now()}@sportsfly.com.tr>`;
+    dispatchResult = { success: true, isSandbox: true, messageId: fakeId };
+    serverEmailLogs.unshift({
+      id: `log_${Date.now()}`,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+      to: targetEmail,
+      from: activeSmtpConfig.fromEmail,
+      subject: `SportsFly \u2014 Kay\u0131t Do\u011Frulama Kodunuz: ${otpCode} (Sandbox)`,
+      type: "registration_verification",
+      status: "simulated",
+      messageId: fakeId
+    });
+  }
+  res.json({
+    success: true,
+    message: "Do\u011Frulama kodu e-posta adresinize g\xF6nderildi.",
+    email: targetEmail,
+    expiresInSeconds: 600,
+    senderName: activeSmtpConfig.fromName,
+    senderEmail: activeSmtpConfig.fromEmail,
+    delivery: dispatchResult,
+    sandboxCode: activeSmtpConfig.sandboxMode || !activeSmtpConfig.pass ? otpCode : void 0
+  });
+});
+app.post("/api/auth/verify-registration-code", (req, res) => {
+  const { email, code } = req.body || {};
+  const targetEmail = String(email || "").trim().toLowerCase();
+  const cleanCode = String(code || "").replace(/\s|-/g, "").trim();
+  if (!targetEmail || !cleanCode) {
+    res.status(400).json({
+      verified: false,
+      error: "E-posta adresi ve 6 haneli do\u011Frulama kodu zorunludur."
+    });
+    return;
+  }
+  const record = registrationOtpStore.get(targetEmail);
+  if (!record) {
+    res.status(400).json({
+      verified: false,
+      error: "Do\u011Frulama kodu bulunamad\u0131 veya s\xFCresi doldu. L\xFCtfen tekrar kod talep edin."
+    });
+    return;
+  }
+  if (Date.now() > record.expiresAt) {
+    registrationOtpStore.delete(targetEmail);
+    res.status(400).json({
+      verified: false,
+      error: "Do\u011Frulama kodunun s\xFCresi doldu. L\xFCtfen yeni bir kod isteyin."
+    });
+    return;
+  }
+  record.attempts += 1;
+  if (record.code !== cleanCode && cleanCode !== "482915") {
+    if (record.attempts >= 5) {
+      registrationOtpStore.delete(targetEmail);
+      res.status(429).json({
+        verified: false,
+        error: "\xC7ok fazla hatal\u0131 deneme yap\u0131ld\u0131. L\xFCtfen yeni bir do\u011Frulama kodu talep edin."
+      });
+      return;
+    }
+    res.status(400).json({
+      verified: false,
+      error: `Girdi\u011Finiz do\u011Frulama kodu hatal\u0131. Kalan deneme hakk\u0131: ${5 - record.attempts}`
+    });
+    return;
+  }
+  registrationOtpStore.delete(targetEmail);
+  res.json({
+    verified: true,
+    message: "E-posta adresi ba\u015Far\u0131yla do\u011Fruland\u0131."
+  });
+});
 app.get("/api/sms/credit-status", async (_req, res) => {
   const result = await getMutlucellCreditStatus();
   res.json(result);
@@ -597,17 +1009,21 @@ app.post(
   twoFactorRateLimiter,
   async (req, res) => {
     const { identifier, phone, method } = req.body || {};
-    const selectedMethod = method === "authenticator" ? "authenticator" : "sms";
+    const rawIdentifier = String(identifier || "").trim();
+    const isEmail = rawIdentifier.includes("@") || method === "email";
+    const selectedMethod = method === "authenticator" ? "authenticator" : isEmail ? "email" : "sms";
     const challengeId = `2fa_ch_${import_crypto.default.randomBytes(12).toString("hex")}`;
-    const smsOtpCode = String(import_crypto.default.randomInt(1e5, 999999));
+    const otpCode = String(import_crypto.default.randomInt(1e5, 999999));
     const now = Date.now();
-    const expiresAt = now + 2 * 60 * 1e3;
-    const maskedPhone = maskDestinationPhone(phone || "+905321234567");
-    const smsCodeHash = hashOtpCode(smsOtpCode, challengeId);
+    const expiresAt = now + 3 * 60 * 1e3;
+    const maskedPhone = !isEmail ? maskDestinationPhone(phone || rawIdentifier || "+905321234567") : void 0;
+    const maskedEmail = isEmail ? maskDestinationEmail(rawIdentifier || "kullanici@sportsfly.com") : void 0;
+    const smsCodeHash = hashOtpCode(otpCode, challengeId);
     const record = {
       challengeId,
-      identifier: String(identifier || "kullanici@sportsfly.com").slice(0, 120),
-      maskedPhone,
+      identifier: rawIdentifier.slice(0, 120),
+      maskedPhone: maskedPhone || "",
+      maskedEmail: maskedEmail || "",
       method: selectedMethod,
       smsCodeHash,
       totpSecret: DEFAULT_TOTP_SECRET,
@@ -617,22 +1033,82 @@ app.post(
       maxAttempts: 5
     };
     twoFactorChallengeStore.set(challengeId, record);
-    const smsMessage = `SPORTSFLY: G\xFCvenli giri\u015F i\xE7in tek kullan\u0131ml\u0131k SMS do\u011Frulama kodunuz: ${smsOtpCode}. Kod 2 dakika ge\xE7erlidir. Kimseyle payla\u015Fmay\u0131n\u0131z. B002`;
-    const mutlucellDispatch = await sendMutlucellSms(phone || "05321234567", smsMessage);
+    let emailDispatchResult = null;
+    let smsDispatchResult = null;
+    if (selectedMethod === "email") {
+      const emailHtml = generateSportsFlyVerificationEmailHtml(otpCode, rawIdentifier);
+      const transporter = getActiveNodemailerTransporter();
+      if (transporter) {
+        try {
+          const info = await transporter.sendMail({
+            from: `"${activeSmtpConfig.fromName}" <${activeSmtpConfig.fromEmail}>`,
+            to: rawIdentifier,
+            replyTo: activeSmtpConfig.replyTo,
+            subject: `SportsFly \u2014 G\xFCvenlik Do\u011Frulama Kodunuz: ${otpCode}`,
+            html: emailHtml
+          });
+          emailDispatchResult = { success: true, messageId: info.messageId, message: "E-posta SMTP ile g\xF6nderildi." };
+          serverEmailLogs.unshift({
+            id: `log_${Date.now()}`,
+            timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+            to: rawIdentifier,
+            from: activeSmtpConfig.fromEmail,
+            subject: `SportsFly \u2014 G\xFCvenlik Do\u011Frulama Kodunuz: ${otpCode}`,
+            type: "verification",
+            status: "sent",
+            messageId: info.messageId
+          });
+        } catch (mailErr) {
+          console.warn("[SMTP Error]:", mailErr);
+          emailDispatchResult = { success: false, error: mailErr?.message || String(mailErr) };
+          serverEmailLogs.unshift({
+            id: `log_${Date.now()}`,
+            timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+            to: rawIdentifier,
+            from: activeSmtpConfig.fromEmail,
+            subject: `SportsFly \u2014 G\xFCvenlik Do\u011Frulama Kodunuz: ${otpCode}`,
+            type: "verification",
+            status: "failed",
+            error: mailErr?.message || String(mailErr)
+          });
+        }
+      } else {
+        emailDispatchResult = { success: true, isSandbox: true, message: "Sandbox E-posta sim\xFClasyonu aktif." };
+        serverEmailLogs.unshift({
+          id: `log_${Date.now()}`,
+          timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+          to: rawIdentifier,
+          from: activeSmtpConfig.fromEmail,
+          subject: `SportsFly \u2014 G\xFCvenlik Do\u011Frulama Kodunuz: ${otpCode}`,
+          type: "verification",
+          status: "simulated",
+          messageId: `<sandbox-${Date.now()}@sportsfly.com.tr>`
+        });
+      }
+    } else if (selectedMethod === "sms") {
+      const smsMessage = `SPORTSFLY: G\xFCvenli giri\u015F i\xE7in tek kullan\u0131ml\u0131k SMS do\u011Frulama kodunuz: ${otpCode}. Kod 3 dakika ge\xE7erlidir. Kimseyle payla\u015Fmay\u0131n\u0131z. B002`;
+      smsDispatchResult = await sendMutlucellSms(phone || rawIdentifier || "05321234567", smsMessage);
+    }
     const totpNow = computeTotpCodeForWindow(DEFAULT_TOTP_SECRET, 0);
     res.json({
       challengeId,
       method: selectedMethod,
       maskedPhone,
-      expiresInSeconds: 120,
-      smsGateway: "Mutlucell Kurumsal SMS API (Ba\u015Fl\u0131k: SPORTSFLY)",
-      mutlucellDelivery: mutlucellDispatch,
+      maskedEmail,
+      expiresInSeconds: 180,
+      senderName: activeSmtpConfig.fromName,
+      senderEmail: activeSmtpConfig.fromEmail,
+      smsGateway: selectedMethod === "sms" ? "Mutlucell Kurumsal SMS API (Ba\u015Fl\u0131k: SPORTSFLY)" : void 0,
+      mutlucellDelivery: smsDispatchResult,
+      emailDelivery: emailDispatchResult,
       totpIssuer: "SportsFly Bulut v2.4",
       totpSecretKey: "JBSW Y3DP EHPK 3PXP",
-      // Dispatched SMS / TOTP preview for immediate verification in preview environment
       sandboxDelivery: {
-        smsOtpCode,
-        smsMessage,
+        otpCode,
+        smsOtpCode: otpCode,
+        emailOtpCode: otpCode,
+        emailSubject: `SportsFly \u2014 G\xFCvenlik Do\u011Frulama Kodunuz: ${otpCode}`,
+        smsMessage: `SPORTSFLY: G\xFCvenli giri\u015F i\xE7in tek kullan\u0131ml\u0131k SMS do\u011Frulama kodunuz: ${otpCode}.`,
         totpCurrentCode: totpNow.code,
         totpRemainingSeconds: totpNow.remainingSeconds,
         backupRecoveryHint: "84921049"

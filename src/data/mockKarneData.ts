@@ -95,6 +95,7 @@ export interface SporcuKarne {
   // Notes
   antrenorNotu: string;
   gelisimAlanlari: string[];
+  expertComment?: string; // Uzman Görüşü (SportsFly Lab entegrasyonu)
 
   // Veli ve İletişim Bilgileri (WhatsApp / SMS Gönderimi için)
   veliAdSoyad?: string;

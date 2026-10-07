@@ -27,6 +27,8 @@ import {
   FileCheck2,
   ExternalLink,
   ChevronDown,
+  Printer,
+  Eye,
 } from 'lucide-react';
 import { NavPage } from '../../types';
 import {
@@ -295,6 +297,7 @@ export const UpcomingEventsNotificationPanel: React.FC<UpcomingEventsNotificatio
 
   // Modals & Action Feedback
   const [selectedContractForRenew, setSelectedContractForRenew] = useState<ContractRenewalItem | null>(null);
+  const [viewingContract, setViewingContract] = useState<ContractRenewalItem | null>(null);
   const [renewing, setRenewing] = useState(false);
   const [selectedTrainingForRoster, setSelectedTrainingForRoster] = useState<UpcomingTrainingItem | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -303,6 +306,110 @@ export const UpcomingEventsNotificationPanel: React.FC<UpcomingEventsNotificatio
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3800);
+  };
+
+  const handlePrintAthleteContract = (contract: ContractRenewalItem) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Yazdırma penceresi tarayıcınız tarafından engellendi. Lütfen pop-up engelleyiciyi kaldırıp tekrar deneyin.');
+      return;
+    }
+    const htmlContent = `
+      <html>
+        <head>
+          <title>${contract.athleteName} — Sporcu Sözleşmesi</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 50px; color: #1e293b; line-height: 1.65; max-width: 800px; margin: 0 auto; }
+            .header { text-align: center; border-bottom: 2px solid #3b82f6; padding-bottom: 20px; margin-bottom: 30px; }
+            .logo { font-size: 26px; font-weight: 900; color: #1e3a8a; letter-spacing: -0.5px; }
+            .logo span { color: #3b82f6; }
+            .title { font-size: 18px; font-weight: 800; color: #0f172a; margin-top: 5px; }
+            h2 { font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 25px; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+            p { font-size: 12.5px; margin-bottom: 12px; text-align: justify; }
+            .grid { display: grid; grid-template-cols: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+            .box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; font-size: 12px; }
+            .box div { margin-bottom: 5px; }
+            .box span { font-weight: bold; color: #0f172a; }
+            .signatures { display: grid; grid-template-cols: 1fr 1fr; gap: 40px; margin-top: 60px; text-align: center; }
+            .sig-line { border-top: 1px dashed #cbd5e1; margin-top: 50px; padding-top: 8px; font-size: 11px; color: #64748b; font-weight: bold; }
+            .footer { margin-top: 60px; font-size: 10px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="logo">SportsFly <span>ACADEMY</span></div>
+            <div class="title">${contract.contractType}</div>
+          </div>
+
+          <p>
+            İşbu sözleşme, aşağıda detayları belirtilen sporcu velisi ile <strong>SportsFly ${contract.subeName} Şubesi</strong> arasında, sporcunun eğitim, lisans ve tesis kullanım şartlarını belirlemek üzere imza altına alınmıştır.
+          </p>
+
+          <h2>1. TARAFLAR VE SPORCU BİLGİLERİ</h2>
+          <div class="grid">
+            <div class="box">
+              <div><strong>Sporcu Adı Soyadı:</strong> <span>${contract.athleteName}</span></div>
+              <div><strong>Branş / Kategori:</strong> <span>${contract.branch} / ${contract.groupName}</span></div>
+              <div><strong>Şube:</strong> <span>${contract.subeName}</span></div>
+            </div>
+            <div class="box">
+              <div><strong>Veli Adı Soyadı:</strong> <span>${contract.parentName}</span></div>
+              <div><strong>İletişim Telefonu:</strong> <span>${contract.parentPhone}</span></div>
+              <div><strong>Sözleşme Türü:</strong> <span>${contract.contractType}</span></div>
+            </div>
+          </div>
+
+          <h2>2. SÜRE VE MADDİ HÜKÜMLER</h2>
+          <div class="grid">
+            <div class="box">
+              <div><strong>Sözleşme Başlangıç Tarihi:</strong> <span>${contract.startDate}</span></div>
+              <div><strong>Sözleşme Bitiş Tarihi:</strong> <span>${contract.endDate}</span></div>
+            </div>
+            <div class="box">
+              <div><strong>Aylık Eğitim Aidatı:</strong> <span>₺${contract.monthlyFee.toLocaleString('tr-TR')}</span></div>
+              <div><strong>Dönem Sonu Yenileme Aidatı:</strong> <span>₺${contract.renewalFee.toLocaleString('tr-TR')}</span></div>
+            </div>
+          </div>
+
+          <h2>3. GENEL KOŞULLAR VE YÜKÜMLÜLÜKLER</h2>
+          <p>
+            1. Veli, aylık eğitim aidatını her ayın en geç 5'inci gününe kadar kulüp kasasına veya belirtilen banka hesabına ödemekle yükümlüdür. Geciken ödemelerde yasal gecikme faizi uygulanabilir.
+          </p>
+          <p>
+            2. Sporcunun antrenman, kamp veya müsabaka saatlerine düzenli katılımı esastır. Sağlık raporu olmaksızın devamsızlık durumlarında aidat iadesi yapılmaz.
+          </p>
+          <p>
+            3. Kulüp, antrenman saatlerini ve tesis koşullarını gerekli gördüğü hallerde önceden veliyi bilgilendirerek revize etme hakkını saklı tutar.
+          </p>
+
+          <h2>4. KİŞİSEL VERİLERİN ONAYI (KVKK)</h2>
+          <p>
+            İşbu sözleşmenin imzalanmasıyla veli, sporcunun ve kendisinin kişisel verilerinin (ad, soyad, iletişim bilgileri, fotoğraf ve gelişim analizleri) SportsFly bulut veri tabanında güvenli şekilde işlenmesine, yoklama ve karne takibi amacıyla kullanılmasına açık rıza verdiğini beyan eder.
+          </p>
+
+          <div class="signatures">
+            <div>
+              <div class="sig-line">Velisi / Kanuni Temsilcisi İmza</div>
+              <div style="font-size:12px; font-weight:bold; margin-top:5px; text-transform:uppercase;">${contract.parentName}</div>
+            </div>
+            <div>
+              <div class="sig-line">SportsFly Yetkili İmza &amp; Kaşe</div>
+              <div style="font-size:12px; font-weight:bold; margin-top:5px;">SportsFly ${contract.subeName} Şubesi</div>
+            </div>
+          </div>
+
+          <div class="footer">
+            SportsFly Kurumsal Spor Okulu &amp; Akademi Otomasyon Portalı • webapp.sportsfly.com.tr
+          </div>
+
+          <script>
+            window.onload = function() { window.print(); window.close(); }
+          </script>
+        </body>
+      </html>
+    `;
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   };
 
   // Sync listener with global notifications

@@ -39,6 +39,7 @@ import {
   Package,
   Blocks,
   Sparkles,
+  Mail,
 } from 'lucide-react';
 import { NavPage, PackagePlanType } from '../types';
 import { SportsFlyLogo, SportsFlyIcon } from './SportsFlyLogo';
@@ -1303,6 +1304,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {isRestricted('yetkilendirmeler') && renderLockedPill()}
               </button>
             )}
+
+
 
             {/* Kulüp Sözleşmeleri */}
             {(isSuperAdmin || isGoogleRestricted) && shouldShowItem('kullanici-sozlesmeleri') && (

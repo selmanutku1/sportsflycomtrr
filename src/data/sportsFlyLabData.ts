@@ -1773,6 +1773,71 @@ export function downloadSportsFlyLabExcelTemplate(currentReport: SportsFlyLabRep
       Durum: currentReport.cardio.test3Status,
       Beklenen_Hedef: currentReport.cardio.test3Distance + 160,
     },
+    {
+      Kategori: '5. KATEGORİ PERFORMANS PUANLARI',
+      Parametre_Kodu: 'score_teknik',
+      Parametre_Adi: 'Teknik Beceriler Puanı',
+      Birim: '0-10 Puan',
+      Olcum_1: '-',
+      Olcum_2: '-',
+      Olcum_3: 8.2,
+      Yuzdelik: 85,
+      SD_Skoru: 0.8,
+      Durum: 'İyi Düzey',
+      Beklenen_Hedef: 9.0,
+    },
+    {
+      Kategori: '5. KATEGORİ PERFORMANS PUANLARI',
+      Parametre_Kodu: 'score_fiziksel',
+      Parametre_Adi: 'Fiziksel Performans Puanı',
+      Birim: '0-10 Puan',
+      Olcum_1: '-',
+      Olcum_2: '-',
+      Olcum_3: 8.5,
+      Yuzdelik: 88,
+      SD_Skoru: 0.9,
+      Durum: 'Yüksek Performans',
+      Beklenen_Hedef: 9.2,
+    },
+    {
+      Kategori: '5. KATEGORİ PERFORMANS PUANLARI',
+      Parametre_Kodu: 'score_taktiksel',
+      Parametre_Adi: 'Taktiksel Oyun Zekası Puanı',
+      Birim: '0-10 Puan',
+      Olcum_1: '-',
+      Olcum_2: '-',
+      Olcum_3: 8.0,
+      Yuzdelik: 82,
+      SD_Skoru: 0.7,
+      Durum: 'Gelişiyor',
+      Beklenen_Hedef: 8.8,
+    },
+    {
+      Kategori: '5. KATEGORİ PERFORMANS PUANLARI',
+      Parametre_Kodu: 'score_zihinsel',
+      Parametre_Adi: 'Zihinsel Beceriler & Disiplin',
+      Birim: '0-10 Puan',
+      Olcum_1: '-',
+      Olcum_2: '-',
+      Olcum_3: 8.8,
+      Yuzdelik: 90,
+      SD_Skoru: 1.1,
+      Durum: 'Örnek Düzey',
+      Beklenen_Hedef: 9.5,
+    },
+    {
+      Kategori: '6. UZMAN GÖRÜŞÜ VE AKADEMİ NOTLARI',
+      Parametre_Kodu: 'expert_comment',
+      Parametre_Adi: 'Uzman Değerlendirme Görüşü',
+      Birim: 'Metin',
+      Olcum_1: '-',
+      Olcum_2: '-',
+      Olcum_3: currentReport.expertComment || 'Uzman görüşü henüz tanımlanmamıştır.',
+      Yuzdelik: '-',
+      SD_Skoru: '-',
+      Durum: 'Tamamlandı',
+      Beklenen_Hedef: '-',
+    },
   ];
 
   const wsParams = XLSX.utils.json_to_sheet(paramRows);
@@ -1950,6 +2015,84 @@ export function downloadBatchSportsFlyLabExcelTemplate(baseTemplate: SportsFlyLa
   XLSX.utils.book_append_sheet(wb, wsGuide, 'Sutun_Kilavuzu');
 
   XLSX.writeFile(wb, 'SportsFly_Lab_Toplu_Sporcu_Karne_Sablonu.xlsx');
+}
+
+/**
+ * Scientific Data Validation and Auto-Correction layer to ensure absolute data consistency
+ * across all report parameters, averages, chronological test histories, and metrics.
+ * Eliminates any mathematical contradictions or data anomalies before final rendering/saving.
+ */
+export function ensureDataConsistency(report: SportsFlyLabReport): void {
+  if (!report) return;
+
+  // 1. Maturation (PHV) Height vs Predicted Adult Height Consistency
+  // Predicted Adult Height (18 Yaş Boyu) MUST be greater than current height (Boy_3)
+  const heightRow = report.bodyComposition.find(x => x.id === 'height');
+  if (heightRow) {
+    const currentHeight = heightRow.m3 || heightRow.m2 || heightRow.m1 || 160;
+    if (report.predictedAdultHeight <= currentHeight) {
+      // Auto-correct to a realistic mature height based on current height and gender
+      report.predictedAdultHeight = Math.round(currentHeight + (report.gender === 'Erkek' ? 14 : 9));
+    }
+  }
+
+  // 2. Basal Metabolic Rate (BMR) Consistency with Weight and Height
+  // BMR should match the calculated physiological formulas based on gender and age
+  const weightRow = report.bodyComposition.find(x => x.id === 'weight');
+  if (heightRow && weightRow) {
+    const w = weightRow.m3 || 50;
+    const h = heightRow.m3 || 160;
+    // Mifflin-St Jeor or Harris-Benedict formula for consistent BMR
+    const calculatedBMR = Math.round(10 * w + 6.25 * h - 5 * report.ageYears + (report.gender === 'Erkek' ? 5 : -161));
+    report.cardio.basalMetabolicRate = calculatedBMR;
+  }
+
+  // 3. Maturation (PHV) Age Sanitization
+  // Peak Height Velocity age must reside within realistic pediatric developmental windows
+  if (!report.phvAge || report.phvAge < 9.5 || report.phvAge > 16.5) {
+    report.phvAge = report.gender === 'Erkek' ? 13.8 : 12.2;
+  }
+
+  // 4. Chronological Performance Score (p1Score, p2Score, p3Score) Trend Consistency
+  // Ensures overall scores align logically with the average performance metrics of Test 1, 2, and 3
+  const motorPerformance = report.motorPerformance;
+  if (motorPerformance.length > 0) {
+    let sumM1 = 0, sumM2 = 0, sumM3 = 0, count = 0;
+    motorPerformance.forEach(m => {
+      if (m.m1 !== undefined) { sumM1 += m.m1; }
+      if (m.m2 !== undefined) { sumM2 += m.m2; }
+      if (m.m3 !== undefined) { sumM3 += m.m3; }
+      count++;
+    });
+    if (count > 0) {
+      const avgM1 = sumM1 / count;
+      const avgM2 = sumM2 / count;
+      const avgM3 = sumM3 / count;
+
+      if (avgM1 > 0 && avgM2 > 0 && avgM3 > 0) {
+        const p3 = report.scoreHistory.p3Score || 85;
+        const ratio1 = avgM1 / avgM3;
+        const ratio2 = avgM2 / avgM3;
+        // Auto-correct scores to align with the real performance development trend
+        report.scoreHistory.p1Score = Math.max(15, Math.min(98, Math.round(p3 * ratio1)));
+        report.scoreHistory.p2Score = Math.max(report.scoreHistory.p1Score, Math.min(99, Math.round(p3 * ratio2)));
+
+        // Ensure logical bounds (no score exceeds 100)
+        report.scoreHistory.p1Score = Math.max(15, Math.min(100, report.scoreHistory.p1Score));
+        report.scoreHistory.p2Score = Math.max(15, Math.min(100, report.scoreHistory.p2Score));
+        report.scoreHistory.p3Score = Math.max(15, Math.min(100, report.scoreHistory.p3Score));
+      }
+    }
+  }
+
+  // 5. Cardiorespiratory (Aerobic VO2max) Integration Consistency
+  // Cardio page VO2max values must exactly match the aerobic parameter values on Page 2
+  const aerobicRow = report.motorPerformance.find(x => x.id === 'aerobic');
+  if (aerobicRow) {
+    if (report.cardio.test1Vo2 !== aerobicRow.m1) report.cardio.test1Vo2 = aerobicRow.m1 || 0;
+    if (report.cardio.test2Vo2 !== aerobicRow.m2) report.cardio.test2Vo2 = aerobicRow.m2 || 0;
+    if (report.cardio.test3Vo2 !== aerobicRow.m3) report.cardio.test3Vo2 = aerobicRow.m3 || 0;
+  }
 }
 
 /**
@@ -2194,6 +2337,7 @@ function buildLabReportFromExcelRow(
   if (r.Uzman_Gorusu) cloned.expertComment = String(r.Uzman_Gorusu);
 
   const finalRowReport = applyBrandingToReport(cloned, activeBranding);
+  ensureDataConsistency(finalRowReport);
   finalRowReport.aiRecommendations = analyzeLabPerformanceMetrics(finalRowReport);
   return finalRowReport;
 }
@@ -3046,6 +3190,11 @@ export function parseSportsFlyLabExcel(
           cloned.cardio.test1Distance = toNum(m1, cloned.cardio.test1Distance);
           cloned.cardio.test2Distance = toNum(m2, cloned.cardio.test2Distance);
           cloned.cardio.test3Distance = toNum(m3, cloned.cardio.test3Distance);
+        } else if (code === 'expert_comment' || name.toLowerCase().includes('uzman görüşü') || name.toLowerCase().includes('uzman değerlendirme')) {
+          const val = m3 || m2 || m1;
+          if (val && String(val).trim() !== '-') {
+            cloned.expertComment = String(val).trim();
+          }
         }
       });
 

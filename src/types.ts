@@ -40,7 +40,8 @@ export type NavPage =
   | 'turnuva-yonetimi'
   | 'envanter-yonetimi'
   | 'referans-programi'
-  | 'entegrasyonlar';
+  | 'entegrasyonlar'
+  | 'eposta-servis-yapilandirmasi';
 
 export interface EntegrasyonItem {
   id: string;

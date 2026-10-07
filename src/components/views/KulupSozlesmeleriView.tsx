@@ -21,10 +21,113 @@ import {
   X,
   Printer,
   ShieldCheck,
+  Check,
+  Fingerprint,
+  FileSignature,
+  UserCheck,
 } from 'lucide-react';
 import { KulupSozlesmesi } from '../../types';
 import { INITIAL_YONETICILER } from '../../data/mockData';
 import { TURKEY_CITIES, getDistrictsForCity } from '../../data/turkeyCitiesData';
+
+export interface AthleteContract {
+  id: string;
+  athleteName: string;
+  parentName: string;
+  birthDate: string;
+  tcNo: string;
+  phone: string;
+  email: string;
+  branch: string;
+  sube: string;
+  signedAt: string;
+  ipAddress: string;
+  status: 'Onaylandı' | 'Bekliyor';
+  signature: string;
+  kvkkApproved: boolean;
+  taahhutnameApproved: boolean;
+  photoVideoApproved: boolean;
+  hash: string;
+}
+
+const INITIAL_ATHLETE_CONTRACTS: AthleteContract[] = [
+  {
+    id: 'AC-2026-001',
+    athleteName: 'Emre Çetinkaya',
+    parentName: 'Murat Çetinkaya',
+    birthDate: '12.06.2014',
+    tcNo: '34918276510',
+    phone: '+90 532 999 88 77',
+    email: 'murat.cetinkaya@gmail.com',
+    branch: 'Basketbol',
+    sube: 'Kadıköy Merkez Şube',
+    signedAt: '14.09.2026 15:45',
+    ipAddress: '185.116.14.202',
+    status: 'Onaylandı',
+    signature: 'MURAT ÇETİNKAYA',
+    kvkkApproved: true,
+    taahhutnameApproved: true,
+    photoVideoApproved: true,
+    hash: 'sha256-8a9d1b4c3e7f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b',
+  },
+  {
+    id: 'AC-2026-002',
+    athleteName: 'Defne Şahin',
+    parentName: 'Zeynep Şahin',
+    birthDate: '24.03.2012',
+    tcNo: '28194017522',
+    phone: '+90 533 222 11 00',
+    email: 'zeynep.sahin@hotmail.com',
+    branch: 'Voleybol',
+    sube: 'Ataşehir Batı Ataşehir Şubesi',
+    signedAt: '14.09.2026 11:30',
+    ipAddress: '85.101.44.18',
+    status: 'Onaylandı',
+    signature: 'ZEYNEP ŞAHİN',
+    kvkkApproved: true,
+    taahhutnameApproved: true,
+    photoVideoApproved: true,
+    hash: 'sha256-4c7e8a9d1b4c7e8a9d1b4c7e8a9d1b4c7e8a9d1b4c7e8a9d1b4c7e8a9d1b4c7e',
+  },
+  {
+    id: 'AC-2026-003',
+    athleteName: 'Kaan Yıldırım',
+    parentName: 'Ahmet Yıldırım',
+    birthDate: '22.01.2010',
+    tcNo: '10839210284',
+    phone: '+90 535 600 77 33',
+    email: 'ahmet.yildirim@gmail.com',
+    branch: 'Basketbol',
+    sube: 'Beşiktaş Spor Kompleksi',
+    signedAt: '18.09.2026 10:15',
+    ipAddress: '176.43.210.99',
+    status: 'Onaylandı',
+    signature: 'AHMET YILDIRIM',
+    kvkkApproved: true,
+    taahhutnameApproved: true,
+    photoVideoApproved: false,
+    hash: 'sha256-2b4c7e8a9d1b4c7e8a9d1b4c7e8a9d1b4c7e8a9d1b4c7e8a9d1b4c7e8a9d1b4c',
+  },
+  {
+    id: 'AC-2026-004',
+    athleteName: 'Zeynep Kaya',
+    parentName: 'Mehmet Kaya',
+    birthDate: '18.06.2012',
+    tcNo: '57111284719',
+    phone: '+90 533 450 12 88',
+    email: 'mehmet.kaya@gmail.com',
+    branch: 'Voleybol',
+    sube: 'Kartal Sahil Tesisleri',
+    signedAt: '',
+    ipAddress: '',
+    status: 'Bekliyor',
+    signature: '',
+    kvkkApproved: false,
+    taahhutnameApproved: false,
+    photoVideoApproved: false,
+    hash: '',
+  }
+];
 
 // Initial pre-populated club contracts for immediate interactivity
 const INITIAL_SOZLESMELER: KulupSozlesmesi[] = [
@@ -121,12 +224,25 @@ const FIRMA_TIPLERI = [
 
 export const KulupSozlesmeleriView: React.FC = () => {
   const [sozlesmeler, setSozlesmeler] = useState<KulupSozlesmesi[]>(INITIAL_SOZLESMELER);
-  const [activeTab, setActiveTab] = useState<'form' | 'liste'>('form');
+  const [activeTab, setActiveTab] = useState<'form' | 'liste' | 'sporcu-sozlesmeleri'>('form');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'Tümü' | 'Onaylandı' | 'İmza Bekliyor' | 'İnceleniyor'>('Tümü');
   const [selectedContract, setSelectedContract] = useState<KulupSozlesmesi | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Athlete Contracts States
+  const [athleteContracts, setAthleteContracts] = useState<AthleteContract[]>(() => {
+    try {
+      const saved = localStorage.getItem('sportsfly_athlete_contracts_v1');
+      return saved ? JSON.parse(saved) : INITIAL_ATHLETE_CONTRACTS;
+    } catch {
+      return INITIAL_ATHLETE_CONTRACTS;
+    }
+  });
+  const [selectedAthleteContract, setSelectedAthleteContract] = useState<AthleteContract | null>(INITIAL_ATHLETE_CONTRACTS[0]);
+  const [athleteSearchQuery, setAthleteSearchQuery] = useState('');
+  const [athleteStatusFilter, setAthleteStatusFilter] = useState<'Tümü' | 'Onaylandı' | 'Bekliyor'>('Tümü');
 
   // Form State matching the exact fields in user's image
   const [formData, setFormData] = useState({
@@ -348,15 +464,15 @@ export const KulupSozlesmeleriView: React.FC = () => {
           </div>
 
           {/* Tab Switcher & Export */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200/80 text-xs font-semibold w-full sm:w-auto">
+          <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto">
+            <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200/80 text-xs font-semibold w-full sm:w-auto shrink-0">
               <button
                 type="button"
                 onClick={() => setActiveTab('form')}
-                className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                className={`flex-1 sm:flex-initial px-3 py-2 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   activeTab === 'form'
                     ? 'bg-white text-blue-700 shadow-2xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    : 'text-slate-600 hover:text-white/60 hover:text-slate-900'
                 }`}
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -365,14 +481,26 @@ export const KulupSozlesmeleriView: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('liste')}
-                className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                className={`flex-1 sm:flex-initial px-3 py-2 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   activeTab === 'liste'
                     ? 'bg-white text-blue-700 shadow-2xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    : 'text-slate-600 hover:text-white/60 hover:text-slate-900'
                 }`}
               >
                 <Building2 className="w-3.5 h-3.5" />
                 <span>Kayıtlı Sözleşmeler ({sozlesmeler.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('sporcu-sozlesmeleri')}
+                className={`flex-1 sm:flex-initial px-3 py-2 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  activeTab === 'sporcu-sozlesmeleri'
+                    ? 'bg-white text-blue-700 shadow-2xs font-bold'
+                    : 'text-slate-600 hover:text-white/60 hover:text-slate-900'
+                }`}
+              >
+                <Fingerprint className="w-3.5 h-3.5" />
+                <span>Sporcu Sözleşmeleri ({athleteContracts.length})</span>
               </button>
             </div>
 
@@ -994,6 +1122,407 @@ export const KulupSozlesmeleriView: React.FC = () => {
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* SPORCU SÖZLEŞMELERİ SPLIT LAYOUT */}
+      {activeTab === 'sporcu-sozlesmeleri' && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-in fade-in duration-150">
+          
+          {/* LEFT COLUMN: Athlete List & Search (5 Columns) */}
+          <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-4 shadow-2xs space-y-4">
+            <div className="border-b border-slate-100 pb-3">
+              <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                <Fingerprint className="w-4 h-4 text-blue-600" />
+                <span>Sporcu Kayıt Taahhütnameleri</span>
+              </h2>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Veliler tarafından onaylanmış dijital taahhütname onay kayıtları
+              </p>
+            </div>
+
+            {/* Filter Bar */}
+            <div className="space-y-2">
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Sporcu, veli adı veya ref ara..."
+                  value={athleteSearchQuery}
+                  onChange={(e) => setAthleteSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-1.5 border border-slate-300 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Quick Status Buttons */}
+              <div className="flex items-center gap-1.5 pt-1">
+                {(['Tümü', 'Onaylandı', 'Bekliyor'] as const).map((st) => (
+                  <button
+                    key={st}
+                    onClick={() => setAthleteStatusFilter(st)}
+                    className={`px-3 py-1 rounded-full text-[10px] font-bold border transition-all cursor-pointer ${
+                      athleteStatusFilter === st
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-3xs'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    {st}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Scrollable Athlete Cards List */}
+            <div className="space-y-2 max-h-[58vh] overflow-y-auto pr-1">
+              {athleteContracts.filter((ac) => {
+                const matchesSearch = ac.athleteName.toLowerCase().includes(athleteSearchQuery.toLowerCase()) ||
+                  ac.parentName.toLowerCase().includes(athleteSearchQuery.toLowerCase()) ||
+                  ac.id.toLowerCase().includes(athleteSearchQuery.toLowerCase());
+                const matchesStatus = athleteStatusFilter === 'Tümü' || ac.status === athleteStatusFilter;
+                return matchesSearch && matchesStatus;
+              }).map((ac) => {
+                const isSelected = selectedAthleteContract?.id === ac.id;
+                return (
+                  <div
+                    key={ac.id}
+                    onClick={() => setSelectedAthleteContract(ac)}
+                    className={`p-3 rounded-xl border transition-all cursor-pointer text-left space-y-2 ${
+                      isSelected
+                        ? 'border-blue-600 bg-blue-50/20 ring-2 ring-blue-500/10'
+                        : 'border-slate-200 hover:border-slate-300 bg-slate-50/30'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <span className="text-[9px] font-mono font-bold text-blue-600 px-1.5 py-0.2 rounded bg-blue-50">
+                          {ac.id}
+                        </span>
+                        <h3 className="font-bold text-slate-900 text-xs sm:text-sm mt-1">{ac.athleteName}</h3>
+                        <p className="text-[11px] text-slate-500">Veli: {ac.parentName}</p>
+                      </div>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0 ${
+                          ac.status === 'Onaylandı'
+                            ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                            : 'bg-amber-50 border border-amber-200 text-amber-800'
+                        }`}
+                      >
+                        {ac.status}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5 pt-1 text-[9px] border-t border-slate-100">
+                      <span className="px-1.5 py-0.2 bg-slate-100 text-slate-600 font-semibold rounded">
+                        {ac.branch}
+                      </span>
+                      <span className="text-slate-400 block max-w-[150px] truncate">
+                        {ac.sube}
+                      </span>
+                      {ac.signedAt && (
+                        <span className="text-slate-400 font-sans tabular-nums ml-auto">
+                          {ac.signedAt.split(' ')[0]}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {athleteContracts.filter((ac) => {
+                const matchesSearch = ac.athleteName.toLowerCase().includes(athleteSearchQuery.toLowerCase()) ||
+                  ac.parentName.toLowerCase().includes(athleteSearchQuery.toLowerCase()) ||
+                  ac.id.toLowerCase().includes(athleteSearchQuery.toLowerCase());
+                const matchesStatus = athleteStatusFilter === 'Tümü' || ac.status === athleteStatusFilter;
+                return matchesSearch && matchesStatus;
+              }).length === 0 && (
+                <div className="py-8 text-center text-slate-500 bg-slate-50 rounded-lg border border-dashed border-slate-200">
+                  <UserCheck className="w-6 h-6 text-slate-300 mx-auto mb-1.5" />
+                  <p className="font-semibold text-xs text-slate-700">Sporcu taahhütnamesi bulunamadı</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Interactive Document Viewer & Actions (7 Columns) */}
+          <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200 p-6 shadow-2xs space-y-5 text-left relative overflow-hidden">
+            
+            {/* Watermark security accent */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.015] pointer-events-none select-none">
+              <ShieldCheck className="w-96 h-96 text-slate-900" />
+            </div>
+
+            {selectedAthleteContract ? (
+              <div className="space-y-5 relative z-10">
+                {/* Viewer Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                        Veli Muvafakatnamesi
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        Ref: {selectedAthleteContract.id}
+                      </span>
+                    </div>
+                    <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+                      {selectedAthleteContract.athleteName} — Taahhütname Kaydı
+                    </h2>
+                  </div>
+
+                  {/* Actions (Yazdır / İndir) */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        // Print Action
+                        const ac = selectedAthleteContract;
+                        const printWindow = window.open('', '_blank');
+                        if (!printWindow) {
+                          alert('Yazdırma penceresi tarayıcınız tarafından engellendi.');
+                          return;
+                        }
+                        const htmlContent = `
+                          <html>
+                            <head>
+                              <title>Sporcu Kayıt Sözleşmesi - ${ac.athleteName}</title>
+                              <style>
+                                body { font-family: sans-serif; padding: 40px; color: #1e293b; line-height: 1.6; max-width: 800px; margin: 0 auto; }
+                                h1 { font-size: 20px; text-align: center; color: #0f172a; border-bottom: 2px solid #cbd5e1; padding-bottom: 12px; margin-bottom: 24px; font-weight: bold; }
+                                .section { margin-bottom: 20px; }
+                                .section-title { font-weight: bold; font-size: 14px; background: #f1f5f9; padding: 6px 12px; border-radius: 4px; margin-bottom: 10px; }
+                                .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; }
+                                .field { font-weight: 600; }
+                                .legal { font-size: 11px; color: #475569; text-align: justify; margin-top: 15px; }
+                                .signature-box { border: 2px dashed #94a3b8; padding: 15px; border-radius: 8px; margin-top: 30px; text-align: center; font-size: 12px; background: #faf5ff; }
+                                .footer { margin-top: 40px; font-size: 10px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+                              </style>
+                            </head>
+                            <body>
+                              <h1>SPORCU KAYIT TAAHHÜTNAMESİ VE DİJİTAL SÖZLEŞME</h1>
+                              <div class="section">
+                                <div class="section-title">1. SPORCU BİLGİLERİ</div>
+                                <div class="grid">
+                                  <div><span class="field">Adı Soyadı:</span> ${ac.athleteName}</div>
+                                  <div><span class="field">Doğum Tarihi:</span> ${ac.birthDate}</div>
+                                  <div><span class="field">T.C. Kimlik No:</span> ${ac.tcNo}</div>
+                                  <div><span class="field">Branş / Şube:</span> ${ac.branch} / ${ac.sube}</div>
+                                </div>
+                              </div>
+                              <div class="section">
+                                <div class="section-title">2. VELİ / YASAL VASİ BİLGİLERİ</div>
+                                <div class="grid">
+                                  <div><span class="field">Adı Soyadı:</span> ${ac.parentName}</div>
+                                  <div><span class="field">Telefon:</span> ${ac.phone}</div>
+                                  <div><span class="field">E-posta:</span> ${ac.email}</div>
+                                </div>
+                              </div>
+                              <div class="section">
+                                <div class="section-title">3. TAAHHÜTNAME HÜKÜMLERİ VE VELİ BEYANI</div>
+                                <p class="legal">
+                                  1. Velisi bulunduğum yukarıda bilgileri yazılı sporcunun, kulübün düzenleyeceği tüm antrenmanlara, hazırlık ve resmi lig müsabakalarına katılmasına izin veriyorum. Sporcunun spor yapmasına engel olabilecek herhangi bir kardiyolojik, ortopedik veya kronik rahatsızlığı olmadığını beyan ederim.<br/>
+                                  2. 6698 sayılı KVKK kapsamında kişisel verilerimizin, sağlık beyanlarımızın ve acil durum iletişim bilgilerinin kulüp veri sorumlusu tarafından yasal sınırlar çerçevesinde işlenmesine ve saklanmasına onay veriyorum.<br/>
+                                  3. Sporcunun antrenmanlar sırasında tesis kurallarına ve antrenör direktiflerine uymakla yükümlü olduğunu kabul ederim.
+                                </p>
+                              </div>
+                              <div class="signature-box">
+                                <div style="font-weight: bold; color: #1e3a8a;">DİJİTAL ONAY VE İMZA GÜNLÜĞÜ</div>
+                                <div style="margin-top: 8px;">
+                                  <div>İmzalayan / Veli: <strong style="text-transform: uppercase;">${ac.signature || '(İMZALANMADI)'}</strong></div>
+                                  <div>Onay Tarihi: ${ac.signedAt || '(İMZALANMADI)'} | IP: ${ac.ipAddress || '-'}</div>
+                                  <div style="font-family: monospace; font-size: 10px; color: #64748b; margin-top: 4px;">Güvenlik Hash: ${ac.hash || '-'}</div>
+                                </div>
+                              </div>
+                              <div class="footer">SportsFly Spor Kulübü ve Akademi Yönetim Yazılımı • sporsepeti.com.tr</div>
+                              <script>
+                                window.onload = function() { window.print(); window.close(); }
+                              </script>
+                            </body>
+                          </html>
+                        `;
+                        printWindow.document.write(htmlContent);
+                        printWindow.document.close();
+                      }}
+                      className="p-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 min-h-[36px]"
+                      title="Sözleşmeyi Yazdır"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Yazdır</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        // Download Action
+                        const ac = selectedAthleteContract;
+                        const content = `SPORCU KAYIT TAAHHÜTNAMESİ VE DİJİTAL SÖZLEŞME ONAY BELGESİ\nReferans/ID: ${ac.id}\nOnay Tarihi: ${ac.signedAt || 'Mevcut Değil'}\nIP Adresi: ${ac.ipAddress || 'Mevcut Değil'}\nDoğrulama Özeti (Hash): ${ac.hash || 'Mevcut Değil'}\n--------------------------------------------------\n\n1. SPORCU BİLGİLERİ\nAdı Soyadı: ${ac.athleteName}\nDoğum Tarihi: ${ac.birthDate}\nT.C. Kimlik No: ${ac.tcNo}\nBranş: ${ac.branch}\nŞube/Tesis: ${ac.sube}\n\n2. VELİ / YASAL VASİ BİLGİLERİ\nAdı Soyadı: ${ac.parentName}\nTelefon: ${ac.phone}\nE-posta: ${ac.email}\n\n3. ONAYLANAN METİNLER VE MUVAFAKATLER\n[X] 6698 Sayılı KVKK Aydınlatma ve Açık Rıza Metni (ONAYLANDI)\n[X] Sporcu Kayıt Taahhütnamesi ve Veli İzin Belgesi (ONAYLANDI)\n[${ac.photoVideoApproved ? 'X' : ' '}] Tanıtım Amaçlı Fotoğraf ve Video Çekim İzni (${ac.photoVideoApproved ? 'ONAYLANDI' : 'RETTEDİLDİ'})\n\n4. VELİ BEYANI VE DİJİTAL İMZA\nMuvafakatname ve taahhütname metinlerinde yer alan tüm kuralları, hak ve yükümlülükleri okudum, anladım ve hür irademle kabul ediyorum.\n\nDijital İmza / Onaylayan: ${ac.signature}\n--------------------------------------------------\nBu belge, velinin SportsFly altyapısı üzerinden gerçekleştirdiği dijital onay günlüğü ve onay log kayıtları uyarınca otomatik üretilmiştir.\nSportsFly Spor Okulu ve Akademi Yönetim Platformu • sporsepeti.com.tr`;
+                        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `SportsFly_Sporcu_Sozlesmesi_${ac.athleteName.replace(/\s+/g, '_')}.txt`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                      }}
+                      className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all shadow-3xs cursor-pointer flex items-center gap-1.5 min-h-[36px]"
+                      title="Sözleşmeyi İndir (Metin)"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>İndir</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Profile Key Value Table */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Sporcu Ad Soyad:</span>
+                    <span className="font-bold text-slate-800">{selectedAthleteContract.athleteName}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Veli Ad Soyad:</span>
+                    <span className="font-bold text-slate-800">{selectedAthleteContract.parentName}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">T.C. Kimlik No:</span>
+                    <span className="font-sans tabular-nums text-slate-700">{selectedAthleteContract.tcNo || 'Belirtilmedi'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Doğum Tarihi:</span>
+                    <span className="text-slate-700 font-sans tabular-nums">{selectedAthleteContract.birthDate}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">İrtibat Telefon:</span>
+                    <span className="text-slate-700 font-sans tabular-nums">{selectedAthleteContract.phone}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">E-posta Adresi:</span>
+                    <span className="text-slate-700">{selectedAthleteContract.email || 'Belirtilmedi'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Kayıt Şube / Branş:</span>
+                    <span className="text-blue-700 font-bold">{selectedAthleteContract.sube} / {selectedAthleteContract.branch}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Sözleşme Durumu:</span>
+                    <span className={`font-bold ${selectedAthleteContract.status === 'Onaylandı' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                      {selectedAthleteContract.status === 'Onaylandı' ? '✓ Dijital Onay Tamamlandı' : 'X İmzalanması Bekleniyor'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Consent & Approval Checkboxes Visualizer */}
+                <div className="space-y-2 pt-1">
+                  <h4 className="font-bold text-slate-800 text-[11px] uppercase tracking-wider">
+                    Veli Dijital Onay ve Muvafakat Tercihleri:
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                        selectedAthleteContract.kvkkApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'
+                      }`}>
+                        <Check className="w-3 h-3 font-bold" />
+                      </div>
+                      <span className="text-slate-700 font-medium">KVKK Aydınlatma Metni</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                        selectedAthleteContract.taahhutnameApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'
+                      }`}>
+                        <Check className="w-3 h-3 font-bold" />
+                      </div>
+                      <span className="text-slate-700 font-medium">Sporcu Kayıt Taahhütnamesi</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-100 sm:col-span-2">
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                        selectedAthleteContract.photoVideoApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'
+                      }`}>
+                        <Check className="w-3 h-3 font-bold" />
+                      </div>
+                      <span className="text-slate-700 font-medium">Sosyal Medya Tanıtım Amaçlı Fotoğraf/Video Çekim İzni</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Secure Cryptographic Trust Seal / Digital Signature Logs */}
+                {selectedAthleteContract.status === 'Onaylandı' ? (
+                  <div className="p-4 rounded-xl bg-slate-900 text-white space-y-3 relative overflow-hidden border border-slate-800">
+                    {/* Glowing lock badge background */}
+                    <div className="absolute right-3 bottom-1.5 opacity-10">
+                      <ShieldCheck className="w-20 h-20 text-white" />
+                    </div>
+
+                    <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+                      <Fingerprint className="w-5 h-5 text-emerald-400" />
+                      <div>
+                        <h4 className="text-xs font-black text-white tracking-wide uppercase">
+                          Güvenli Elektronik İmza &amp; Onay Günlüğü
+                        </h4>
+                        <p className="text-[10px] text-slate-400">
+                          SportsFly Dijital Güvenlik Ağı Tarafından Doğrulanmıştır
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-[11px] font-mono leading-relaxed text-slate-300">
+                      <div>
+                        <span className="text-slate-500 block text-[9px] uppercase font-sans">ONAYLAYAN VELİ (DİJİTAL İMZA)</span>
+                        <span className="font-bold text-white uppercase tracking-wider">
+                          {selectedAthleteContract.signature}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block text-[9px] uppercase font-sans">ONAY TARİHİ VE SAATİ</span>
+                        <span className="font-bold text-white">
+                          {selectedAthleteContract.signedAt}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block text-[9px] uppercase font-sans">KULLANICI IP ADRESİ</span>
+                        <span className="font-semibold text-slate-200">
+                          {selectedAthleteContract.ipAddress}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block text-[9px] uppercase font-sans">İŞLEM DURUMU</span>
+                        <span className="font-bold text-emerald-400 flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>E-İMZALANDI (VERIFIED)</span>
+                        </span>
+                      </div>
+                      <div className="sm:col-span-2 pt-1 border-t border-slate-800">
+                        <span className="text-slate-500 block text-[9px] uppercase font-sans">DİJİTAL PARMAK İZİ ÖZETİ (SHA-256 HASH)</span>
+                        <span className="text-[10px] text-slate-400 select-all block break-all leading-normal">
+                          {selectedAthleteContract.hash}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-2 flex flex-col justify-center items-center text-center py-6">
+                    <Clock className="w-8 h-8 text-amber-500 animate-pulse" />
+                    <div>
+                      <h4 className="font-extrabold text-slate-800">Sözleşme Onayı Bekliyor</h4>
+                      <p className="text-slate-500 mt-0.5 max-w-sm">
+                        Bu sporcunun velisi henüz dijital kayıt taahhütnamesini imzalamamıştır. Veli, ön kayıt formu veya veli paneli üzerinden taahhütnameyi onayladığında dijital onay günlüğü bu alanda belirecektir.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="py-20 flex flex-col items-center justify-center text-center text-slate-500 space-y-3">
+                <FileSignature className="w-12 h-12 text-slate-300 animate-bounce" />
+                <div>
+                  <h3 className="font-bold text-slate-800">Sözleşme Seçilmedi</h3>
+                  <p className="text-xs text-slate-400 max-w-xs mx-auto">
+                    Sözleşme detaylarını, KVKK muvafakatlerini ve dijital e-imza günlüklerini görüntülemek için sol taraftaki listeden bir sporcu seçiniz.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

@@ -53,19 +53,6 @@ export const INITIAL_INTEGRATIONS: EntegrasyonItem[] = [
     targetPage: 'referans-programi',
     connectedAt: '24.09.2024',
   },
-  {
-    id: 'int-envanter',
-    name: 'Envanter & Malzeme Takibi',
-    category: 'Kulüp & Spor Modülleri',
-    description: 'Toplar, formalar, sağlık kitleri ve salon ekipmanlarının stok sayımı, zimmet atamaları ve kritik stok alarmları.',
-    logoUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=200&auto=format&fit=crop&q=80',
-    iconName: 'Boxes',
-    isRecommended: true,
-    isActive: true,
-    isInternalModule: true,
-    targetPage: 'envanter-yonetimi',
-    connectedAt: '10.02.2024',
-  },
 ];
 
 const INTEGRATIONS_STORAGE_KEY = 'sportsfly_integrations_list_v2';

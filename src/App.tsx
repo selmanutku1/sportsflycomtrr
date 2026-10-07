@@ -112,9 +112,7 @@ const ReferralProgramView = lazy(() =>
     default: m.ReferralProgramView,
   }))
 );
-const EntegrasyonlarView = lazy(() =>
-  import('./components/views/EntegrasyonlarView').then((m) => ({ default: m.EntegrasyonlarView }))
-);
+import { EntegrasyonlarView } from './components/views/EntegrasyonlarView';
 const PaketlerView = lazy(() =>
   import('./components/views/PaketlerView').then((m) => ({ default: m.PaketlerView }))
 );
@@ -123,6 +121,11 @@ const OnKayitView = lazy(() =>
 );
 const YetkilendirmelerView = lazy(() =>
   import('./components/views/YetkilendirmelerView').then((m) => ({ default: m.YetkilendirmelerView }))
+);
+const EpostaServisYapilandirmasiView = lazy(() =>
+  import('./components/views/EpostaServisYapilandirmasiView').then((m) => ({
+    default: m.EpostaServisYapilandirmasiView,
+  }))
 );
 const SubelerView = lazy(() =>
   import('./components/views/SubelerView').then((m) => ({ default: m.SubelerView }))
@@ -470,6 +473,11 @@ export default function App() {
         description:
           'Sporcu bazlı taksitli aidat planları ve online kredi kartı tahsilat yapılandırması.',
       },
+      'eposta-servis-yapilandirmasi': {
+        title: 'E-Posta Servis Yapılandırması (SMTP) | SportsFly',
+        description:
+          'Kullanıcı kayıt ve 2FA doğrulama e-postaları için SportsFly markalı SMTP sunucu ayarları ve şablon yönetimi.',
+      },
       entegrasyonlar: {
         title: 'Entegrasyonlar & Modüller | SportsFly',
         description:
@@ -636,6 +644,8 @@ export default function App() {
         return <EnvanterYonetimiView />;
       case 'referans-programi':
         return <ReferralProgramView onNavigate={handlePageSelect} />;
+      case 'eposta-servis-yapilandirmasi':
+        return <EpostaServisYapilandirmasiView />;
       case 'entegrasyonlar':
         return <EntegrasyonlarView onNavigate={handlePageSelect} />;
       case 'paketler':
