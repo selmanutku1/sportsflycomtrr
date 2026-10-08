@@ -67,7 +67,6 @@ import {
   sanitizeInputString,
   detectInjectionAttempt,
   recordSecurityAuditEvent,
-  getSecurityAuditEvents,
   secureFetch,
   secureStorageSet,
 } from '../utils/securityCore';
@@ -1156,16 +1155,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 </button>
               </div>
             )}
-            <button
-              onClick={() => {
-                const logs = getSecurityAuditEvents();
-                console.table(logs);
-                alert('Güvenlik logları konsola (F12) yazdırıldı. Detaylar için konsolu kontrol edin.');
-              }}
-              className="mt-2 text-[10px] font-bold text-slate-500 underline cursor-pointer"
-            >
-              Güvenlik Loglarını Konsola Yazdır
-            </button>
           </div>
         )}
 
