@@ -4748,9 +4748,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             </div>
           </div>
 
-          {/* Corporate Legal Disclaimer */}
-          <div className="pt-3 border-t border-slate-200/60 text-[9px] sm:text-[9.5px] leading-relaxed text-slate-400 font-semibold italic text-center">
-            Bu karnedeki teknik analizler ve ölçümler <strong className="text-slate-600 dark:text-slate-300 font-black uppercase">ROTA PERFORMANS</strong> tarafından gelişim takibi amacıyla hassasiyetle yapılmıştır; kesinlikle tıbbi tanı, teşhis, tedavi veya bir hekim raporu niteliği taşımamaktadır.
+          {/* Corporate Rota Performans Text */}
+          <div className="pt-3 border-t border-slate-200/60 text-[9.5px] sm:text-[10px] leading-relaxed text-slate-500 dark:text-slate-400 font-semibold italic text-center flex flex-wrap items-center justify-center gap-1.5">
+            <span>Bu karnedeki teknik analizler ve ölçümler</span>
+            <span className="inline-flex items-center gap-1 bg-gradient-to-r from-cyan-600 to-blue-700 text-white font-black text-[10px] px-2.5 py-0.5 rounded-full shadow-2xs not-italic uppercase tracking-wider">
+              ROTA PERFORMANS
+            </span>
+            <span>tarafından gelişim takibi amacıyla hassasiyetle yapılmıştır; kesinlikle tıbbi tanı, teşhis, tedavi veya bir hekim raporu niteliği taşımamaktadır.</span>
           </div>
         </div>
 

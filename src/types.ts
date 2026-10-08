@@ -508,7 +508,7 @@ export interface PackageLimits {
   maxManagers: number | 'Sınırsız';
   maxBranches: string;
   maxFacilities: number | 'Sınırsız';
-  reportCards: 'Yılda 2 Dönem' | 'Sınırsız';
+  reportCards: 'Yılda 2 Dönem' | '100 Sporcuya Kadar' | 'Sınırsız';
   whatsappDelivery: boolean;
   radarAnalytics: boolean;
   onlinePos: boolean;

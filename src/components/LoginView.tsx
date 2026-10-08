@@ -2312,13 +2312,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                   {[
                     {
                       name: 'Başlangıç Kulübü' as const,
-                      price: 1190,
+                      price: 2199,
                       subtitle: 'Tek şubeli, büyümekte olan butik spor okulları ve atölyeler için ideal.',
                       features: [
                         '100 Aktif Sporcuya Kadar',
                         'Mobil Uyumlu Hızlı Yoklama',
-                        'Temel Veli Bildirimleri (SMS/Mail)',
-                        'Sporcu Karnesi (Yılda 2 Dönem)',
+                        'Temel Veli Bildirimleri (SMS & Mail)',
                         'Standart Sporpuan Entegrasyonu',
                         '2 Antrenör & 1 Yönetici Hesabı',
                         'E-posta ile Teknik Destek',
@@ -2326,34 +2325,34 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     },
                     {
                       name: 'Kulüp & Akademi' as const,
-                      price: 2290,
+                      price: 3699,
                       tag: 'EN ÇOK TERCİH EDİLEN',
                       subtitle: 'Devamlılığı ödüllendirmek, kurumsal veli iletişimi ve çoklu branş yönetimi isteyenler için.',
                       features: [
                         '350 Aktif Sporcuya Kadar',
-                        'Gelişmiş Ödül Kataloğu Modülü',
-                        'Sınırsız Dijital Sporcu Karnesi',
-                        'Velilere WhatsApp Karnesi Gönderimi',
-                        'Performans Radar Grafikleri',
-                        'Aidat Takibi & Sanal POS Entegrasyonu',
+                        'Gelişmiş Sporpuan & Ödül Kataloğu Modülü',
+                        '100 Sporcuya Kadar Dijital Sporcu Karnesi',
+                        'Velilere Otomatik WhatsApp Karnesi Gönderimi',
+                        'Performans Radar Grafikleri ve Gelişim Analitiği',
+                        'Otomatik Aidat Takibi & Veli Borç Bildirimleri',
                         'Sınırsız Antrenör & Branş Hesabı',
-                        '7/24 Öncelikli Canlı Destek',
+                        '7/24 Öncelikli Canlı Destek & Kulüp Eğitimi',
                       ],
                     },
                     {
                       name: 'Pro Akademi & Çoklu Şube' as const,
-                      price: 3990,
+                      price: 0,
+                      isCustomQuote: true,
                       tag: 'MAKSİMUM GÜÇ',
                       subtitle: 'Birden fazla tesisi, yüzlerce sporcusu ve özel marka kimliği olan büyük kulüpler için.',
                       features: [
-                        'Sınırsız Sporcu & Şube / Tesis',
-                        'Branş Bazlı Eğitim Planlama',
-                        'Kendi Alan Adınız (White-Label)',
-                        'Kulübe Özel Ödül Havuzu',
-                        'Özel Formlar, Turnuva ve Kamp',
-                        'Gelişmiş Finans & Kasa Entegrasyonu',
-                        'Özel Müşteri Başarı Yöneticisi',
-                        'Yerinde Kurulum ve Taşıma Desteği',
+                        'Sınırsız Sporcu & Sınırsız Şube / Tesis',
+                        'Kendi Markanızla Web Sitesi & Özel Alan Adı (White-Label)',
+                        'Sanal POS & Online Kredi Kartı Tahsilat Entegrasyonu',
+                        'Özel Kulüp Mobil Uygulaması (iOS & Android)',
+                        'Kulübe Özel Sporpuan & Ödül Havuzu Yönetimi',
+                        'Gelişmiş Finans, Kasa ve Muhasebe Entegrasyonu',
+                        'Özel Müşteri Başarı Yöneticisi & Yerinde Kurulum Desteği',
                       ],
                     },
                   ].map((p) => {
@@ -2383,12 +2382,25 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                           </div>
 
                           <div className="text-center bg-slate-50 rounded-xl py-3 border border-slate-100">
-                            <span className="text-xl font-black text-blue-600">
-                              {displayPrice.toLocaleString('tr-TR')} TL
-                            </span>
-                            <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">
-                              {onboardingBillingCycle === 'yillik' ? 'Aylık (Yıllık faturalandırılır)' : 'aylık'}
-                            </span>
+                            {p.isCustomQuote ? (
+                              <>
+                                <span className="text-lg font-black text-blue-600 block">
+                                  Kurumsal Teklif
+                                </span>
+                                <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">
+                                  Kulübünüze Özel Kapsam
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-xl font-black text-blue-600">
+                                  {displayPrice.toLocaleString('tr-TR')} TL
+                                </span>
+                                <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">
+                                  {onboardingBillingCycle === 'yillik' ? 'Aylık (Yıllık faturalandırılır)' : 'aylık'}
+                                </span>
+                              </>
+                            )}
                           </div>
 
                           <ul className="space-y-1.5 text-[11px] text-slate-600">

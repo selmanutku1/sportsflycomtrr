@@ -76,6 +76,8 @@ export interface PackagePlanItem {
   tagText?: string;
   tagColor?: string;
   monthlyPrice: number;
+  customPriceTitle?: string;
+  customPriceSubtitle?: string;
   subtitle: string;
   ctaText: string;
   ctaVariant: 'light' | 'primary';
@@ -87,15 +89,14 @@ const OFFICIAL_PACKAGES: PackagePlanItem[] = [
   {
     id: 'baslangic-kulubu',
     name: 'Başlangıç Kulübü',
-    monthlyPrice: 1190,
+    monthlyPrice: 2199,
     subtitle: 'Tek şubeli, büyümekte olan butik spor okulları ve atölyeler için ideal.',
-    ctaText: '14 GÜN ÜCRETSİZ BAŞLA',
+    ctaText: 'HEMEN BAŞLA',
     ctaVariant: 'light',
     features: [
       '100 Aktif Sporcuya Kadar',
       'Mobil Uyumlu Hızlı Yoklama',
       'Temel Veli Bildirimleri (SMS & Mail)',
-      'Dijital Sporcu Karnesi (Yılda 2 Dönem)',
       'Standart Sporpuan Entegrasyonu',
       '2 Antrenör & 1 Yönetici Hesabı',
       'E-posta ile Teknik Destek',
@@ -107,17 +108,17 @@ const OFFICIAL_PACKAGES: PackagePlanItem[] = [
     name: 'Kulüp & Akademi',
     tagText: 'EN ÇOK TERCİH EDİLEN',
     tagColor: 'bg-blue-600 text-white',
-    monthlyPrice: 2290,
+    monthlyPrice: 3699,
     subtitle: 'Devamlılığı ödüllendirmek, kurumsal veli iletişimi ve çoklu branş yönetimi isteyenler için.',
-    ctaText: 'HEMEN DENEYİN',
+    ctaText: 'HEMEN BAŞLA',
     ctaVariant: 'primary',
     features: [
       '350 Aktif Sporcuya Kadar',
       'Gelişmiş Sporpuan & Ödül Kataloğu Modülü',
-      'Sınırsız Dijital Sporcu Karnesi Oluşturma',
+      '100 Sporcuya Kadar Dijital Sporcu Karnesi',
       'Velilere Otomatik WhatsApp Karnesi Gönderimi',
       'Performans Radar Grafikleri ve Gelişim Analitiği',
-      'Otomatik Aidat Takibi & Sanal POS Entegrasyonu',
+      'Otomatik Aidat Takibi & Veli Borç Bildirimleri',
       'Sınırsız Antrenör & Branş Hesabı',
       '7/24 Öncelikli Canlı Destek & Kulüp Eğitimi',
     ],
@@ -128,25 +129,26 @@ const OFFICIAL_PACKAGES: PackagePlanItem[] = [
     name: 'Pro Akademi & Çoklu Şube',
     tagText: 'MAKSİMUM GÜÇ',
     tagColor: 'bg-blue-600 text-white',
-    monthlyPrice: 3990,
+    monthlyPrice: 0,
+    customPriceTitle: 'Kurumsal Teklif',
+    customPriceSubtitle: 'Kulübünüze Özel Kapsam & Fiyatlandırma',
     subtitle: 'Birden fazla tesisi, yüzlerce sporcusu ve özel marka kimliği olan büyük kulüpler için.',
-    ctaText: 'KURUMSAL GÖRÜŞME AYARLA',
+    ctaText: 'KURUMSAL GÖRÜŞME',
     ctaVariant: 'light',
     features: [
       'Sınırsız Sporcu & Sınırsız Şube / Tesis',
-      'Branş Bazlı Eğitim Planlama & Yaş Kategorisi Müfredat Şablonları',
-      'Kendi Alan Adınız ve Özel Kulüp Mobil Uygulaması (White-Label)',
-      'Kulübe Özel Sporpuan Ödül Havuzu ve Sponsor Entegrasyonu',
-      'Özel Formlar, Turnuva ve Kamp Yönetimi',
+      'Kendi Markanızla Web Sitesi & Özel Alan Adı (White-Label)',
+      'Sanal POS & Online Kredi Kartı Tahsilat Entegrasyonu',
+      'Özel Kulüp Mobil Uygulaması (iOS & Android)',
+      'Kulübe Özel Sporpuan & Ödül Havuzu Yönetimi',
       'Gelişmiş Finans, Kasa ve Muhasebe Entegrasyonu',
-      'Özel Müşteri Başarı Yöneticisi',
-      'Yerinde Kurulum ve Veri Taşıma Desteği',
+      'Özel Müşteri Başarı Yöneticisi & Yerinde Kurulum Desteği',
     ],
     limits: PACKAGE_DETAILS['Pro Akademi & Çoklu Şube'].limits,
   },
 ];
 
-const PACKAGES_CUSTOM_STORAGE_KEY = 'sportsfly_packages_official_v3';
+const PACKAGES_CUSTOM_STORAGE_KEY = 'sportsfly_packages_official_v5';
 
 export const PaketlerView: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<'aylik' | 'yillik'>('aylik');
@@ -529,14 +531,25 @@ export const PaketlerView: React.FC = () => {
                     </p>
 
                     {/* Big Price Display */}
-                    <div className="flex items-baseline gap-1.5 pb-6 border-b border-slate-100">
-                      <span className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
-                        {getPriceFormatted(pkg.monthlyPrice).replace(' ₺', '')}
-                      </span>
-                      <span className="text-sm font-semibold text-slate-500">
-                        ₺ / ay
-                      </span>
-                    </div>
+                    {pkg.customPriceTitle ? (
+                      <div className="pb-6 border-b border-slate-100 min-h-[72px] flex flex-col justify-center">
+                        <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                          {pkg.customPriceTitle}
+                        </div>
+                        <p className="text-xs font-semibold text-slate-500 mt-1">
+                          {pkg.customPriceSubtitle || 'Kulübünüze Özel Kapsam & Fiyatlandırma'}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex items-baseline gap-1.5 pb-6 border-b border-slate-100 min-h-[72px]">
+                        <span className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
+                          {getPriceFormatted(pkg.monthlyPrice).replace(' ₺', '')}
+                        </span>
+                        <span className="text-sm font-semibold text-slate-500">
+                          ₺ / ay
+                        </span>
+                      </div>
+                    )}
 
                     {/* Feature Section Header */}
                     <div className="pt-6 mb-4">
