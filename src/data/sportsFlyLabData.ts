@@ -1347,11 +1347,14 @@ export function archiveBatchLabReports(
 
 /**
  * Sample multi-athlete rows for Batch Excel Template and 1-Click Sample Batch Testing
+ * Fully aligned with current 7-page SportsFly Lab report card content (Anthropometry, Heath-Carter Somatotype change table, Motor tests, PACER, PHV, Score progression, Trainer notes).
  */
 export const SAMPLE_BATCH_ATHLETE_ROWS: Record<string, string | number>[] = [
   {
     Sporcu_Adi: 'Ege Örnektir',
     Sporcu_Kodu: 'SF-2026-101',
+    Kulup_Adi: 'ATAŞEHİR SPOR OKULLARI',
+    Sube: 'Ataşehir Merkez',
     Brans: 'Voleybol / Çoklu Branş Gelişim',
     Cinsiyet: 'Erkek',
     Yas: 11.4,
@@ -1370,35 +1373,73 @@ export const SAMPLE_BATCH_ATHLETE_ROWS: Record<string, string | number>[] = [
     Yag_Yuzdesi_1: 24.4,
     Yag_Yuzdesi_2: 22.8,
     Yag_Yuzdesi_3: 20.6,
+    Subscapula_3: 9.2,
+    Triceps_3: 17.0,
+    Calf_DKK_3: 30.0,
+    Supraspinal_3: 19.2,
+    Humerus_3: 6.2,
+    Femur_3: 9.1,
+    Calf_Cevre_3: 31.1,
+    Biceps_Cevre_3: 22.3,
+    Oturma_Boyu_3: 78.5,
+    Kulac_3: 151.3,
     Surat_1: 4.12,
     Surat_2: 3.95,
     Surat_3: 3.82,
     Cabukluk_1: 22.4,
     Cabukluk_2: 20.1,
     Cabukluk_3: 19.2,
+    Reaksiyon_3: 11.7,
     Sirt_Kuvveti_3: 45.0,
     Kavrama_Kuvveti_3: 24.5,
     Durarak_Uzun_Atlama_3: 154,
     Dikey_Sicrama_3: 29.5,
+    Denge_3: 19,
     Esneklik_3: 41.0,
     VO2max_3: 38.4,
     PACER_Mesafe_1: 360,
     PACER_Mesafe_2: 440,
     PACER_Mesafe_3: 540,
+    PACER_Mekik_3: 27,
+    Endomorfi_1: 4.5,
+    Endomorfi_2: 4.1,
+    Endomorfi_3: 3.8,
     Endomorfi: 3.8,
+    Mezomorfi_1: 4.1,
+    Mezomorfi_2: 4.4,
+    Mezomorfi_3: 4.6,
     Mezomorfi: 4.6,
+    Ektomorfi_1: 2.3,
+    Ektomorfi_2: 2.6,
+    Ektomorfi_3: 2.9,
     Ektomorfi: 2.9,
+    Somatotip_Kategorisi: 'Endomorfik Mezomorf',
+    Elit_Referans_Endo: 3.9,
+    Elit_Referans_Mezo: 2.2,
+    Elit_Referans_Ekto: 3.4,
+    Elit_Referans_Puan: 82,
+    Elit_Brans: 'Elit Voleybol',
     PHV_Yasi: 13.8,
     PHV_Boyu: 163.5,
     Tahmini_18_Yas_Boyu: 181.2,
+    Olgunlasma_Durumu: 'Geç Ergen (Normal Büyüme Hızı)',
+    Skor_P1: 64,
+    Skor_P2: 70,
+    Skor_P3: 76,
     Genel_Performans_Puani: 76,
     Brans_Referans_Puani: 82,
+    BMR: 1291,
+    MET: 11,
+    Maksimum_Kalp_Hizi: 209,
+    Anaerobik_Guc_Watt: 365,
     Uzman_Gorusu:
-      'Ege 3. ölçüm döneminde patlayıcı dikey sıçrama ve 20m sürat parametrelerinde belirgin ivme yakalamıştır. PHV öncesi koordinasyon penceresi verimli kullanılmaktadır.',
+      'Ege 3. ölçüm döneminde patlayıcı dikey sıçrama ve 20m sürat parametrelerinde belirgin ivme yakalamıştır. Heath-Carter değişim tablosunda mezomorfi artışı ve yağ oranı düşüşü olumludur.',
   },
   {
     Sporcu_Adi: 'Kerem Yılmaz',
     Sporcu_Kodu: 'SF-2026-102',
+    Kulup_Adi: 'ATAŞEHİR SPOR OKULLARI',
+    Sube: 'Ataşehir Merkez',
     Brans: 'Futbol / U12 Elit Akademi',
     Cinsiyet: 'Erkek',
     Yas: 11.8,
@@ -1417,35 +1458,73 @@ export const SAMPLE_BATCH_ATHLETE_ROWS: Record<string, string | number>[] = [
     Yag_Yuzdesi_1: 16.8,
     Yag_Yuzdesi_2: 15.9,
     Yag_Yuzdesi_3: 14.8,
+    Subscapula_3: 7.8,
+    Triceps_3: 13.5,
+    Calf_DKK_3: 22.0,
+    Supraspinal_3: 14.0,
+    Humerus_3: 6.0,
+    Femur_3: 8.9,
+    Calf_Cevre_3: 31.8,
+    Biceps_Cevre_3: 22.8,
+    Oturma_Boyu_3: 79.5,
+    Kulac_3: 153.2,
     Surat_1: 3.88,
     Surat_2: 3.74,
     Surat_3: 3.61,
     Cabukluk_1: 19.8,
     Cabukluk_2: 18.6,
     Cabukluk_3: 17.7,
+    Reaksiyon_3: 10.9,
     Sirt_Kuvveti_3: 48.5,
     Kavrama_Kuvveti_3: 26.2,
     Durarak_Uzun_Atlama_3: 168,
     Dikey_Sicrama_3: 33.0,
+    Denge_3: 22,
     Esneklik_3: 39.5,
     VO2max_3: 44.2,
     PACER_Mesafe_1: 520,
     PACER_Mesafe_2: 640,
     PACER_Mesafe_3: 780,
+    PACER_Mekik_3: 39,
+    Endomorfi_1: 3.2,
+    Endomorfi_2: 2.8,
+    Endomorfi_3: 2.4,
     Endomorfi: 2.4,
+    Mezomorfi_1: 4.6,
+    Mezomorfi_2: 4.9,
+    Mezomorfi_3: 5.1,
     Mezomorfi: 5.1,
+    Ektomorfi_1: 3.0,
+    Ektomorfi_2: 3.2,
+    Ektomorfi_3: 3.4,
     Ektomorfi: 3.4,
+    Somatotip_Kategorisi: 'Dengeli Mezomorf',
+    Elit_Referans_Endo: 2.5,
+    Elit_Referans_Mezo: 4.9,
+    Elit_Referans_Ekto: 2.8,
+    Elit_Referans_Puan: 84,
+    Elit_Brans: 'Elit Futbol',
     PHV_Yasi: 13.6,
     PHV_Boyu: 164.0,
     Tahmini_18_Yas_Boyu: 179.8,
+    Olgunlasma_Durumu: 'Normal Büyüme Hızı (Zamanında)',
+    Skor_P1: 72,
+    Skor_P2: 79,
+    Skor_P3: 85,
     Genel_Performans_Puani: 85,
     Brans_Referans_Puani: 84,
+    BMR: 1315,
+    MET: 12.6,
+    Maksimum_Kalp_Hizi: 208,
+    Anaerobik_Guc_Watt: 412,
     Uzman_Gorusu:
       'Kerem aerobik kapasite (VO2max 44.2 ml/kg/dk), 10x5m çabukluk ve 20m sprint değerlerinde yaş grubu elit futbol normlarının üzerine çıkmıştır.',
   },
   {
     Sporcu_Adi: 'Zeynep Kaya',
     Sporcu_Kodu: 'SF-2026-103',
+    Kulup_Adi: 'ATAŞEHİR SPOR OKULLARI',
+    Sube: 'Ataşehir Merkez',
     Brans: 'Yüzme / Olimpik Hazırlık',
     Cinsiyet: 'Kadın',
     Yas: 11.2,
@@ -1464,35 +1543,73 @@ export const SAMPLE_BATCH_ATHLETE_ROWS: Record<string, string | number>[] = [
     Yag_Yuzdesi_1: 18.2,
     Yag_Yuzdesi_2: 17.5,
     Yag_Yuzdesi_3: 16.9,
+    Subscapula_3: 8.5,
+    Triceps_3: 14.8,
+    Calf_DKK_3: 24.5,
+    Supraspinal_3: 15.2,
+    Humerus_3: 5.8,
+    Femur_3: 8.7,
+    Calf_Cevre_3: 31.0,
+    Biceps_Cevre_3: 21.9,
+    Oturma_Boyu_3: 80.2,
+    Kulac_3: 157.8,
     Surat_1: 3.96,
     Surat_2: 3.84,
     Surat_3: 3.72,
     Cabukluk_1: 20.5,
     Cabukluk_2: 19.3,
     Cabukluk_3: 18.5,
+    Reaksiyon_3: 11.2,
     Sirt_Kuvveti_3: 46.0,
     Kavrama_Kuvveti_3: 25.4,
     Durarak_Uzun_Atlama_3: 161,
     Dikey_Sicrama_3: 31.0,
+    Denge_3: 25,
     Esneklik_3: 46.5,
     VO2max_3: 45.8,
     PACER_Mesafe_1: 540,
     PACER_Mesafe_2: 680,
     PACER_Mesafe_3: 820,
+    PACER_Mekik_3: 41,
+    Endomorfi_1: 3.4,
+    Endomorfi_2: 3.0,
+    Endomorfi_3: 2.6,
     Endomorfi: 2.6,
+    Mezomorfi_1: 4.3,
+    Mezomorfi_2: 4.6,
+    Mezomorfi_3: 4.8,
     Mezomorfi: 4.8,
+    Ektomorfi_1: 3.2,
+    Ektomorfi_2: 3.5,
+    Ektomorfi_3: 3.7,
     Ektomorfi: 3.7,
+    Somatotip_Kategorisi: 'Mezomorfik Ektomorf',
+    Elit_Referans_Endo: 2.2,
+    Elit_Referans_Mezo: 4.4,
+    Elit_Referans_Ekto: 3.8,
+    Elit_Referans_Puan: 85,
+    Elit_Brans: 'Elit Yüzme',
     PHV_Yasi: 12.3,
     PHV_Boyu: 159.5,
     Tahmini_18_Yas_Boyu: 173.4,
+    Olgunlasma_Durumu: 'Erken Büyüme Atağı (PHV Öncesi)',
+    Skor_P1: 76,
+    Skor_P2: 83,
+    Skor_P3: 88,
     Genel_Performans_Puani: 88,
     Brans_Referans_Puani: 85,
+    BMR: 1285,
+    MET: 13.1,
+    Maksimum_Kalp_Hizi: 209,
+    Anaerobik_Guc_Watt: 388,
     Uzman_Gorusu:
-      'Zeynep kulaç açıklığı, gövde esnekliği (46.5 cm) ve kardiyorespiratuar dayanıklılıkta üst yüzdelik dilimde yer almaktadır. PHV büyüme atağı dönemine yaklaşmaktadır.',
+      'Zeynep kulaç açıklığı (157.8 cm), gövde esnekliği (46.5 cm) ve kardiyorespiratuar dayanıklılıkta üst dilimdedir. Biyolojik olgunlaşma takibi periyodik yapılmalıdır.',
   },
   {
     Sporcu_Adi: 'Arda Demir',
     Sporcu_Kodu: 'SF-2026-104',
+    Kulup_Adi: 'ATAŞEHİR SPOR OKULLARI',
+    Sube: 'Ataşehir Merkez',
     Brans: 'Basketbol / Altyapı Performans',
     Cinsiyet: 'Erkek',
     Yas: 12.1,
@@ -1511,35 +1628,73 @@ export const SAMPLE_BATCH_ATHLETE_ROWS: Record<string, string | number>[] = [
     Yag_Yuzdesi_1: 19.4,
     Yag_Yuzdesi_2: 18.2,
     Yag_Yuzdesi_3: 17.1,
+    Subscapula_3: 9.8,
+    Triceps_3: 15.2,
+    Calf_DKK_3: 25.0,
+    Supraspinal_3: 16.5,
+    Humerus_3: 6.4,
+    Femur_3: 9.5,
+    Calf_Cevre_3: 33.2,
+    Biceps_Cevre_3: 24.1,
+    Oturma_Boyu_3: 84.8,
+    Kulac_3: 168.0,
     Surat_1: 3.92,
     Surat_2: 3.79,
     Surat_3: 3.68,
     Cabukluk_1: 20.2,
     Cabukluk_2: 19.1,
     Cabukluk_3: 18.3,
+    Reaksiyon_3: 11.5,
     Sirt_Kuvveti_3: 52.0,
     Kavrama_Kuvveti_3: 28.4,
     Durarak_Uzun_Atlama_3: 174,
     Dikey_Sicrama_3: 35.5,
+    Denge_3: 21,
     Esneklik_3: 38.0,
     VO2max_3: 41.6,
     PACER_Mesafe_1: 480,
     PACER_Mesafe_2: 580,
     PACER_Mesafe_3: 700,
+    PACER_Mekik_3: 35,
+    Endomorfi_1: 3.3,
+    Endomorfi_2: 2.9,
+    Endomorfi_3: 2.5,
     Endomorfi: 2.5,
+    Mezomorfi_1: 4.2,
+    Mezomorfi_2: 4.5,
+    Mezomorfi_3: 4.7,
     Mezomorfi: 4.7,
+    Ektomorfi_1: 3.4,
+    Ektomorfi_2: 3.7,
+    Ektomorfi_3: 3.9,
     Ektomorfi: 3.9,
+    Somatotip_Kategorisi: 'Mezomorfik Ektomorf',
+    Elit_Referans_Endo: 2.3,
+    Elit_Referans_Mezo: 4.2,
+    Elit_Referans_Ekto: 4.1,
+    Elit_Referans_Puan: 83,
+    Elit_Brans: 'Elit Basketbol',
     PHV_Yasi: 13.9,
     PHV_Boyu: 174.0,
     Tahmini_18_Yas_Boyu: 192.5,
+    Olgunlasma_Durumu: 'Geç Büyüme Atağı (Yüksek Boy Potansiyeli)',
+    Skor_P1: 69,
+    Skor_P2: 76,
+    Skor_P3: 82,
     Genel_Performans_Puani: 82,
     Brans_Referans_Puani: 83,
+    BMR: 1420,
+    MET: 11.9,
+    Maksimum_Kalp_Hizi: 208,
+    Anaerobik_Guc_Watt: 456,
     Uzman_Gorusu:
       'Arda uzun boy projeksiyonu (192.5 cm) ve dikey sıçrama (35.5 cm) kapasitesiyle basketbol branşı için yüksek potansiyel taşımaktadır. Hamstring esnekliği desteklenmelidir.',
   },
   {
     Sporcu_Adi: 'Elif Şahin',
     Sporcu_Kodu: 'SF-2026-105',
+    Kulup_Adi: 'ATAŞEHİR SPOR OKULLARI',
+    Sube: 'Ataşehir Merkez',
     Brans: 'Tenis / Performans Grubu',
     Cinsiyet: 'Kadın',
     Yas: 10.9,
@@ -1558,35 +1713,73 @@ export const SAMPLE_BATCH_ATHLETE_ROWS: Record<string, string | number>[] = [
     Yag_Yuzdesi_1: 19.8,
     Yag_Yuzdesi_2: 18.9,
     Yag_Yuzdesi_3: 18.0,
+    Subscapula_3: 8.2,
+    Triceps_3: 14.1,
+    Calf_DKK_3: 23.0,
+    Supraspinal_3: 14.8,
+    Humerus_3: 5.5,
+    Femur_3: 8.4,
+    Calf_Cevre_3: 29.8,
+    Biceps_Cevre_3: 21.0,
+    Oturma_Boyu_3: 76.8,
+    Kulac_3: 148.5,
     Surat_1: 4.05,
     Surat_2: 3.89,
     Surat_3: 3.75,
     Cabukluk_1: 19.6,
     Cabukluk_2: 18.4,
     Cabukluk_3: 17.6,
+    Reaksiyon_3: 10.8,
     Sirt_Kuvveti_3: 41.5,
     Kavrama_Kuvveti_3: 24.8,
     Durarak_Uzun_Atlama_3: 152,
     Dikey_Sicrama_3: 28.5,
+    Denge_3: 24,
     Esneklik_3: 43.5,
     VO2max_3: 40.5,
     PACER_Mesafe_1: 420,
     PACER_Mesafe_2: 520,
     PACER_Mesafe_3: 640,
+    PACER_Mekik_3: 32,
+    Endomorfi_1: 3.5,
+    Endomorfi_2: 3.1,
+    Endomorfi_3: 2.8,
     Endomorfi: 2.8,
+    Mezomorfi_1: 4.1,
+    Mezomorfi_2: 4.3,
+    Mezomorfi_3: 4.5,
     Mezomorfi: 4.5,
+    Ektomorfi_1: 2.8,
+    Ektomorfi_2: 3.1,
+    Ektomorfi_3: 3.3,
     Ektomorfi: 3.3,
+    Somatotip_Kategorisi: 'Endomorfik Mezomorf',
+    Elit_Referans_Endo: 2.8,
+    Elit_Referans_Mezo: 4.2,
+    Elit_Referans_Ekto: 3.4,
+    Elit_Referans_Puan: 80,
+    Elit_Brans: 'Elit Tenis',
     PHV_Yasi: 12.1,
     PHV_Boyu: 156.0,
     Tahmini_18_Yas_Boyu: 169.8,
+    Olgunlasma_Durumu: 'Zamanında (Normal)',
+    Skor_P1: 67,
+    Skor_P2: 74,
+    Skor_P3: 79,
     Genel_Performans_Puani: 79,
     Brans_Referans_Puani: 80,
+    BMR: 1205,
+    MET: 11.6,
+    Maksimum_Kalp_Hizi: 209,
+    Anaerobik_Guc_Watt: 342,
     Uzman_Gorusu:
-      'Elif yanal yön değiştirme (10x5m çabukluk: 17.6 sn) ve dominant el kavrama kuvvetinde tenis branşı gereksinimlerini başarıyla karşılamaktadır.',
+      'Elif yanal yön değiştirme (10x5m çabukluk: 17.6 sn) ve dominant el kavrama kuvvetinde tenis branşı gereksinimlerini karşılamaktadır.',
   },
   {
     Sporcu_Adi: 'Canberk Aydın',
     Sporcu_Kodu: 'SF-2026-106',
+    Kulup_Adi: 'ATAŞEHİR SPOR OKULLARI',
+    Sube: 'Ataşehir Merkez',
     Brans: 'Atletizm / Sprint & Sıçrama',
     Cinsiyet: 'Erkek',
     Yas: 11.6,
@@ -1605,34 +1798,69 @@ export const SAMPLE_BATCH_ATHLETE_ROWS: Record<string, string | number>[] = [
     Yag_Yuzdesi_1: 15.6,
     Yag_Yuzdesi_2: 14.8,
     Yag_Yuzdesi_3: 13.9,
+    Subscapula_3: 7.2,
+    Triceps_3: 12.8,
+    Calf_DKK_3: 20.5,
+    Supraspinal_3: 13.2,
+    Humerus_3: 6.1,
+    Femur_3: 9.0,
+    Calf_Cevre_3: 32.0,
+    Biceps_Cevre_3: 23.0,
+    Oturma_Boyu_3: 79.2,
+    Kulac_3: 154.0,
     Surat_1: 3.82,
     Surat_2: 3.68,
     Surat_3: 3.54,
     Cabukluk_1: 19.4,
     Cabukluk_2: 18.3,
     Cabukluk_3: 17.5,
+    Reaksiyon_3: 10.6,
     Sirt_Kuvveti_3: 47.0,
     Kavrama_Kuvveti_3: 25.8,
     Durarak_Uzun_Atlama_3: 178,
     Dikey_Sicrama_3: 36.0,
+    Denge_3: 20,
     Esneklik_3: 42.0,
     VO2max_3: 42.8,
     PACER_Mesafe_1: 480,
     PACER_Mesafe_2: 600,
     PACER_Mesafe_3: 720,
+    PACER_Mekik_3: 36,
+    Endomorfi_1: 2.7,
+    Endomorfi_2: 2.4,
+    Endomorfi_3: 2.1,
     Endomorfi: 2.1,
+    Mezomorfi_1: 4.8,
+    Mezomorfi_2: 5.1,
+    Mezomorfi_3: 5.3,
     Mezomorfi: 5.3,
+    Ektomorfi_1: 3.1,
+    Ektomorfi_2: 3.3,
+    Ektomorfi_3: 3.5,
     Ektomorfi: 3.5,
+    Somatotip_Kategorisi: 'Dengeli Mezomorf',
+    Elit_Referans_Endo: 2.0,
+    Elit_Referans_Mezo: 5.2,
+    Elit_Referans_Ekto: 3.2,
+    Elit_Referans_Puan: 85,
+    Elit_Brans: 'Elit Atletizm',
     PHV_Yasi: 13.7,
     PHV_Boyu: 165.0,
     Tahmini_18_Yas_Boyu: 182.0,
+    Olgunlasma_Durumu: 'Normal Büyüme Hızı',
+    Skor_P1: 75,
+    Skor_P2: 82,
+    Skor_P3: 89,
     Genel_Performans_Puani: 89,
     Brans_Referans_Puani: 85,
+    BMR: 1300,
+    MET: 12.2,
+    Maksimum_Kalp_Hizi: 208,
+    Anaerobik_Guc_Watt: 425,
     Uzman_Gorusu:
-      'Canberk 20m sürat (3.54 sn), durarak uzun atlama (178 cm) ve dikey sıçrama (36.0 cm) testlerinde yüksek patlayıcı güç profili sergilemektedir.',
+      'Canberk 20m sürat (3.54 sn), durarak uzun atlama (178 cm) ve dikey sıçrama (36.0 cm) testlerinde yüksek patlayıcı güç sergilemektedir.',
   },
 ];
-
 
 /**
  * Creates a brand-new 7-page SportsFlyLabReport and automatically applies
@@ -1666,19 +1894,115 @@ export function createNewLabReportWithBranding(params: {
 }
 
 /**
- * Downloads a comprehensive 2-sheet Excel template (.xlsx) so the user can either:
- * 1) Fill out the "Parametre_Tablosu" sheet for an athlete (exact match to the PDF structure)
- * 2) Fill out the "Toplu_Sporcu_Listesi" sheet with multiple athletes (1 row per athlete)
+ * Helper to build an athlete flat row matching all current karne fields
+ */
+function buildAthleteFlatRow(rep: SportsFlyLabReport, activeBranding: SportsFlyLabSchoolBranding): Record<string, string | number> {
+  const getB = (id: string, period: 'm1' | 'm2' | 'm3', fallback: number) =>
+    rep.bodyComposition.find((x) => x.id === id)?.[period] ?? fallback;
+  const getM = (id: string, period: 'm1' | 'm2' | 'm3', fallback: number) =>
+    rep.motorPerformance.find((x) => x.id === id)?.[period] ?? fallback;
+
+  return {
+    Sporcu_Adi: rep.athleteName,
+    Sporcu_Kodu: rep.athleteCode,
+    Kulup_Adi: activeBranding.schoolName || rep.clubName,
+    Sube: activeBranding.branchName || rep.branchName,
+    Brans: rep.sportBranch,
+    Cinsiyet: rep.gender,
+    Yas: rep.ageYears,
+    Olcum_1_Tarihi: rep.date1,
+    Olcum_2_Tarihi: rep.date2,
+    Olcum_3_Tarihi: rep.date3,
+    Boy_1: getB('height', 'm1', 142.6),
+    Boy_2: getB('height', 'm2', 146.1),
+    Boy_3: getB('height', 'm3', 149.5),
+    Agirlik_1: getB('weight', 'm1', 40.3),
+    Agirlik_2: getB('weight', 'm2', 41.2),
+    Agirlik_3: getB('weight', 'm3', 43.2),
+    BKI_1: getB('bmi', 'm1', 19.82),
+    BKI_2: getB('bmi', 'm2', 19.3),
+    BKI_3: getB('bmi', 'm3', 19.33),
+    Yag_Yuzdesi_1: getB('body_fat', 'm1', 24.4),
+    Yag_Yuzdesi_2: getB('body_fat', 'm2', 22.8),
+    Yag_Yuzdesi_3: getB('body_fat', 'm3', 20.6),
+    Subscapula_3: getB('subscapula', 'm3', 9.2),
+    Triceps_3: getB('triceps', 'm3', 17.0),
+    Calf_DKK_3: getB('calf_skf', 'm3', 30.0),
+    Supraspinal_3: getB('supraspinal', 'm3', 19.2),
+    Humerus_3: getB('humerus', 'm3', 6.2),
+    Femur_3: getB('femur', 'm3', 9.1),
+    Calf_Cevre_3: getB('calf_girth', 'm3', 31.1),
+    Biceps_Cevre_3: getB('biceps_girth', 'm3', 22.3),
+    Oturma_Boyu_3: rep.sittingHeight || getB('sitting_height', 'm3', 78.5),
+    Kulac_3: getB('arm_span', 'm3', 151.3),
+    Surat_1: getM('sprint', 'm1', 4.12),
+    Surat_2: getM('sprint', 'm2', 3.95),
+    Surat_3: getM('sprint', 'm3', 3.82),
+    Cabukluk_1: getM('agility', 'm1', 22.4),
+    Cabukluk_2: getM('agility', 'm2', 20.1),
+    Cabukluk_3: getM('agility', 'm3', 19.2),
+    Reaksiyon_3: getM('reaction', 'm3', 11.7),
+    Sirt_Kuvveti_3: getM('back_strength', 'm3', 45.0),
+    Kavrama_Kuvveti_3: getM('grip_strength', 'm3', 24.5),
+    Durarak_Uzun_Atlama_3: getM('standing_long_jump', 'm3', 154),
+    Dikey_Sicrama_3: getM('vertical_jump', 'm3', 29.5),
+    Denge_3: getM('balance', 'm3', 19),
+    Esneklik_3: getM('flexibility', 'm3', 41.0),
+    VO2max_3: getM('aerobic', 'm3', 38.4),
+    PACER_Mesafe_1: rep.cardio.test1Distance || 360,
+    PACER_Mesafe_2: rep.cardio.test2Distance || 440,
+    PACER_Mesafe_3: rep.cardio.test3Distance || 540,
+    PACER_Mekik_3: rep.cardio.test3Shuttles || 27,
+    Endomorfi_1: rep.somatotype.m1.endo,
+    Endomorfi_2: rep.somatotype.m2.endo,
+    Endomorfi_3: rep.somatotype.m3.endo,
+    Endomorfi: rep.somatotype.m3.endo,
+    Mezomorfi_1: rep.somatotype.m1.meso,
+    Mezomorfi_2: rep.somatotype.m2.meso,
+    Mezomorfi_3: rep.somatotype.m3.meso,
+    Mezomorfi: rep.somatotype.m3.meso,
+    Ektomorfi_1: rep.somatotype.m1.ecto,
+    Ektomorfi_2: rep.somatotype.m2.ecto,
+    Ektomorfi_3: rep.somatotype.m3.ecto,
+    Ektomorfi: rep.somatotype.m3.ecto,
+    Somatotip_Kategorisi: rep.somatotype.m3.category,
+    Elit_Referans_Endo: rep.somatotype.eliteRef.endo,
+    Elit_Referans_Mezo: rep.somatotype.eliteRef.meso,
+    Elit_Referans_Ekto: rep.somatotype.eliteRef.ecto,
+    Elit_Referans_Puan: rep.somatotype.eliteRef.refScore,
+    Elit_Brans: rep.somatotype.eliteRef.sport,
+    PHV_Yasi: rep.phvAge,
+    PHV_Boyu: rep.phvHeight,
+    Tahmini_18_Yas_Boyu: rep.predictedAdultHeight,
+    Olgunlasma_Durumu: rep.maturationStatus || 'Normal Büyüme Hızı',
+    Skor_P1: rep.scoreHistory.p1Score,
+    Skor_P2: rep.scoreHistory.p2Score,
+    Skor_P3: rep.scoreHistory.p3Score,
+    Genel_Performans_Puani: rep.scoreHistory.p3Score,
+    Brans_Referans_Puani: rep.somatotype.eliteRef.refScore,
+    BMR: rep.cardio.basalMetabolicRate || 1291,
+    MET: rep.cardio.functionalCapacityMet || 11,
+    Maksimum_Kalp_Hizi: rep.cardio.maxHeartRate || 209,
+    Anaerobik_Guc_Watt: rep.cardio.verticalJumpAnaerobicWatt || 365,
+    Uzman_Gorusu: rep.expertComment || '',
+  };
+}
+
+/**
+ * Downloads a comprehensive 3-sheet Excel template (.xlsx) strictly reflecting the CURRENT report card content:
+ * 1) "Parametre_Bazli_Karne": Vertical parameter table of all 7 sections (Anthropometry, Somatotype change table, Motor tests, PACER, PHV, Score history, Notes)
+ * 2) "Toplu_Sporcu_Listesi": Multi-athlete row table (1 row = 1 athlete) pre-populated with active athlete and sample rows
+ * 3) "Sutun_Rehberi_ve_Normlar": Explanatory guide detailing units, norms, and formats
  */
 export function downloadSportsFlyLabExcelTemplate(currentReport: SportsFlyLabReport): void {
   const wb = XLSX.utils.book_new();
   const activeBranding = getStoredLabSchoolBranding();
   const brandedCurrent = applyBrandingToReport(currentReport, activeBranding);
 
-  // Sheet 1: Detailed Parameter Sheet for the active athlete (very easy to edit!)
+  // Sheet 1: Detailed Parameter Sheet for the active athlete (matches current 7-page report structure)
   const paramRows: Record<string, string | number>[] = [
     {
-      Kategori: 'SPORCU BİLGİLERİ',
+      Kategori: 'SPORCU GENEL BİLGİLERİ',
       Parametre_Kodu: 'athlete_info',
       Parametre_Adi: brandedCurrent.athleteName,
       Birim: brandedCurrent.sportBranch,
@@ -1691,7 +2015,7 @@ export function downloadSportsFlyLabExcelTemplate(currentReport: SportsFlyLabRep
       Beklenen_Hedef: brandedCurrent.predictedAdultHeight,
     },
     ...currentReport.bodyComposition.map((row) => ({
-      Kategori: '1. BEDEN KOMPOZİSYONU',
+      Kategori: '1. ANTROPOMETRİ VE BEDEN KOMPOZİSYONU',
       Parametre_Kodu: row.id,
       Parametre_Adi: row.name,
       Birim: row.unit,
@@ -1703,12 +2027,52 @@ export function downloadSportsFlyLabExcelTemplate(currentReport: SportsFlyLabRep
       Durum: row.status,
       Beklenen_Hedef: row.refMid,
     })),
+    // Somatotype Heath-Carter Change Table (Only Change Table, no radar/2D)
+    {
+      Kategori: '2. HEATH-CARTER SOMATOTİP DEĞİŞİM TABLOSU',
+      Parametre_Kodu: 'somatotype_endo',
+      Parametre_Adi: 'Endomorfi (Göreceli Yağlılık)',
+      Birim: 'Puan',
+      Olcum_1: currentReport.somatotype.m1.endo,
+      Olcum_2: currentReport.somatotype.m2.endo,
+      Olcum_3: currentReport.somatotype.m3.endo,
+      Yuzdelik: currentReport.somatotype.eliteRef.refScore,
+      SD_Skoru: Number((currentReport.somatotype.m3.endo - currentReport.somatotype.m1.endo).toFixed(2)),
+      Durum: currentReport.somatotype.m3.category,
+      Beklenen_Hedef: currentReport.somatotype.eliteRef.endo,
+    },
+    {
+      Kategori: '2. HEATH-CARTER SOMATOTİP DEĞİŞİM TABLOSU',
+      Parametre_Kodu: 'somatotype_meso',
+      Parametre_Adi: 'Mezomorfi (Kas-İskelet Gelişimi)',
+      Birim: 'Puan',
+      Olcum_1: currentReport.somatotype.m1.meso,
+      Olcum_2: currentReport.somatotype.m2.meso,
+      Olcum_3: currentReport.somatotype.m3.meso,
+      Yuzdelik: currentReport.somatotype.eliteRef.refScore,
+      SD_Skoru: Number((currentReport.somatotype.m3.meso - currentReport.somatotype.m1.meso).toFixed(2)),
+      Durum: currentReport.somatotype.m3.category,
+      Beklenen_Hedef: currentReport.somatotype.eliteRef.meso,
+    },
+    {
+      Kategori: '2. HEATH-CARTER SOMATOTİP DEĞİŞİM TABLOSU',
+      Parametre_Kodu: 'somatotype_ecto',
+      Parametre_Adi: 'Ektomorfi (İncelik / Doğrusallık)',
+      Birim: 'Puan',
+      Olcum_1: currentReport.somatotype.m1.ecto,
+      Olcum_2: currentReport.somatotype.m2.ecto,
+      Olcum_3: currentReport.somatotype.m3.ecto,
+      Yuzdelik: currentReport.somatotype.eliteRef.refScore,
+      SD_Skoru: Number((currentReport.somatotype.m3.ecto - currentReport.somatotype.m1.ecto).toFixed(2)),
+      Durum: currentReport.somatotype.m3.category,
+      Beklenen_Hedef: currentReport.somatotype.eliteRef.ecto,
+    },
     ...currentReport.motorPerformance.map((row) => {
       const ips = currentReport.ipsativeTargets.find((t) =>
         row.name.toLowerCase().includes(t.parameter.toLowerCase())
       );
       return {
-        Kategori: '2. MOTOR PERFORMANS',
+        Kategori: '3. BİYOMOTOR YETENEK VE MOTOR TESTLER',
         Parametre_Kodu: row.id,
         Parametre_Adi: row.name,
         Birim: row.unit,
@@ -1722,297 +2086,195 @@ export function downloadSportsFlyLabExcelTemplate(currentReport: SportsFlyLabRep
       };
     }),
     {
-      Kategori: '3. SOMATOTİP (HEATH-CARTER)',
-      Parametre_Kodu: 'somatotype_endo',
-      Parametre_Adi: 'Endomorfi',
-      Birim: 'puan',
-      Olcum_1: currentReport.somatotype.m1.endo,
-      Olcum_2: currentReport.somatotype.m2.endo,
-      Olcum_3: currentReport.somatotype.m3.endo,
-      Yuzdelik: currentReport.somatotype.eliteRef.refScore,
-      SD_Skoru: 0,
-      Durum: currentReport.somatotype.m3.category,
-      Beklenen_Hedef: currentReport.somatotype.eliteRef.endo,
-    },
-    {
-      Kategori: '3. SOMATOTİP (HEATH-CARTER)',
-      Parametre_Kodu: 'somatotype_meso',
-      Parametre_Adi: 'Mezomorfi',
-      Birim: 'puan',
-      Olcum_1: currentReport.somatotype.m1.meso,
-      Olcum_2: currentReport.somatotype.m2.meso,
-      Olcum_3: currentReport.somatotype.m3.meso,
-      Yuzdelik: currentReport.somatotype.eliteRef.refScore,
-      SD_Skoru: 0,
-      Durum: currentReport.somatotype.m3.category,
-      Beklenen_Hedef: currentReport.somatotype.eliteRef.meso,
-    },
-    {
-      Kategori: '3. SOMATOTİP (HEATH-CARTER)',
-      Parametre_Kodu: 'somatotype_ecto',
-      Parametre_Adi: 'Ektomorfi',
-      Birim: 'puan',
-      Olcum_1: currentReport.somatotype.m1.ecto,
-      Olcum_2: currentReport.somatotype.m2.ecto,
-      Olcum_3: currentReport.somatotype.m3.ecto,
-      Yuzdelik: currentReport.somatotype.eliteRef.refScore,
-      SD_Skoru: 0,
-      Durum: currentReport.somatotype.m3.category,
-      Beklenen_Hedef: currentReport.somatotype.eliteRef.ecto,
-    },
-    {
-      Kategori: '4. KARDİYORESPİRATUAR (PACER)',
+      Kategori: '4. KARDİYORESPİRATUAR VE KONDİSYON',
       Parametre_Kodu: 'pacer_distance',
-      Parametre_Adi: 'Shuttle Run Koşu Mesafesi',
-      Birim: 'metre',
+      Parametre_Adi: 'PACER Shuttle Run Koşu Mesafesi',
+      Birim: 'Metre',
       Olcum_1: currentReport.cardio.test1Distance,
       Olcum_2: currentReport.cardio.test2Distance,
       Olcum_3: currentReport.cardio.test3Distance,
-      Yuzdelik: 75,
-      SD_Skoru: 0.6,
+      Yuzdelik: 80,
+      SD_Skoru: 0.8,
       Durum: currentReport.cardio.test3Status,
       Beklenen_Hedef: currentReport.cardio.test3Distance + 160,
     },
     {
-      Kategori: '5. KATEGORİ PERFORMANS PUANLARI',
-      Parametre_Kodu: 'score_teknik',
-      Parametre_Adi: 'Teknik Beceriler Puanı',
-      Birim: '0-10 Puan',
-      Olcum_1: '-',
-      Olcum_2: '-',
-      Olcum_3: 8.2,
+      Kategori: '4. KARDİYORESPİRATUAR VE KONDİSYON',
+      Parametre_Kodu: 'pacer_vo2',
+      Parametre_Adi: 'VO2peak Aerobik Güç',
+      Birim: 'ml/kg/dk',
+      Olcum_1: currentReport.cardio.test1Vo2,
+      Olcum_2: currentReport.cardio.test2Vo2,
+      Olcum_3: currentReport.cardio.test3Vo2,
       Yuzdelik: 85,
-      SD_Skoru: 0.8,
+      SD_Skoru: 1.0,
       Durum: 'İyi Düzey',
-      Beklenen_Hedef: 9.0,
+      Beklenen_Hedef: 45.0,
     },
     {
-      Kategori: '5. KATEGORİ PERFORMANS PUANLARI',
-      Parametre_Kodu: 'score_fiziksel',
-      Parametre_Adi: 'Fiziksel Performans Puanı',
-      Birim: '0-10 Puan',
-      Olcum_1: '-',
-      Olcum_2: '-',
-      Olcum_3: 8.5,
+      Kategori: '4. KARDİYORESPİRATUAR VE KONDİSYON',
+      Parametre_Kodu: 'bmr_met',
+      Parametre_Adi: 'Bazal Metabolizma (BMR) & MET',
+      Birim: 'kcal / MET',
+      Olcum_1: currentReport.cardio.basalMetabolicRate - 60,
+      Olcum_2: currentReport.cardio.basalMetabolicRate - 25,
+      Olcum_3: currentReport.cardio.basalMetabolicRate,
+      Yuzdelik: 75,
+      SD_Skoru: 0.5,
+      Durum: `${currentReport.cardio.functionalCapacityMet} MET Kapasite`,
+      Beklenen_Hedef: currentReport.cardio.basalMetabolicRate + 100,
+    },
+    {
+      Kategori: '5. BİYOLOJİK OLGUNLAŞMA VE PHV',
+      Parametre_Kodu: 'phv_age',
+      Parametre_Adi: 'Tepe Boy Hızı (PHV) Yaşı',
+      Birim: 'Yaş',
+      Olcum_1: currentReport.phvAge,
+      Olcum_2: currentReport.phvAge,
+      Olcum_3: currentReport.phvAge,
+      Yuzdelik: 50,
+      SD_Skoru: 0,
+      Durum: currentReport.maturationStatus || 'Zamanında',
+      Beklenen_Hedef: currentReport.predictedAdultHeight,
+    },
+    {
+      Kategori: '5. BİYOLOJİK OLGUNLAŞMA VE PHV',
+      Parametre_Kodu: 'predicted_height',
+      Parametre_Adi: 'Tahmini 18 Yaş Yetişkin Boyu',
+      Birim: 'cm',
+      Olcum_1: currentReport.predictedAdultHeight - 2,
+      Olcum_2: currentReport.predictedAdultHeight - 1,
+      Olcum_3: currentReport.predictedAdultHeight,
       Yuzdelik: 88,
-      SD_Skoru: 0.9,
-      Durum: 'Yüksek Performans',
-      Beklenen_Hedef: 9.2,
+      SD_Skoru: 1.2,
+      Durum: 'Uzun Boy Projeksiyonu',
+      Beklenen_Hedef: currentReport.predictedAdultHeight,
     },
     {
-      Kategori: '5. KATEGORİ PERFORMANS PUANLARI',
-      Parametre_Kodu: 'score_taktiksel',
-      Parametre_Adi: 'Taktiksel Oyun Zekası Puanı',
-      Birim: '0-10 Puan',
-      Olcum_1: '-',
-      Olcum_2: '-',
-      Olcum_3: 8.0,
-      Yuzdelik: 82,
-      SD_Skoru: 0.7,
-      Durum: 'Gelişiyor',
-      Beklenen_Hedef: 8.8,
+      Kategori: '6. DÖNEMSEL PERFORMANS SKORLARI',
+      Parametre_Kodu: 'overall_score',
+      Parametre_Adi: 'Genel Karne Performans Puanı',
+      Birim: '% 0-100',
+      Olcum_1: currentReport.scoreHistory.p1Score,
+      Olcum_2: currentReport.scoreHistory.p2Score,
+      Olcum_3: currentReport.scoreHistory.p3Score,
+      Yuzdelik: currentReport.scoreHistory.p3Score,
+      SD_Skoru: 1.0,
+      Durum: currentReport.scoreHistory.p3Score >= 80 ? 'Yüksek Başarı' : 'Gelişiyor',
+      Beklenen_Hedef: Math.min(100, currentReport.scoreHistory.p3Score + 6),
     },
     {
-      Kategori: '5. KATEGORİ PERFORMANS PUANLARI',
-      Parametre_Kodu: 'score_zihinsel',
-      Parametre_Adi: 'Zihinsel Beceriler & Disiplin',
-      Birim: '0-10 Puan',
-      Olcum_1: '-',
-      Olcum_2: '-',
-      Olcum_3: 8.8,
-      Yuzdelik: 90,
-      SD_Skoru: 1.1,
-      Durum: 'Örnek Düzey',
-      Beklenen_Hedef: 9.5,
-    },
-    {
-      Kategori: '6. UZMAN GÖRÜŞÜ VE AKADEMİ NOTLARI',
+      Kategori: '7. UZMAN DEĞERLENDİRME VE GELİŞİM NOTU',
       Parametre_Kodu: 'expert_comment',
-      Parametre_Adi: 'Uzman Değerlendirme Görüşü',
+      Parametre_Adi: 'Antrenör / Uzman Değerlendirme Görüşü',
       Birim: 'Metin',
       Olcum_1: '-',
       Olcum_2: '-',
-      Olcum_3: currentReport.expertComment || 'Uzman görüşü henüz tanımlanmamıştır.',
+      Olcum_3: currentReport.expertComment || 'Uzman değerlendirme notu tanımlanmıştır.',
       Yuzdelik: '-',
       SD_Skoru: '-',
       Durum: 'Tamamlandı',
-      Beklenen_Hedef: '-',
+      Beklenen_Hedef: currentReport.nextTargetDate || 'Gelecek Test Dönemi',
     },
   ];
 
   const wsParams = XLSX.utils.json_to_sheet(paramRows);
   wsParams['!cols'] = [
-    { wch: 28 },
-    { wch: 20 },
-    { wch: 28 },
+    { wch: 36 },
+    { wch: 22 },
+    { wch: 34 },
     { wch: 16 },
     { wch: 14 },
     { wch: 14 },
     { wch: 14 },
     { wch: 12 },
     { wch: 12 },
-    { wch: 24 },
-    { wch: 16 },
+    { wch: 26 },
+    { wch: 18 },
   ];
   XLSX.utils.book_append_sheet(wb, wsParams, 'Parametre_Bazli_Karne');
 
-  // Sheet 2: Multi-Athlete Flat List (1 row = 1 athlete, pre-populated with 6 sample athletes)
-  const flatRows = SAMPLE_BATCH_ATHLETE_ROWS.map((row) => ({
-    Sporcu_Adi: row.Sporcu_Adi,
-    Sporcu_Kodu: row.Sporcu_Kodu,
-    Kulup_Adi: activeBranding.schoolName || brandedCurrent.clubName,
-    Sube: activeBranding.branchName || brandedCurrent.branchName,
-    Brans: row.Brans,
-    Cinsiyet: row.Cinsiyet,
-    Yas: row.Yas,
-    Olcum_1_Tarihi: row.Olcum_1_Tarihi,
-    Olcum_2_Tarihi: row.Olcum_2_Tarihi,
-    Olcum_3_Tarihi: row.Olcum_3_Tarihi,
-    Boy_1: row.Boy_1,
-    Boy_2: row.Boy_2,
-    Boy_3: row.Boy_3,
-    Agirlik_1: row.Agirlik_1,
-    Agirlik_2: row.Agirlik_2,
-    Agirlik_3: row.Agirlik_3,
-    BKI_1: row.BKI_1,
-    BKI_2: row.BKI_2,
-    BKI_3: row.BKI_3,
-    Yag_Yuzdesi_1: row.Yag_Yuzdesi_1,
-    Yag_Yuzdesi_2: row.Yag_Yuzdesi_2,
-    Yag_Yuzdesi_3: row.Yag_Yuzdesi_3,
-    Surat_1: row.Surat_1,
-    Surat_2: row.Surat_2,
-    Surat_3: row.Surat_3,
-    Cabukluk_1: row.Cabukluk_1,
-    Cabukluk_2: row.Cabukluk_2,
-    Cabukluk_3: row.Cabukluk_3,
-    Sirt_Kuvveti_3: row.Sirt_Kuvveti_3,
-    Kavrama_Kuvveti_3: row.Kavrama_Kuvveti_3,
-    Durarak_Uzun_Atlama_3: row.Durarak_Uzun_Atlama_3,
-    Dikey_Sicrama_3: row.Dikey_Sicrama_3,
-    Esneklik_3: row.Esneklik_3,
-    VO2max_3: row.VO2max_3,
-    PACER_Mesafe_1: row.PACER_Mesafe_1,
-    PACER_Mesafe_2: row.PACER_Mesafe_2,
-    PACER_Mesafe_3: row.PACER_Mesafe_3,
-    Endomorfi: row.Endomorfi,
-    Mezomorfi: row.Mezomorfi,
-    Ektomorfi: row.Ektomorfi,
-    PHV_Yasi: row.PHV_Yasi,
-    PHV_Boyu: row.PHV_Boyu,
-    Tahmini_18_Yas_Boyu: row.Tahmini_18_Yas_Boyu,
-    Genel_Performans_Puani: row.Genel_Performans_Puani,
-    Brans_Referans_Puani: row.Brans_Referans_Puani,
-    Uzman_Gorusu: row.Uzman_Gorusu,
-  }));
+  // Sheet 2: Multi-Athlete Flat Table (Row 1 is active athlete, followed by sample athletes)
+  const currentAthleteRow = buildAthleteFlatRow(currentReport, activeBranding);
+  const otherSampleRows = SAMPLE_BATCH_ATHLETE_ROWS.filter(
+    (s) => String(s.Sporcu_Adi).toLowerCase() !== currentReport.athleteName.toLowerCase()
+  );
+  const combinedRows = [currentAthleteRow, ...otherSampleRows];
 
-  const wsFlat = XLSX.utils.json_to_sheet(flatRows);
+  const wsFlat = XLSX.utils.json_to_sheet(combinedRows);
+  wsFlat['!cols'] = Object.keys(currentAthleteRow).map(() => ({ wch: 18 }));
   XLSX.utils.book_append_sheet(wb, wsFlat, 'Toplu_Sporcu_Listesi');
+
+  // Sheet 3: Reference Guide
+  const guideRows = [
+    { Sutun: 'Sporcu_Adi', Zorunlu: 'Evet', Birim: 'Metin', Aciklama: 'Sporcunun tam adı (Her satır için 1 tam karne oluşturur)' },
+    { Sutun: 'Sporcu_Kodu', Zorunlu: 'İsteğe Bağlı', Birim: 'Metin', Aciklama: 'Lisans / kulüp kodu (Boşsa otomatik atanır)' },
+    { Sutun: 'Brans', Zorunlu: 'Evet', Birim: 'Metin', Aciklama: 'Spor branşı ve yaş grubu (Örn: Voleybol / U12)' },
+    { Sutun: 'Cinsiyet', Zorunlu: 'Evet', Birim: 'Erkek / Kadın', Aciklama: 'Normatif hesaplamalar için cinsiyet' },
+    { Sutun: 'Yas', Zorunlu: 'Evet', Birim: 'Yıl (Ondalık)', Aciklama: 'Kronolojik takvim yaşı (Örn: 11.4)' },
+    { Sutun: 'Boy_1, Boy_2, Boy_3', Zorunlu: 'Evet', Birim: 'cm', Aciklama: '1., 2. ve 3. dönem boy uzunlukları' },
+    { Sutun: 'Agirlik_1, Agirlik_2, Agirlik_3', Zorunlu: 'Evet', Birim: 'kg', Aciklama: '1., 2. ve 3. dönem vücut ağırlıkları' },
+    { Sutun: 'Yag_Yuzdesi_1, 2, 3', Zorunlu: 'İsteğe Bağlı', Birim: '%', Aciklama: 'Deri altı vücut yağ oranı' },
+    { Sutun: 'Endomorfi_1, 2, 3', Zorunlu: 'İsteğe Bağlı', Birim: 'Puan', Aciklama: 'Heath-Carter Endomorfi dönem ölçümleri' },
+    { Sutun: 'Mezomorfi_1, 2, 3', Zorunlu: 'İsteğe Bağlı', Birim: 'Puan', Aciklama: 'Heath-Carter Mezomorfi dönem ölçümleri' },
+    { Sutun: 'Ektomorfi_1, 2, 3', Zorunlu: 'İsteğe Bağlı', Birim: 'Puan', Aciklama: 'Heath-Carter Ektomorfi dönem ölçümleri' },
+    { Sutun: 'Surat_1, 2, 3', Zorunlu: 'Evet', Birim: 'sn', Aciklama: '20 metre sürat testi süreleri' },
+    { Sutun: 'Cabukluk_1, 2, 3', Zorunlu: 'Evet', Birim: 'sn', Aciklama: '10x5 metre çabukluk testi süreleri' },
+    { Sutun: 'Dikey_Sicrama_3, Uzun_Atlama_3', Zorunlu: 'Evet', Birim: 'cm', Aciklama: 'Patlayıcı bacak kuvveti testleri' },
+    { Sutun: 'VO2max_3, PACER_Mesafe_3', Zorunlu: 'İsteğe Bağlı', Birim: 'ml/kg/dk, m', Aciklama: 'Kardiyorespiratuar dayanıklılık' },
+    { Sutun: 'PHV_Yasi, Tahmini_18_Yas_Boyu', Zorunlu: 'İsteğe Bağlı', Birim: 'Yaş, cm', Aciklama: 'Büyüme atağı ve yetişkin boy projeksiyonu' },
+    { Sutun: 'Genel_Performans_Puani', Zorunlu: 'İsteğe Bağlı', Birim: '0-100', Aciklama: 'Genel karne performans skoru (Boşsa testlerden hesaplanır)' },
+    { Sutun: 'Uzman_Gorusu', Zorunlu: 'İsteğe Bağlı', Birim: 'Metin', Aciklama: 'Karne 7. sayfasındaki uzman antrenör değerlendirme notu' },
+  ];
+  const wsGuide = XLSX.utils.json_to_sheet(guideRows);
+  wsGuide['!cols'] = [{ wch: 30 }, { wch: 14 }, { wch: 18 }, { wch: 60 }];
+  XLSX.utils.book_append_sheet(wb, wsGuide, 'Sutun_Rehberi_ve_Normlar');
 
   XLSX.writeFile(wb, `SportsFly_Lab_Karne_Sablonu_${currentReport.athleteName.replace(/\s+/g, '_')}.xlsx`);
 }
 
 /**
  * Downloads a dedicated Multi-Athlete Batch Excel template (.xlsx) where the primary sheet
- * is "Toplu_Sporcu_Listesi" (1 row = 1 athlete, pre-populated with 6 sample athletes across branches)
- * and the second sheet is "Sutun_Kilavuzu" (column reference guide).
+ * is "Toplu_Sporcu_Listesi" (1 row = 1 athlete) containing all current karne parameters,
+ * pre-populated with realistic athlete rows across branches and second sheet is "Sutun_Rehberi_ve_Normlar".
  */
 export function downloadBatchSportsFlyLabExcelTemplate(baseTemplate: SportsFlyLabReport): void {
   const wb = XLSX.utils.book_new();
   const activeBranding = getStoredLabSchoolBranding();
-  const brandedCurrent = applyBrandingToReport(baseTemplate, activeBranding);
 
   const batchRows = SAMPLE_BATCH_ATHLETE_ROWS.map((row) => ({
-    Sporcu_Adi: row.Sporcu_Adi,
-    Sporcu_Kodu: row.Sporcu_Kodu,
-    Kulup_Adi: activeBranding.schoolName || brandedCurrent.clubName,
-    Sube: activeBranding.branchName || brandedCurrent.branchName,
-    Brans: row.Brans,
-    Cinsiyet: row.Cinsiyet,
-    Yas: row.Yas,
-    Olcum_1_Tarihi: row.Olcum_1_Tarihi,
-    Olcum_2_Tarihi: row.Olcum_2_Tarihi,
-    Olcum_3_Tarihi: row.Olcum_3_Tarihi,
-    Boy_1: row.Boy_1,
-    Boy_2: row.Boy_2,
-    Boy_3: row.Boy_3,
-    Agirlik_1: row.Agirlik_1,
-    Agirlik_2: row.Agirlik_2,
-    Agirlik_3: row.Agirlik_3,
-    BKI_1: row.BKI_1,
-    BKI_2: row.BKI_2,
-    BKI_3: row.BKI_3,
-    Yag_Yuzdesi_1: row.Yag_Yuzdesi_1,
-    Yag_Yuzdesi_2: row.Yag_Yuzdesi_2,
-    Yag_Yuzdesi_3: row.Yag_Yuzdesi_3,
-    Surat_1: row.Surat_1,
-    Surat_2: row.Surat_2,
-    Surat_3: row.Surat_3,
-    Cabukluk_1: row.Cabukluk_1,
-    Cabukluk_2: row.Cabukluk_2,
-    Cabukluk_3: row.Cabukluk_3,
-    Sirt_Kuvveti_3: row.Sirt_Kuvveti_3,
-    Kavrama_Kuvveti_3: row.Kavrama_Kuvveti_3,
-    Durarak_Uzun_Atlama_3: row.Durarak_Uzun_Atlama_3,
-    Dikey_Sicrama_3: row.Dikey_Sicrama_3,
-    Esneklik_3: row.Esneklik_3,
-    VO2max_3: row.VO2max_3,
-    PACER_Mesafe_1: row.PACER_Mesafe_1,
-    PACER_Mesafe_2: row.PACER_Mesafe_2,
-    PACER_Mesafe_3: row.PACER_Mesafe_3,
-    Endomorfi: row.Endomorfi,
-    Mezomorfi: row.Mezomorfi,
-    Ektomorfi: row.Ektomorfi,
-    PHV_Yasi: row.PHV_Yasi,
-    PHV_Boyu: row.PHV_Boyu,
-    Tahmini_18_Yas_Boyu: row.Tahmini_18_Yas_Boyu,
-    Genel_Performans_Puani: row.Genel_Performans_Puani,
-    Brans_Referans_Puani: row.Brans_Referans_Puani,
-    Uzman_Gorusu: row.Uzman_Gorusu,
+    ...row,
+    Kulup_Adi: activeBranding.schoolName || row.Kulup_Adi || baseTemplate.clubName,
+    Sube: activeBranding.branchName || row.Sube || baseTemplate.branchName,
   }));
 
   const wsBatch = XLSX.utils.json_to_sheet(batchRows);
-  wsBatch['!cols'] = [
-    { wch: 22 },
-    { wch: 15 },
-    { wch: 26 },
-    { wch: 22 },
-    { wch: 28 },
-    { wch: 10 },
-    { wch: 8 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 10 },
-    { wch: 10 },
-    { wch: 10 },
-    { wch: 10 },
-    { wch: 10 },
-    { wch: 10 },
-  ];
+  wsBatch['!cols'] = Object.keys(batchRows[0] || {}).map(() => ({ wch: 18 }));
   XLSX.utils.book_append_sheet(wb, wsBatch, 'Toplu_Sporcu_Listesi');
 
   const guideRows = [
-    { Sutun_Adi: 'Sporcu_Adi', Zorunlu: 'Evet', Birim: 'Metin', Aciklama: 'Sporcunun Adı ve Soyadı (Her satır 1 sporcu karnesi oluşturur)' },
-    { Sutun_Adi: 'Sporcu_Kodu', Zorunlu: 'İsteğe Bağlı', Birim: 'Kod', Aciklama: 'Lisans veya akademi sporcu numarası (Boş bırakılırsa otomatik atanır)' },
-    { Sutun_Adi: 'Brans', Zorunlu: 'Evet', Birim: 'Metin', Aciklama: 'Spor branşı ve grup adı (Örn: Futbol / U12 Elit Akademi)' },
-    { Sutun_Adi: 'Cinsiyet', Zorunlu: 'Evet', Birim: 'Erkek / Kadın', Aciklama: 'Normatif referans ve PHV hesaplaması için cinsiyet' },
-    { Sutun_Adi: 'Yas', Zorunlu: 'Evet', Birim: 'Yıl (Ondalık)', Aciklama: 'Sporcunun takvim yaşı (Örn: 11.4)' },
-    { Sutun_Adi: 'Boy_1 / Boy_2 / Boy_3', Zorunlu: 'Evet', Birim: 'cm', Aciklama: '1., 2. ve 3. ölçüm boy uzunluğu değerleri' },
-    { Sutun_Adi: 'Agirlik_1 / Agirlik_2 / Agirlik_3', Zorunlu: 'Evet', Birim: 'kg', Aciklama: '1., 2. ve 3. ölçüm vücut ağırlığı değerleri' },
-    { Sutun_Adi: 'Yag_Yuzdesi_1 / 2 / 3', Zorunlu: 'İsteğe Bağlı', Birim: '%', Aciklama: 'Deri altı yağ yüzdesi ölçümleri' },
-    { Sutun_Adi: 'Surat_1 / Surat_2 / Surat_3', Zorunlu: 'Evet', Birim: 'saniye', Aciklama: '20 metre sürat koşusu süreleri (Düşük süre daha iyidir)' },
-    { Sutun_Adi: 'Cabukluk_1 / Cabukluk_2 / Cabukluk_3', Zorunlu: 'Evet', Birim: 'saniye', Aciklama: '10x5m mekik çabukluk testi süreleri' },
-    { Sutun_Adi: 'Sirt_Kuvveti_3 / Kavrama_Kuvveti_3', Zorunlu: 'İsteğe Bağlı', Birim: 'kg', Aciklama: 'Dinamometre sırt ve el kavrama kuvveti 3. ölçüm değerleri' },
-    { Sutun_Adi: 'Durarak_Uzun_Atlama_3 / Dikey_Sicrama_3', Zorunlu: 'Evet', Birim: 'cm', Aciklama: 'Patlayıcı alt ekstremite sıçrama değerleri' },
-    { Sutun_Adi: 'Esneklik_3 / VO2max_3', Zorunlu: 'İsteğe Bağlı', Birim: 'cm / ml-kg-dk', Aciklama: 'Otur-eriş esneklik ve aerobik kapasite değerleri' },
-    { Sutun_Adi: 'Endomorfi / Mezomorfi / Ektomorfi', Zorunlu: 'İsteğe Bağlı', Birim: 'Puan', Aciklama: 'Heath-Carter somatotip bileşenleri' },
-    { Sutun_Adi: 'PHV_Yasi / Tahmini_18_Yas_Boyu', Zorunlu: 'İsteğe Bağlı', Birim: 'Yaş / cm', Aciklama: 'Büyüme atağı yaşı ve 18 yaş tahmini yetişkin boyu' },
-    { Sutun_Adi: 'Genel_Performans_Puani', Zorunlu: 'İsteğe Bağlı', Birim: '0-100 Puan', Aciklama: 'Boş bırakılırsa yüzdelik dilimlerden otomatik hesaplanır' },
+    { Sutun: 'Sporcu_Adi', Zorunlu: 'Evet', Birim: 'Metin', Aciklama: 'Sporcunun tam adı (Her satır 1 sporcu için 7 sayfalık tam karne üretir)' },
+    { Sutun: 'Sporcu_Kodu', Zorunlu: 'İsteğe Bağlı', Birim: 'Kod', Aciklama: 'Lisans veya akademi kodu' },
+    { Sutun: 'Brans', Zorunlu: 'Evet', Birim: 'Metin', Aciklama: 'Spor branşı ve yaş kategorisi (Örn: Voleybol / U12)' },
+    { Sutun: 'Cinsiyet', Zorunlu: 'Evet', Birim: 'Erkek / Kadın', Aciklama: 'Normatif referans ve PHV hesabı' },
+    { Sutun: 'Yas', Zorunlu: 'Evet', Birim: 'Yıl', Aciklama: 'Takvim yaşı (Örn: 11.4)' },
+    { Sutun: 'Boy_1, Boy_2, Boy_3', Zorunlu: 'Evet', Birim: 'cm', Aciklama: '1., 2. ve 3. dönem boy uzunluğu' },
+    { Sutun: 'Agirlik_1, Agirlik_2, Agirlik_3', Zorunlu: 'Evet', Birim: 'kg', Aciklama: '1., 2. ve 3. dönem vücut ağırlığı' },
+    { Sutun: 'Yag_Yuzdesi_1, 2, 3', Zorunlu: 'İsteğe Bağlı', Birim: '%', Aciklama: 'Deri altı yağ oranı' },
+    { Sutun: 'Endomorfi_1, 2, 3', Zorunlu: 'İsteğe Bağlı', Birim: 'Puan', Aciklama: 'Heath-Carter Endomorfi ölçümleri' },
+    { Sutun: 'Mezomorfi_1, 2, 3', Zorunlu: 'İsteğe Bağlı', Birim: 'Puan', Aciklama: 'Heath-Carter Mezomorfi ölçümleri' },
+    { Sutun: 'Ektomorfi_1, 2, 3', Zorunlu: 'İsteğe Bağlı', Birim: 'Puan', Aciklama: 'Heath-Carter Ektomorfi ölçümleri' },
+    { Sutun: 'Surat_1, 2, 3', Zorunlu: 'Evet', Birim: 'sn', Aciklama: '20 metre sürat koşusu süresi' },
+    { Sutun: 'Cabukluk_1, 2, 3', Zorunlu: 'Evet', Birim: 'sn', Aciklama: '10x5 metre çabukluk süresi' },
+    { Sutun: 'Dikey_Sicrama_3, Uzun_Atlama_3', Zorunlu: 'Evet', Birim: 'cm', Aciklama: 'Patlayıcı sıçrama testleri' },
+    { Sutun: 'VO2max_3, PACER_Mesafe_3', Zorunlu: 'İsteğe Bağlı', Birim: 'ml/kg/dk, m', Aciklama: 'Kardiyorespiratuar dayanıklılık' },
+    { Sutun: 'PHV_Yasi, Tahmini_18_Yas_Boyu', Zorunlu: 'İsteğe Bağlı', Birim: 'Yaş, cm', Aciklama: 'Büyüme atağı ve yetişkin boyu' },
+    { Sutun: 'Genel_Performans_Puani', Zorunlu: 'İsteğe Bağlı', Birim: '0-100', Aciklama: 'Genel karne skoru (Boşsa testlerden hesaplanır)' },
+    { Sutun: 'Uzman_Gorusu', Zorunlu: 'İsteğe Bağlı', Birim: 'Metin', Aciklama: 'Karne 7. sayfasındaki uzman antrenör değerlendirme notu' },
   ];
   const wsGuide = XLSX.utils.json_to_sheet(guideRows);
-  wsGuide['!cols'] = [{ wch: 34 }, { wch: 14 }, { wch: 16 }, { wch: 64 }];
-  XLSX.utils.book_append_sheet(wb, wsGuide, 'Sutun_Kilavuzu');
+  wsGuide['!cols'] = [{ wch: 30 }, { wch: 14 }, { wch: 18 }, { wch: 60 }];
+  XLSX.utils.book_append_sheet(wb, wsGuide, 'Sutun_Rehberi_ve_Normlar');
 
   XLSX.writeFile(wb, 'SportsFly_Lab_Toplu_Sporcu_Karne_Sablonu.xlsx');
 }
@@ -2194,6 +2456,16 @@ function buildLabReportFromExcelRow(
   setB('bmi', bmi1, bmi2, bmi3);
   setB('body_fat', r.Yag_Yuzdesi_1, r.Yag_Yuzdesi_2, r.Yag_Yuzdesi_3 ?? r.Yag_Yuzdesi);
 
+  // Additional anthropometric skinfolds, bone breadths, circumferences
+  setB('subscapula', r.Subscapula_1, r.Subscapula_2, r.Subscapula_3 ?? r.Subscapula);
+  setB('triceps', r.Triceps_1, r.Triceps_2, r.Triceps_3 ?? r.Triceps);
+  setB('calf_skf', r.Calf_DKK_1, r.Calf_DKK_2, r.Calf_DKK_3 ?? r.Calf_DKK ?? r.Calf_Skf);
+  setB('supraspinal', r.Supraspinal_1, r.Supraspinal_2, r.Supraspinal_3 ?? r.Supraspinal);
+  setB('humerus', r.Humerus_1, r.Humerus_2, r.Humerus_3 ?? r.Humerus);
+  setB('femur', r.Femur_1, r.Femur_2, r.Femur_3 ?? r.Femur);
+  setB('calf_girth', r.Calf_Cevre_1, r.Calf_Cevre_2, r.Calf_Cevre_3 ?? r.Calf_Cevre);
+  setB('biceps_girth', r.Biceps_Cevre_1, r.Biceps_Cevre_2, r.Biceps_Cevre_3 ?? r.Biceps_Cevre);
+
   // Proportionally scale sitting height & arm span if height was provided, or use explicit mapped values
   if (hItem) {
     const sitItem = cloned.bodyComposition.find((x) => x.id === 'sitting_height');
@@ -2205,6 +2477,7 @@ function buildLabReportFromExcelRow(
         r.Oturma_Boyu_3 !== undefined && r.Oturma_Boyu_3 !== ''
           ? toNum(r.Oturma_Boyu_3, Number((hItem.m3 * 0.525).toFixed(1)))
           : Number((hItem.m3 * 0.525).toFixed(1));
+      cloned.sittingHeight = sitItem.m3;
     }
     if (armItem) {
       armItem.m1 = Number((hItem.m1 * 1.005).toFixed(1));
@@ -2278,6 +2551,9 @@ function buildLabReportFromExcelRow(
   if (r.PACER_Mesafe_1) cloned.cardio.test1Distance = toNum(r.PACER_Mesafe_1, cloned.cardio.test1Distance);
   if (r.PACER_Mesafe_2) cloned.cardio.test2Distance = toNum(r.PACER_Mesafe_2, cloned.cardio.test2Distance);
   if (r.PACER_Mesafe_3) cloned.cardio.test3Distance = toNum(r.PACER_Mesafe_3, cloned.cardio.test3Distance);
+  if (r.PACER_Mekik_1) cloned.cardio.test1Shuttles = toNum(r.PACER_Mekik_1, cloned.cardio.test1Shuttles);
+  if (r.PACER_Mekik_2) cloned.cardio.test2Shuttles = toNum(r.PACER_Mekik_2, cloned.cardio.test2Shuttles);
+  if (r.PACER_Mekik_3) cloned.cardio.test3Shuttles = toNum(r.PACER_Mekik_3, cloned.cardio.test3Shuttles);
   if (aeroItem) {
     cloned.cardio.test1Vo2 = aeroItem.m1;
     cloned.cardio.test2Vo2 = aeroItem.m2;
@@ -2295,24 +2571,60 @@ function buildLabReportFromExcelRow(
       66.5 + 13.75 * wItem.m3 + 5.003 * hItem.m3 - 6.75 * cloned.ageYears
     );
   }
+  if (r.BMR) cloned.cardio.basalMetabolicRate = toNum(r.BMR, cloned.cardio.basalMetabolicRate);
+  if (r.MET) cloned.cardio.functionalCapacityMet = toNum(r.MET, cloned.cardio.functionalCapacityMet);
+  if (r.Maksimum_Kalp_Hizi) cloned.cardio.maxHeartRate = toNum(r.Maksimum_Kalp_Hizi, cloned.cardio.maxHeartRate);
 
-  // Update Somatotype
-  if (r.Endomorfi) cloned.somatotype.m3.endo = toNum(r.Endomorfi, cloned.somatotype.m3.endo);
-  if (r.Mezomorfi) cloned.somatotype.m3.meso = toNum(r.Mezomorfi, cloned.somatotype.m3.meso);
-  if (r.Ektomorfi) cloned.somatotype.m3.ecto = toNum(r.Ektomorfi, cloned.somatotype.m3.ecto);
-  const { endo, meso, ecto } = cloned.somatotype.m3;
-  if (meso >= endo && meso >= ecto) {
-    cloned.somatotype.m3.category = endo > ecto + 0.5 ? 'Endomorfik Mezomorf' : ecto > endo + 0.5 ? 'Ektomorfik Mezomorf' : 'Dengeli Mezomorf';
-  } else if (ecto > meso && ecto > endo) {
-    cloned.somatotype.m3.category = 'Mezomorfik Ektomorf';
+  // Update Somatotype (Heath-Carter Değişim Tablosu)
+  const endo3 = toNum(r.Endomorfi_3 ?? r.Endomorfi, cloned.somatotype.m3.endo);
+  const endo1 = toNum(r.Endomorfi_1, r.Endomorfi_3 !== undefined ? Number((endo3 * 1.12).toFixed(1)) : cloned.somatotype.m1.endo);
+  const endo2 = toNum(r.Endomorfi_2, r.Endomorfi_3 !== undefined ? Number((endo3 * 1.05).toFixed(1)) : cloned.somatotype.m2.endo);
+  cloned.somatotype.m1.endo = endo1;
+  cloned.somatotype.m2.endo = endo2;
+  cloned.somatotype.m3.endo = endo3;
+
+  const meso3 = toNum(r.Mezomorfi_3 ?? r.Mezomorfi, cloned.somatotype.m3.meso);
+  const meso1 = toNum(r.Mezomorfi_1, r.Mezomorfi_3 !== undefined ? Number((meso3 * 0.92).toFixed(1)) : cloned.somatotype.m1.meso);
+  const meso2 = toNum(r.Mezomorfi_2, r.Mezomorfi_3 !== undefined ? Number((meso3 * 0.96).toFixed(1)) : cloned.somatotype.m2.meso);
+  cloned.somatotype.m1.meso = meso1;
+  cloned.somatotype.m2.meso = meso2;
+  cloned.somatotype.m3.meso = meso3;
+
+  const ecto3 = toNum(r.Ektomorfi_3 ?? r.Ektomorfi, cloned.somatotype.m3.ecto);
+  const ecto1 = toNum(r.Ektomorfi_1, r.Ektomorfi_3 !== undefined ? Number((ecto3 * 0.90).toFixed(1)) : cloned.somatotype.m1.ecto);
+  const ecto2 = toNum(r.Ektomorfi_2, r.Ektomorfi_3 !== undefined ? Number((ecto3 * 0.95).toFixed(1)) : cloned.somatotype.m2.ecto);
+  cloned.somatotype.m1.ecto = ecto1;
+  cloned.somatotype.m2.ecto = ecto2;
+  cloned.somatotype.m3.ecto = ecto3;
+
+  if (r.Somatotip_Kategorisi) {
+    cloned.somatotype.m3.category = String(r.Somatotip_Kategorisi);
   } else {
-    cloned.somatotype.m3.category = 'Mezomorf-Endomorf';
+    const { endo, meso, ecto } = cloned.somatotype.m3;
+    if (meso >= endo && meso >= ecto) {
+      cloned.somatotype.m3.category = endo > ecto + 0.5 ? 'Endomorfik Mezomorf' : ecto > endo + 0.5 ? 'Ektomorfik Mezomorf' : 'Dengeli Mezomorf';
+    } else if (ecto > meso && ecto > endo) {
+      cloned.somatotype.m3.category = 'Mezomorfik Ektomorf';
+    } else {
+      cloned.somatotype.m3.category = 'Mezomorf-Endomorf';
+    }
   }
+  cloned.somatotype.m1.category = cloned.somatotype.m3.category;
+  cloned.somatotype.m2.category = cloned.somatotype.m3.category;
+
+  if (r.Elit_Referans_Endo) cloned.somatotype.eliteRef.endo = toNum(r.Elit_Referans_Endo, cloned.somatotype.eliteRef.endo);
+  if (r.Elit_Referans_Mezo) cloned.somatotype.eliteRef.meso = toNum(r.Elit_Referans_Mezo, cloned.somatotype.eliteRef.meso);
+  if (r.Elit_Referans_Ekto) cloned.somatotype.eliteRef.ecto = toNum(r.Elit_Referans_Ekto, cloned.somatotype.eliteRef.ecto);
+  if (r.Elit_Referans_Puan) cloned.somatotype.eliteRef.refScore = toNum(r.Elit_Referans_Puan, cloned.somatotype.eliteRef.refScore);
+  if (r.Elit_Brans) cloned.somatotype.eliteRef.sport = String(r.Elit_Brans);
 
   if (r.PHV_Yasi) cloned.phvAge = toNum(r.PHV_Yasi, cloned.phvAge);
   if (r.PHV_Boyu) cloned.phvHeight = toNum(r.PHV_Boyu, cloned.phvHeight);
   if (r.Tahmini_18_Yas_Boyu) {
     cloned.predictedAdultHeight = toNum(r.Tahmini_18_Yas_Boyu, cloned.predictedAdultHeight);
+  }
+  if (r.Olgunlasma_Durumu) {
+    cloned.maturationStatus = String(r.Olgunlasma_Durumu);
   }
 
   // Compute or assign overall performance scores
@@ -2320,13 +2632,23 @@ function buildLabReportFromExcelRow(
     cloned.motorPerformance.reduce((acc, m) => acc + m.percentile, 0) /
       Math.max(1, cloned.motorPerformance.length)
   );
-  if (r.Genel_Performans_Puani) {
+  if (r.Skor_P3 !== undefined && r.Skor_P3 !== '') {
+    cloned.scoreHistory.p3Score = toNum(r.Skor_P3, avgMotorPct);
+  } else if (r.Genel_Performans_Puani) {
     cloned.scoreHistory.p3Score = toNum(r.Genel_Performans_Puani, avgMotorPct);
   } else {
     cloned.scoreHistory.p3Score = avgMotorPct;
   }
-  cloned.scoreHistory.p2Score = Math.max(25, Math.round(cloned.scoreHistory.p3Score - 8));
-  cloned.scoreHistory.p1Score = Math.max(20, Math.round(cloned.scoreHistory.p3Score - 17));
+  if (r.Skor_P2 !== undefined && r.Skor_P2 !== '') {
+    cloned.scoreHistory.p2Score = toNum(r.Skor_P2, Math.max(25, Math.round(cloned.scoreHistory.p3Score - 8)));
+  } else {
+    cloned.scoreHistory.p2Score = Math.max(25, Math.round(cloned.scoreHistory.p3Score - 8));
+  }
+  if (r.Skor_P1 !== undefined && r.Skor_P1 !== '') {
+    cloned.scoreHistory.p1Score = toNum(r.Skor_P1, Math.max(20, Math.round(cloned.scoreHistory.p3Score - 17)));
+  } else {
+    cloned.scoreHistory.p1Score = Math.max(20, Math.round(cloned.scoreHistory.p3Score - 17));
+  }
 
   if (r.Brans_Referans_Puani) {
     cloned.somatotype.eliteRef.refScore = toNum(
@@ -2356,7 +2678,7 @@ export function generateSampleBatchLabReports(baseTemplate: SportsFlyLabReport):
 /**
  * Column Mapping Schema for Flexible Multi-Format Batch Excel Import
  */
-export type LabBatchFieldCategory = 'identity' | 'body' | 'motor' | 'advanced';
+export type LabBatchFieldCategory = 'identity' | 'body' | 'somatotype' | 'motor' | 'cardio' | 'advanced';
 
 export interface LabBatchMappableField {
   key: string; // Canonical row property expected by buildLabReportFromExcelRow (e.g. 'Sporcu_Adi', 'Boy_3', 'Surat_3')
@@ -2396,7 +2718,7 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     category: 'identity',
     categoryLabel: '1. Kimlik & Dönem',
     unit: 'Metin',
-    description: 'Sporcunun branşı veya yaş grubu (Örn: Futbol / U12)',
+    description: 'Sporcunun branşı veya yaş grubu (Örn: Voleybol / U12)',
     aliases: ['Brans', 'Branş', 'Branş / Takım', 'Spor Branşı', 'Grup', 'Takım', 'Kategori', 'Branch', 'Sport'],
   },
   {
@@ -2463,7 +2785,7 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     aliases: ['Olcum_3_Tarihi', '3. Ölçüm Tarihi', 'Ölçüm Tarihi', 'Son Ölçüm Tarihi', 'Tarih', 'Tarih 3', 'Date'],
   },
 
-  // 2. Beden Kompozisyonu
+  // 2. Beden Kompozisyonu & Antropometri
   {
     key: 'Boy_1',
     label: 'Boy Uzunluğu — 1. Ölçüm',
@@ -2488,12 +2810,12 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     category: 'body',
     categoryLabel: '2. Beden Kompozisyonu',
     unit: 'cm',
-    description: 'Güncel boy uzunluğu (Tek boy sütunu varsa buraya eşleştirin)',
+    description: 'Güncel boy uzunluğu',
     aliases: ['Boy_3', '3. Boy', 'Boy 3', 'Son Boy Ölçümü (cm)', 'Güncel Boy', 'Boy (cm)', 'Boy', 'Boy Uzunluğu', 'Height'],
   },
   {
     key: 'Agirlik_1',
-    label: 'Vücut Ağırlığı (Kilo) — 1. Ölçüm',
+    label: 'Vücut Ağırlığı — 1. Ölçüm',
     category: 'body',
     categoryLabel: '2. Beden Kompozisyonu',
     unit: 'kg',
@@ -2502,7 +2824,7 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
   },
   {
     key: 'Agirlik_2',
-    label: 'Vücut Ağırlığı (Kilo) — 2. Ölçüm',
+    label: 'Vücut Ağırlığı — 2. Ölçüm',
     category: 'body',
     categoryLabel: '2. Beden Kompozisyonu',
     unit: 'kg',
@@ -2511,16 +2833,16 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
   },
   {
     key: 'Agirlik_3',
-    label: 'Vücut Ağırlığı (Kilo) — 3. Ölçüm (Güncel)',
+    label: 'Vücut Ağırlığı — 3. Ölçüm (Güncel)',
     category: 'body',
     categoryLabel: '2. Beden Kompozisyonu',
     unit: 'kg',
-    description: 'Güncel vücut ağırlığı (Tek kilo sütunu varsa buraya eşleştirin)',
+    description: 'Güncel vücut ağırlığı',
     aliases: ['Agirlik_3', 'Ağırlık 3', 'Kilo 3', 'Güncel Kilo (kg)', 'Kilosu', 'Kilo (kg)', 'Kilo', 'Ağırlık', 'Vücut Ağırlığı', 'Weight'],
   },
   {
     key: 'BKI_3',
-    label: 'Beden Kütle İndeksi (BKİ) — 3. Ölçüm',
+    label: 'Beden Kütle İndeksi (BKİ)',
     category: 'body',
     categoryLabel: '2. Beden Kompozisyonu',
     unit: 'kg/m²',
@@ -2555,12 +2877,84 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     aliases: ['Yag_Yuzdesi_3', 'Yag_Yuzdesi', 'Yağ Oranı (%)', 'Yağ Oranı', 'Yağ Yüzdesi', 'Yağ %', 'Body Fat'],
   },
   {
+    key: 'Subscapula_3',
+    label: 'Subscapula D.K.K. — 3. Ölçüm',
+    category: 'body',
+    categoryLabel: '2. Beden Kompozisyonu',
+    unit: 'mm',
+    description: 'Kürek kemiği altı deri kıvrım kalınlığı',
+    aliases: ['Subscapula_3', 'Subscapula', 'Subscapula DKK', 'Subscapula (mm)'],
+  },
+  {
+    key: 'Triceps_3',
+    label: 'Triceps D.K.K. — 3. Ölçüm',
+    category: 'body',
+    categoryLabel: '2. Beden Kompozisyonu',
+    unit: 'mm',
+    description: 'Arka kol deri kıvrım kalınlığı',
+    aliases: ['Triceps_3', 'Triceps', 'Triceps DKK', 'Triceps (mm)'],
+  },
+  {
+    key: 'Calf_DKK_3',
+    label: 'Calf (Baldır) D.K.K. — 3. Ölçüm',
+    category: 'body',
+    categoryLabel: '2. Beden Kompozisyonu',
+    unit: 'mm',
+    description: 'Baldır deri kıvrım kalınlığı',
+    aliases: ['Calf_DKK_3', 'Calf DKK', 'Calf_Skf', 'Baldır DKK', 'Calf (mm)'],
+  },
+  {
+    key: 'Supraspinal_3',
+    label: 'Supraspinal D.K.K. — 3. Ölçüm',
+    category: 'body',
+    categoryLabel: '2. Beden Kompozisyonu',
+    unit: 'mm',
+    description: 'Leğen kemiği üstü deri kıvrım kalınlığı',
+    aliases: ['Supraspinal_3', 'Supraspinal', 'Supraspinal DKK', 'Supraspinale'],
+  },
+  {
+    key: 'Humerus_3',
+    label: 'Humerus Kemik Çapı — 3. Ölçüm',
+    category: 'body',
+    categoryLabel: '2. Beden Kompozisyonu',
+    unit: 'cm',
+    description: 'Dirsek eklemi kemik genişliği (Mezomorfi)',
+    aliases: ['Humerus_3', 'Humerus', 'Humerus Çap', 'Humerus (cm)'],
+  },
+  {
+    key: 'Femur_3',
+    label: 'Femur Kemik Çapı — 3. Ölçüm',
+    category: 'body',
+    categoryLabel: '2. Beden Kompozisyonu',
+    unit: 'cm',
+    description: 'Diz eklemi kemik genişliği (Mezomorfi)',
+    aliases: ['Femur_3', 'Femur', 'Femur Çap', 'Femur (cm)'],
+  },
+  {
+    key: 'Calf_Cevre_3',
+    label: 'Calf (Baldır) Çevresi — 3. Ölçüm',
+    category: 'body',
+    categoryLabel: '2. Beden Kompozisyonu',
+    unit: 'cm',
+    description: 'Baldır maksimum kas çevresi',
+    aliases: ['Calf_Cevre_3', 'Calf Çevre', 'Baldır Çevresi', 'Calf Girth'],
+  },
+  {
+    key: 'Biceps_Cevre_3',
+    label: 'Biceps (Kol) Çevresi — 3. Ölçüm',
+    category: 'body',
+    categoryLabel: '2. Beden Kompozisyonu',
+    unit: 'cm',
+    description: 'Fleksiyonda üst kol kas çevresi',
+    aliases: ['Biceps_Cevre_3', 'Biceps Çevre', 'Kol Çevresi', 'Biceps Girth'],
+  },
+  {
     key: 'Oturma_Boyu_3',
     label: 'Oturma (Büst) Boyu — 3. Ölçüm',
     category: 'body',
     categoryLabel: '2. Beden Kompozisyonu',
     unit: 'cm',
-    description: 'Eşleştirilmezse boy uzunluğuyla orantılı hesaplanır',
+    description: 'PHV ve olgunlaşma hesabında kullanılan büst boyu',
     aliases: ['Oturma_Boyu_3', 'Oturma Boyu', 'Büst Boyu', 'Sitting Height'],
   },
   {
@@ -2569,16 +2963,108 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     category: 'body',
     categoryLabel: '2. Beden Kompozisyonu',
     unit: 'cm',
-    description: 'Eşleştirilmezse boy uzunluğuyla orantılı hesaplanır',
+    description: 'Kollar açık parmak ucu mesafesi',
     aliases: ['Kulac_3', 'Kulaç Uzunluğu', 'Kulaç', 'Arm Span'],
   },
 
-  // 3. Motor Performans
+  // 3. Heath-Carter Somatotip Değişim Tablosu
+  {
+    key: 'Endomorfi_1',
+    label: 'Endomorfi — 1. Ölçüm',
+    category: 'somatotype',
+    categoryLabel: '3. Somatotip Değişim Tablosu',
+    unit: 'Puan',
+    description: '1. test dönemi Endomorfi bileşeni',
+    aliases: ['Endomorfi_1', 'Endomorfi 1', 'Endo 1'],
+  },
+  {
+    key: 'Endomorfi_2',
+    label: 'Endomorfi — 2. Ölçüm',
+    category: 'somatotype',
+    categoryLabel: '3. Somatotip Değişim Tablosu',
+    unit: 'Puan',
+    description: '2. test dönemi Endomorfi bileşeni',
+    aliases: ['Endomorfi_2', 'Endomorfi 2', 'Endo 2'],
+  },
+  {
+    key: 'Endomorfi_3',
+    label: 'Endomorfi — 3. Ölçüm (Güncel)',
+    category: 'somatotype',
+    categoryLabel: '3. Somatotip Değişim Tablosu',
+    unit: 'Puan',
+    description: 'Güncel Heath-Carter Endomorfi (göreceli yağlılık)',
+    aliases: ['Endomorfi_3', 'Endomorfi', 'Endo', 'Endomorphy', 'Endomorfi 3'],
+  },
+  {
+    key: 'Mezomorfi_1',
+    label: 'Mezomorfi — 1. Ölçüm',
+    category: 'somatotype',
+    categoryLabel: '3. Somatotip Değişim Tablosu',
+    unit: 'Puan',
+    description: '1. test dönemi Mezomorfi bileşeni',
+    aliases: ['Mezomorfi_1', 'Mezomorfi 1', 'Mezo 1'],
+  },
+  {
+    key: 'Mezomorfi_2',
+    label: 'Mezomorfi — 2. Ölçüm',
+    category: 'somatotype',
+    categoryLabel: '3. Somatotip Değişim Tablosu',
+    unit: 'Puan',
+    description: '2. test dönemi Mezomorfi bileşeni',
+    aliases: ['Mezomorfi_2', 'Mezomorfi 2', 'Mezo 2'],
+  },
+  {
+    key: 'Mezomorfi_3',
+    label: 'Mezomorfi — 3. Ölçüm (Güncel)',
+    category: 'somatotype',
+    categoryLabel: '3. Somatotip Değişim Tablosu',
+    unit: 'Puan',
+    description: 'Güncel Heath-Carter Mezomorfi (kas-iskelet sağlamlığı)',
+    aliases: ['Mezomorfi_3', 'Mezomorfi', 'Mezo', 'Mesomorphy', 'Mezomorfi 3'],
+  },
+  {
+    key: 'Ektomorfi_1',
+    label: 'Ektomorfi — 1. Ölçüm',
+    category: 'somatotype',
+    categoryLabel: '3. Somatotip Değişim Tablosu',
+    unit: 'Puan',
+    description: '1. test dönemi Ektomorfi bileşeni',
+    aliases: ['Ektomorfi_1', 'Ektomorfi 1', 'Ekto 1'],
+  },
+  {
+    key: 'Ektomorfi_2',
+    label: 'Ektomorfi — 2. Ölçüm',
+    category: 'somatotype',
+    categoryLabel: '3. Somatotip Değişim Tablosu',
+    unit: 'Puan',
+    description: '2. test dönemi Ektomorfi bileşeni',
+    aliases: ['Ektomorfi_2', 'Ektomorfi 2', 'Ekto 2'],
+  },
+  {
+    key: 'Ektomorfi_3',
+    label: 'Ektomorfi — 3. Ölçüm (Güncel)',
+    category: 'somatotype',
+    categoryLabel: '3. Somatotip Değişim Tablosu',
+    unit: 'Puan',
+    description: 'Güncel Heath-Carter Ektomorfi (incelik / doğrusallık)',
+    aliases: ['Ektomorfi_3', 'Ektomorfi', 'Ekto', 'Ectomorphy', 'Ektomorfi 3'],
+  },
+  {
+    key: 'Somatotip_Kategorisi',
+    label: 'Somatotip Sınıfı / Kategorisi',
+    category: 'somatotype',
+    categoryLabel: '3. Somatotip Değişim Tablosu',
+    unit: 'Metin',
+    description: 'Örn: Dengeli Mezomorf, Endomorfik Mezomorf',
+    aliases: ['Somatotip_Kategorisi', 'Somatotip Sınıfı', 'Somatotip Kategorisi', 'Somatotip Tipi'],
+  },
+
+  // 4. Biyomotor Yetenek & Motor Testler
   {
     key: 'Surat_1',
     label: '20m Sürat Koşusu — 1. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'sn',
     description: '1. dönem 20m sprint süresi',
     aliases: ['Surat_1', 'Sürat 1', 'İlk 20m Sürat', 'Sprint 1'],
@@ -2587,7 +3073,7 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     key: 'Surat_2',
     label: '20m Sürat Koşusu — 2. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'sn',
     description: '2. dönem 20m sprint süresi',
     aliases: ['Surat_2', 'Sürat 2', 'Ara 20m Sürat', 'Sprint 2'],
@@ -2596,16 +3082,16 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     key: 'Surat_3',
     label: '20m Sürat Koşusu — 3. Ölçüm (Güncel)',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'sn',
-    description: 'Güncel 20m sürat süresi (Tek sürat sütunu varsa buraya eşleştirin)',
+    description: 'Güncel 20m sürat süresi',
     aliases: ['Surat_3', 'Surat', 'Sürat', '20 Metre Koşu (sn)', '20m Sürat', '20m Sprint', 'Sprint'],
   },
   {
     key: 'Cabukluk_1',
     label: '10x5m Çabukluk Testi — 1. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'sn',
     description: '1. dönem 10x5m yön değiştirme süresi',
     aliases: ['Cabukluk_1', 'Çabukluk 1', 'Agility 1'],
@@ -2614,7 +3100,7 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     key: 'Cabukluk_2',
     label: '10x5m Çabukluk Testi — 2. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'sn',
     description: '2. dönem 10x5m yön değiştirme süresi',
     aliases: ['Cabukluk_2', 'Çabukluk 2', 'Agility 2'],
@@ -2623,16 +3109,16 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     key: 'Cabukluk_3',
     label: '10x5m Çabukluk Testi — 3. Ölçüm (Güncel)',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'sn',
     description: 'Güncel 10x5m çabukluk süresi',
     aliases: ['Cabukluk_3', 'Cabukluk', 'Çabukluk', '10x5m Çabukluk (sn)', '10x5m', 'Çeviklik', 'Agility'],
   },
   {
     key: 'Reaksiyon_3',
-    label: 'Görsel Reaksiyon Sürati — 3. Ölçüm',
+    label: 'Reaksiyon Sürati — 3. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'sn',
     description: 'Görsel reaksiyon testi süresi',
     aliases: ['Reaksiyon_3', 'Reaksiyon', 'Reaksiyon Sürati', 'Reaction'],
@@ -2641,7 +3127,7 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     key: 'Sirt_Kuvveti_3',
     label: 'Sırt Kuvveti — 3. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'kg',
     description: 'Sırt dinamometre kuvvet ölçümü',
     aliases: ['Sirt_Kuvveti_3', 'Sirt_Kuvveti', 'Sırt Kuvveti', 'Sırt Dinamometre (kg)', 'Back Strength'],
@@ -2650,7 +3136,7 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     key: 'Kavrama_Kuvveti_3',
     label: 'El Kavrama (Pençe) Kuvveti — 3. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'kg',
     description: 'Dominant el kavrama kuvvet ölçümü',
     aliases: ['Kavrama_Kuvveti_3', 'Kavrama_Kuvveti', 'Kavrama Kuvveti', 'Pençe Kuvveti (kg)', 'Pençe Kuvveti', 'El Kavrama', 'Handgrip'],
@@ -2659,7 +3145,7 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     key: 'Durarak_Uzun_Atlama_3',
     label: 'Durarak Uzun Atlama — 3. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'cm',
     description: 'Çift ayak yatay sıçrama mesafesi',
     aliases: ['Durarak_Uzun_Atlama_3', 'Durarak Uzun Atlama (cm)', 'Durarak Uzun Atlama', 'Uzun_Atlama', 'Uzun Atlama', 'Broad Jump'],
@@ -2668,25 +3154,25 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     key: 'Dikey_Sicrama_3',
     label: 'Dikey Sıçrama — 3. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'cm',
-    description: 'Dikey sıçrama yüksekliği (Anaerobik güç W/kg hesabında da kullanılır)',
+    description: 'Dikey sıçrama yüksekliği (CMJ)',
     aliases: ['Dikey_Sicrama_3', 'Dikey_Sicrama', 'Dikey Sıçrama Testi (cm)', 'Dikey Sıçrama', 'CMJ', 'Vertical Jump'],
   },
   {
     key: 'Denge_3',
     label: 'Flamingo Denge Testi — 3. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'hata',
-    description: '60 sn tek ayak denge hata sayısı',
+    description: '60 sn tek ayak denge testi',
     aliases: ['Denge_3', 'Denge', 'Flamingo Denge', 'Balance'],
   },
   {
     key: 'Esneklik_3',
     label: 'Otur-Eriş Esneklik — 3. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'cm',
     description: 'Otur-eriş sehpası esneklik ölçümü',
     aliases: ['Esneklik_3', 'Esneklik', 'Otur Eriş Esneklik (cm)', 'Otur Eriş', 'Flexibility'],
@@ -2695,83 +3181,157 @@ export const LAB_BATCH_MAPPABLE_FIELDS: LabBatchMappableField[] = [
     key: 'VO2max_3',
     label: 'VO2max / Aerobik Kapasite — 3. Ölçüm',
     category: 'motor',
-    categoryLabel: '3. Motor Performans',
+    categoryLabel: '4. Biyomotor Yetenek',
     unit: 'ml/kg/dk',
     description: 'Maksimal oksijen tüketimi (VO2peak)',
     aliases: ['VO2max_3', 'VO2max', 'Mekik VO2max', 'VO2peak', 'Aerobik Güç'],
   },
 
-  // 4. Somatotip, PACER, PHV & Genel Puan
+  // 5. Kardiyorespiratuar, PACER & Kondisyon
+  {
+    key: 'PACER_Mesafe_1',
+    label: 'PACER Koşu Mesafesi — 1. Ölçüm',
+    category: 'cardio',
+    categoryLabel: '5. Kardiyo & Kondisyon',
+    unit: 'metre',
+    description: '1. test 20m mekik koşusu mesafesi',
+    aliases: ['PACER_Mesafe_1', 'PACER 1', 'Mekik Mesafesi 1'],
+  },
+  {
+    key: 'PACER_Mesafe_2',
+    label: 'PACER Koşu Mesafesi — 2. Ölçüm',
+    category: 'cardio',
+    categoryLabel: '5. Kardiyo & Kondisyon',
+    unit: 'metre',
+    description: '2. test 20m mekik koşusu mesafesi',
+    aliases: ['PACER_Mesafe_2', 'PACER 2', 'Mekik Mesafesi 2'],
+  },
   {
     key: 'PACER_Mesafe_3',
-    label: 'PACER / Mekik Koşu Mesafesi — 3. Ölçüm',
-    category: 'advanced',
-    categoryLabel: '4. Somatotip, PHV & Puan',
+    label: 'PACER Koşu Mesafesi — 3. Ölçüm',
+    category: 'cardio',
+    categoryLabel: '5. Kardiyo & Kondisyon',
     unit: 'metre',
-    description: '20m mekik koşusu toplam mesafesi',
+    description: 'Güncel 20m mekik koşusu mesafesi',
     aliases: ['PACER_Mesafe_3', 'Mekik Mesafesi (m)', 'Mekik Mesafesi', 'PACER', 'Shuttle Run'],
   },
   {
-    key: 'Endomorfi',
-    label: 'Endomorfi (Somatotip)',
-    category: 'advanced',
-    categoryLabel: '4. Somatotip, PHV & Puan',
-    unit: 'puan',
-    description: 'Heath-Carter Endomorfi bileşeni',
-    aliases: ['Endomorfi', 'Endo', 'Endomorphy'],
+    key: 'PACER_Mekik_3',
+    label: 'PACER Mekik Sayısı — 3. Ölçüm',
+    category: 'cardio',
+    categoryLabel: '5. Kardiyo & Kondisyon',
+    unit: 'adet',
+    description: 'Tamamlanan mekik sayısı',
+    aliases: ['PACER_Mekik_3', 'Mekik Sayısı', 'Shuttles'],
   },
   {
-    key: 'Mezomorfi',
-    label: 'Mezomorfi (Somatotip)',
-    category: 'advanced',
-    categoryLabel: '4. Somatotip, PHV & Puan',
-    unit: 'puan',
-    description: 'Heath-Carter Mezomorfi (kas-iskelet) bileşeni',
-    aliases: ['Mezomorfi', 'Mezo', 'Meso', 'Mesomorphy'],
+    key: 'BMR',
+    label: 'Bazal Metabolizma Hızı (BMR)',
+    category: 'cardio',
+    categoryLabel: '5. Kardiyo & Kondisyon',
+    unit: 'kcal',
+    description: 'Günlük bazal metabolik enerji ihtiyacı',
+    aliases: ['BMR', 'Bazal Metabolizma', 'Metabolizma'],
   },
   {
-    key: 'Ektomorfi',
-    label: 'Ektomorfi (Somatotip)',
-    category: 'advanced',
-    categoryLabel: '4. Somatotip, PHV & Puan',
-    unit: 'puan',
-    description: 'Heath-Carter Ektomorfi (doğrusallık) bileşeni',
-    aliases: ['Ektomorfi', 'Ekto', 'Ecto', 'Ectomorphy'],
+    key: 'MET',
+    label: 'Fonksiyonel Kapasite (MET)',
+    category: 'cardio',
+    categoryLabel: '5. Kardiyo & Kondisyon',
+    unit: 'MET',
+    description: 'Metabolik eşdeğer egzersiz kapasitesi',
+    aliases: ['MET', 'Kapasite MET', 'Fonksiyonel MET'],
   },
+  {
+    key: 'Maksimum_Kalp_Hizi',
+    label: 'Maksimum Kalp Hızı (HRmax)',
+    category: 'cardio',
+    categoryLabel: '5. Kardiyo & Kondisyon',
+    unit: 'bpm',
+    description: 'Tepe nabız değeri',
+    aliases: ['Maksimum_Kalp_Hizi', 'HRmax', 'Maksimum Nabız', 'Kalp Hızı'],
+  },
+
+  // 6. PHV, Skorlar & Uzman Notu
   {
     key: 'PHV_Yasi',
     label: 'PHV (Tepe Boy Hızı) Yaşı',
     category: 'advanced',
-    categoryLabel: '4. Somatotip, PHV & Puan',
+    categoryLabel: '6. PHV & Skorlar',
     unit: 'Yaş',
-    description: 'Tahmini büyüme atağı (Peak Height Velocity) yaşı',
+    description: 'Tahmini büyüme atağı yaşı',
     aliases: ['PHV_Yasi', 'PHV Yaşı', 'PHV', 'Büyüme Atağı Yaşı'],
+  },
+  {
+    key: 'PHV_Boyu',
+    label: 'PHV Dönemi Tahmini Boy',
+    category: 'advanced',
+    categoryLabel: '6. PHV & Skorlar',
+    unit: 'cm',
+    description: 'Büyüme atağındaki tahmini boy',
+    aliases: ['PHV_Boyu', 'PHV Boy', 'PHV Dönemi Boyu'],
   },
   {
     key: 'Tahmini_18_Yas_Boyu',
     label: 'Tahmini 18 Yaş Yetişkin Boyu',
     category: 'advanced',
-    categoryLabel: '4. Somatotip, PHV & Puan',
+    categoryLabel: '6. PHV & Skorlar',
     unit: 'cm',
     description: 'Khamis-Roche / Mirwald 18 yaş boy projeksiyonu',
     aliases: ['Tahmini_18_Yas_Boyu', 'Tahmini Yetişkin Boyu', '18 Yaş Boyu', 'Tahmini Boy', 'Hedef Boy'],
   },
   {
-    key: 'Genel_Performans_Puani',
-    label: 'Genel Performans Puanı (3. Ölçüm)',
+    key: 'Olgunlasma_Durumu',
+    label: 'Biyolojik Olgunlaşma Durumu',
     category: 'advanced',
-    categoryLabel: '4. Somatotip, PHV & Puan',
-    unit: '0-100',
-    description: 'Boş bırakılırsa motor test yüzdeliklerinden otomatik hesaplanır',
-    aliases: ['Genel_Performans_Puani', 'Genel Skor', 'Performans Puanı', 'Genel Puan', 'Toplam Puan', 'Score'],
+    categoryLabel: '6. PHV & Skorlar',
+    unit: 'Metin',
+    description: 'Erken, Normal (Zamanında) veya Geç Ergen',
+    aliases: ['Olgunlasma_Durumu', 'Olgunlaşma Durumu', 'Olgunlaşma', 'Maturation'],
+  },
+  {
+    key: 'Skor_P1',
+    label: '1. Dönem Karne Skoru',
+    category: 'advanced',
+    categoryLabel: '6. PHV & Skorlar',
+    unit: '%',
+    description: '1. ölçüm genel karne başarı puanı',
+    aliases: ['Skor_P1', 'P1 Skoru', '1. Dönem Skoru', 'Puan 1'],
+  },
+  {
+    key: 'Skor_P2',
+    label: '2. Dönem Karne Skoru',
+    category: 'advanced',
+    categoryLabel: '6. PHV & Skorlar',
+    unit: '%',
+    description: '2. ölçüm genel karne başarı puanı',
+    aliases: ['Skor_P2', 'P2 Skoru', '2. Dönem Skoru', 'Puan 2'],
+  },
+  {
+    key: 'Skor_P3',
+    label: '3. Dönem Karne Skoru (Güncel)',
+    category: 'advanced',
+    categoryLabel: '6. PHV & Skorlar',
+    unit: '%',
+    description: '3. ölçüm genel karne başarı puanı',
+    aliases: ['Skor_P3', 'Genel_Performans_Puani', 'Genel Skor', 'Performans Puanı', 'P3 Skoru', 'Puan 3'],
+  },
+  {
+    key: 'Brans_Referans_Puani',
+    label: 'Branş Referans Puanı',
+    category: 'advanced',
+    categoryLabel: '6. PHV & Skorlar',
+    unit: 'Puan',
+    description: 'Elit sporcu referans başarı hedefi',
+    aliases: ['Brans_Referans_Puani', 'Elit Puan', 'Referans Puanı', 'Hedef Puan'],
   },
   {
     key: 'Uzman_Gorusu',
     label: 'Uzman / Antrenör Görüşü',
     category: 'advanced',
-    categoryLabel: '4. Somatotip, PHV & Puan',
+    categoryLabel: '6. PHV & Skorlar',
     unit: 'Metin',
-    description: 'Karne 7. sayfasında yer alan uzman değerlendirme metni',
+    description: 'Karne 7. sayfasında yer alan uzman antrenör değerlendirme metni',
     aliases: ['Uzman_Gorusu', 'Antrenör Değerlendirmesi', 'Uzman Görüşü', 'Antrenör Notu', 'Yorum', 'Açıklama'],
   },
 ];
@@ -3186,11 +3746,25 @@ export function parseSportsFlyLabExcel(
           cloned.somatotype.m1.ecto = toNum(m1, cloned.somatotype.m1.ecto);
           cloned.somatotype.m2.ecto = toNum(m2, cloned.somatotype.m2.ecto);
           cloned.somatotype.m3.ecto = toNum(m3, cloned.somatotype.m3.ecto);
-        } else if (code === 'pacer_distance') {
+        } else if (code === 'pacer_distance' || name.toLowerCase().includes('pacer') || name.toLowerCase().includes('shuttle run')) {
           cloned.cardio.test1Distance = toNum(m1, cloned.cardio.test1Distance);
           cloned.cardio.test2Distance = toNum(m2, cloned.cardio.test2Distance);
           cloned.cardio.test3Distance = toNum(m3, cloned.cardio.test3Distance);
-        } else if (code === 'expert_comment' || name.toLowerCase().includes('uzman görüşü') || name.toLowerCase().includes('uzman değerlendirme')) {
+        } else if (code === 'pacer_vo2' || name.toLowerCase().includes('vo2peak') || name.toLowerCase().includes('aerobik güç')) {
+          cloned.cardio.test1Vo2 = toNum(m1, cloned.cardio.test1Vo2);
+          cloned.cardio.test2Vo2 = toNum(m2, cloned.cardio.test2Vo2);
+          cloned.cardio.test3Vo2 = toNum(m3, cloned.cardio.test3Vo2);
+        } else if (code === 'bmr_met' || name.toLowerCase().includes('bazal metabolizma')) {
+          cloned.cardio.basalMetabolicRate = toNum(m3 ?? m2 ?? m1, cloned.cardio.basalMetabolicRate);
+        } else if (code === 'phv_age' || name.toLowerCase().includes('phv')) {
+          cloned.phvAge = toNum(m3 ?? m1, cloned.phvAge);
+        } else if (code === 'predicted_height' || name.toLowerCase().includes('18 yaş')) {
+          cloned.predictedAdultHeight = toNum(m3 ?? m1, cloned.predictedAdultHeight);
+        } else if (code === 'overall_score' || name.toLowerCase().includes('genel karne') || name.toLowerCase().includes('performans puanı')) {
+          if (m1) cloned.scoreHistory.p1Score = toNum(m1, cloned.scoreHistory.p1Score);
+          if (m2) cloned.scoreHistory.p2Score = toNum(m2, cloned.scoreHistory.p2Score);
+          if (m3) cloned.scoreHistory.p3Score = toNum(m3, cloned.scoreHistory.p3Score);
+        } else if (code === 'expert_comment' || name.toLowerCase().includes('uzman görüşü') || name.toLowerCase().includes('uzman değerlendirme') || name.toLowerCase().includes('antrenör')) {
           const val = m3 || m2 || m1;
           if (val && String(val).trim() !== '-') {
             cloned.expertComment = String(val).trim();

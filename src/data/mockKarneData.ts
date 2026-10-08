@@ -10,6 +10,19 @@ export interface SporcuKarne {
   boy: number; // cm
   kilo: number; // kg
   
+  // Heath-Carter Somatotype Profile (Optional)
+  somatotype?: {
+    endo: number; // Endomorfi (1-10)
+    meso: number; // Mezomorfi (1-10)
+    ecto: number; // Ektomorfi (1-10)
+    category: string; // e.g. "Dengeli Mezomorf", "Mezomorfik Ektomorf"
+    eliteRef?: {
+      endo: number;
+      meso: number;
+      ecto: number;
+    };
+  };
+  
   // Evaluation categories (out of 10)
   teknik: {
     topKontrolu?: number;

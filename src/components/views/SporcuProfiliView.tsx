@@ -46,6 +46,7 @@ import {
   KulupGaleriKategori,
 } from '../../types';
 import { downloadSporcuDevelopmentPdfReport } from '../../utils/sporcuPdfReportGenerator';
+import { SomatotypeRadarAndChart } from '../charts/SomatotypeRadarAndChart';
 import {
   SporcuProfil,
   getOrCreateSporcuProfil,
@@ -626,8 +627,15 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
 
           <button
             type="button"
-            onClick={() => window.print()}
-            className="p-2 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-semibold transition-colors ml-1"
+            onClick={() => {
+              try {
+                window.print();
+              } catch (err) {
+                console.warn('Yazdırma engellendi:', err);
+                alert('Tarayıcınızın yazdırma özelliği bu pencerede kısıtlanmış olabilir. Lütfen rapor veya karne indirme seçeneğini kullanın.');
+              }
+            }}
+            className="p-2 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-semibold transition-colors ml-1 cursor-pointer"
             title="Yazdır"
           >
             <Printer className="w-4 h-4 text-slate-600" />
@@ -1424,6 +1432,32 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
                 )}
               </div>
             </div>
+
+            {/* Heath-Carter Somatotip & Somato-Grafik Analizi (Sağlık & Biyometrik Görünümü) */}
+            <div className="pt-4 border-t border-slate-200">
+              <div className="mb-3">
+                <h4 className="font-extrabold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-indigo-600" />
+                  <span>Somatotip Beden Yapısı &amp; Biomekanik Analiz (Heath-Carter)</span>
+                </h4>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Endomorfi, Mezomorfi ve Ektomorfi bileşenlerinin dönemler arası net değişim ve gelişim tablosu
+                </p>
+              </div>
+              <SomatotypeRadarAndChart
+                somatotype={{
+                  endo: 3.2,
+                  meso: 5.4,
+                  ecto: 2.1,
+                  category: 'Mezomorfik-Endomorf',
+                  eliteRef: { endo: 2.5, meso: 5.2, ecto: 3.5 },
+                }}
+                athleteName={currentProfil.kimlik.adSoyad}
+                branch={currentProfil.kimlik.brans}
+                defaultView="table"
+                onlyTable={true}
+              />
+            </div>
           </div>
         )}
 
@@ -1448,6 +1482,29 @@ export const SporcuProfiliView: React.FC<SporcuProfiliViewProps> = ({
                   <span>Resmi Karne Görünümünü Aç</span>
                 </button>
               )}
+            </div>
+
+            {/* Somatotip Analiz Radarı & 2D Düzlem Grafiği */}
+            <div className="p-4 bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/30 rounded-2xl border border-indigo-100 shadow-2xs">
+              <div className="mb-3">
+                <h4 className="font-extrabold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+                  <Award className="w-4 h-4 text-indigo-600" />
+                  <span>Heath-Carter Somatotip Değişim Tablosu</span>
+                </h4>
+              </div>
+              <SomatotypeRadarAndChart
+                somatotype={{
+                  endo: 3.2,
+                  meso: 5.4,
+                  ecto: 2.1,
+                  category: 'Mezomorfik-Endomorf',
+                  eliteRef: { endo: 2.5, meso: 5.2, ecto: 3.5 },
+                }}
+                athleteName={currentProfil.kimlik.adSoyad}
+                branch={currentProfil.kimlik.brans}
+                defaultView="table"
+                onlyTable={true}
+              />
             </div>
 
             {/* 4 Ana Puan Sütunu */}

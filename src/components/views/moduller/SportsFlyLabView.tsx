@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { exportReportPagesToA4Pdf, BatchA4PdfBuilder } from '../../../utils/pdfExportHelper';
+import { SomatotypeRadarAndChart } from '../../charts/SomatotypeRadarAndChart';
 import {
   Activity,
   Upload,
@@ -111,9 +112,9 @@ interface SportsFlyLabViewProps {
 }
 
 const PAGE_TITLES = [
-  { page: 1, short: '1. Beden', full: '1. Beden Kompozisyonu Değerlendirmesi (Beden Sağlığı)' },
-  { page: 2, short: '2. Motor', full: '2. Motor Performans Değerlendirmesi' },
-  { page: 3, short: '3. Karşılaştırma', full: '3. Kritik Performans & Gelişim Analizi' },
+  { page: 1, short: '1. Beden & Somatotip', full: '1. Beden Kompozisyonu & Heath-Carter Somatotip Analizi' },
+  { page: 2, short: '2. Motor Performans', full: '2. Motor Performans Değerlendirmesi' },
+  { page: 3, short: '3. Somatotip & Kritik', full: '3. Somatotip Analizi & Kritik Performans Karşılaştırması' },
   { page: 4, short: '4. Gelişim Rehberi', full: '4. Veli & Antrenör Kapsamlı Gelişim Rehberi' },
 ];
 
@@ -263,19 +264,19 @@ const KARNE_TEMPLATES: KarneTemplateOption[] = [
     name: 'Kurumsal Teknik',
     shortName: '3. Kurumsal Teknik',
     subtitle: 'Resmi federasyon ve biyomekanik laboratuvar standardı, cetvelli teknik tablo ve Z-skor/SD analitik düzeni',
-    badgeColor: 'bg-amber-600 text-white',
+    badgeColor: 'bg-slate-700 text-white',
     pageFrameClass: 'bg-white text-slate-900 border-2 border-slate-400 ring-2 ring-slate-900/5',
-    headerBoxClass: 'bg-slate-950 text-white p-3.5 rounded-xl border-b-4 border-amber-400 mb-4',
-    headerTitleClass: 'text-amber-300',
+    headerBoxClass: 'bg-slate-950 text-white p-3.5 rounded-xl border-b-4 border-slate-500 mb-4',
+    headerTitleClass: 'text-slate-200',
     headerSubtitleClass: 'text-slate-300',
-    headerMetaClass: 'text-amber-400',
-    bannerClass: 'bg-slate-950 text-amber-50 border border-amber-500/50',
-    tableHeadClass: 'bg-slate-950 text-amber-300',
+    headerMetaClass: 'text-slate-300',
+    bannerClass: 'bg-slate-950 text-slate-100 border border-slate-500/50',
+    tableHeadClass: 'bg-slate-950 text-slate-200',
     accentTextClass: 'text-rose-700',
-    accentBgClass: 'bg-amber-50/50',
+    accentBgClass: 'bg-slate-50/50',
     footerBorderClass: 'border-t-2 border-slate-400 text-slate-600',
     defaultPrimaryHex: '#0f172a',
-    defaultSecondaryHex: '#f59e0b',
+    defaultSecondaryHex: '#475569',
   },
 ];
 
@@ -1296,9 +1297,9 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
     const sections = [
       activeAiAnalysis.overallSummary,
-      drillBullets ? `\n\n📌 ÖNCELİKLİ GELİŞİM VE DRİLL REÇETESİ:\n${drillBullets}` : '',
+      drillBullets ? `\n\n[1] ÖNCELİKLİ GELİŞİM VE DRİLL REÇETESİ:\n${drillBullets}` : '',
       activeAiAnalysis.nutritionAndRecoveryTip
-        ? `\n\n🥗 BESLENME & TOPARLANMA REHBERİ: ${activeAiAnalysis.nutritionAndRecoveryTip}`
+        ? `\n\n[2] BESLENME & TOPARLANMA REHBERİ: ${activeAiAnalysis.nutritionAndRecoveryTip}`
         : '',
     ].filter(Boolean);
 
@@ -1336,13 +1337,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
       if (found) {
         saveStoredKarneler(updatedKarneler);
-        notify(`✓ Uzman ve yapay zeka değerlendirmesi "${currentReport.athleteName}" adlı sporcunun 5. Sayfa Uzman Görüşü alanına başarıyla aktarıldı.`);
+        notify(`Uzman ve yapay zeka değerlendirmesi "${currentReport.athleteName}" adlı sporcunun 5. Sayfa Uzman Görüşü alanına başarıyla aktarıldı.`);
       } else {
-        notify('✓ Uzman ve yapay zeka değerlendirmesi karneye (5. Sayfa Uzman Görüşü alanına) başarıyla aktarıldı.');
+        notify('Uzman ve yapay zeka değerlendirmesi karneye (5. Sayfa Uzman Görüşü alanına) başarıyla aktarıldı.');
       }
     } catch (err) {
       console.error('Error syncing expertComment to SporcuKarne:', err);
-      notify('✓ Uzman ve yapay zeka değerlendirmesi karneye (5. Sayfa Uzman Görüşü alanına) başarıyla aktarıldı.');
+      notify('Uzman ve yapay zeka değerlendirmesi karneye (5. Sayfa Uzman Görüşü alanına) başarıyla aktarıldı.');
     }
   };
 
@@ -1406,19 +1407,28 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
   };
 
   // Trigger clean A4 Print / Browser PDF Output using @media print styles
-  const handlePrintA4 = () => {
+  const handlePrintA4 = async () => {
     setActiveLabTab('studio');
     setViewMode('all');
     setPdfZoom(100);
     setIsPdfPreviewMode(true);
+
+    const inIframe = window.self !== window.top;
+    if (inIframe) {
+      notify('A4 Düzeni Hazırlandı! İframe ortamı nedeniyle temiz A4 PDF dosyanız oluşturulup indiriliyor...');
+      await handleDownloadPDF();
+      return;
+    }
+
     notify('A4 Yazdırma diyaloğu hazırlanıyor...');
 
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
         window.print();
       } catch (err) {
         console.warn('window.print çağrısı uyarısı:', err);
-        notify('Tarayıcı yazdırma penceresi açılamadı. "Tüm Karneyi İndir" butonuyla temiz A4 PDF dosyasını kaydedebilirsiniz.');
+        notify('Yazdırma diyaloğu engellendi. Temiz A4 PDF dosyanız oluşturulup indiriliyor...');
+        await handleDownloadPDF();
       }
     }, 250);
   };
@@ -1481,15 +1491,15 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
   const getStatusBadge = (status: string) => {
     const s = (status || '').toLowerCase();
     if (s === 'mükemmel' || s === 'iyi' || s === 'yüksek') {
-      return 'bg-emerald-50 text-emerald-950 border border-emerald-300 font-extrabold px-2.5 py-0.5 rounded-full text-[10.5px] inline-block shadow-2xs';
+      return 'bg-emerald-50 text-emerald-900 border border-emerald-300 font-extrabold px-2.5 py-0.5 rounded-full text-[10.5px] inline-block shadow-2xs';
     }
     if (s === 'normal' || s === 'uzun' || s === 'optimal') {
-      return 'bg-blue-50 text-blue-950 border border-blue-300 font-extrabold px-2.5 py-0.5 rounded-full text-[10.5px] inline-block shadow-2xs';
+      return 'bg-blue-50 text-blue-900 border border-blue-300 font-extrabold px-2.5 py-0.5 rounded-full text-[10.5px] inline-block shadow-2xs';
     }
     if (s === 'desteklenmeli' || s === 'orta') {
-      return 'bg-amber-50 text-amber-950 border border-amber-300 font-extrabold px-2.5 py-0.5 rounded-full text-[10.5px] inline-block shadow-2xs';
+      return 'bg-amber-100 text-slate-900 border border-amber-400 font-black px-2.5 py-0.5 rounded-full text-[10.5px] inline-block shadow-2xs';
     }
-    return 'bg-rose-50 text-rose-950 border border-rose-300 font-extrabold px-2.5 py-0.5 rounded-full text-[10.5px] inline-block shadow-2xs';
+    return 'bg-rose-50 text-rose-900 border border-rose-300 font-extrabold px-2.5 py-0.5 rounded-full text-[10.5px] inline-block shadow-2xs';
   };
 
   const getStatusColor = (status: string) => {
@@ -1538,15 +1548,15 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
       className="absolute inset-0 pointer-events-none select-none flex flex-col items-center justify-center overflow-hidden z-0"
       aria-hidden="true"
     >
-      <div className="flex flex-col items-center justify-center opacity-[0.065] -rotate-12">
+      <div className="flex flex-col items-center justify-center opacity-[0.16] -rotate-12 transition-opacity">
         <div
-          className="w-[400px] h-[400px] sm:w-[460px] sm:h-[460px] rounded-full border-[5px] border-dashed flex flex-col items-center justify-center p-8"
+          className="w-[410px] h-[410px] sm:w-[470px] sm:h-[470px] rounded-full border-[6px] border-dashed flex flex-col items-center justify-center p-8"
           style={{ borderColor: effectivePrimaryHex }}
         >
           <img
             src={ROTA_PERFORMANS_LOGO_DATA_URL}
             alt="Rota Performans Logo"
-            className="w-[260px] h-[260px] sm:w-[300px] sm:h-[300px] object-contain"
+            className="w-[270px] h-[270px] sm:w-[310px] sm:h-[310px] object-contain filter drop-shadow-xs"
           />
           <div className="mt-2 text-center">
             <div
@@ -1878,7 +1888,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
       {
         code: '06',
         title: 'HUMERUS & FEMUR KEMİK ÇAPLARI',
-        subtitle: `Dirsek (${humerusBr} cm) & Diz (${femurBr} cm) Bikondiler Çatısı`,
+        subtitle: `Dirsek (${humerusBr} cm) & Diz (${femurBr} cm)`,
         m1: getM1('femurBreadth', 8.4),
         m2: getM2('femurBreadth', 8.5),
         m3: femurBr,
@@ -1886,7 +1896,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
         pct: getPct('femurBreadth', 82),
         sd: getSd('femurBreadth', 0.7),
         status: 'Sağlam İskelet',
-        accent: '#d97706',
+        accent: '#ea580c',
       },
       {
         code: '07',
@@ -2152,20 +2162,30 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     />
                   ))}
 
-                  {/* Regional Anatomical Zone Dividers */}
+                  {/* Regional Anatomical Zone Dividers & Clear Non-Overlapping Category Badges */}
                   <rect x="52" y="146" width="480" height="136" rx="8" fill="#f8fafc" fillOpacity="0.55" />
                   <rect x="52" y="284" width="480" height="92" rx="8" fill="#fff1f2" fillOpacity="0.35" />
                   <rect x="52" y="378" width="480" height="202" rx="8" fill="#f0fdf4" fillOpacity="0.35" />
 
-                  <text x="526" y="160" textAnchor="end" className="text-[7.5px] font-sans tabular-nums font-bold fill-slate-400">
-                    BÖLGE I · ÜST EKSTREMİTE &amp; TORAKS
-                  </text>
-                  <text x="526" y="298" textAnchor="end" className="text-[7.5px] font-sans tabular-nums font-bold fill-rose-400">
-                    BÖLGE II · MERKEZ GÖVDE (CORE &amp; PELVİS)
-                  </text>
-                  <text x="526" y="392" textAnchor="end" className="text-[7.5px] font-sans tabular-nums font-bold fill-emerald-600/70">
-                    BÖLGE III · ALT EKSTREMİTE &amp; İTKİ ZİNCİRİ
-                  </text>
+                  {/* Clean Non-Overlapping Zone Badges positioned safely in open layout space (Left column between callouts) */}
+                  <g>
+                    <rect x="52" y="158" width="118" height="14" rx="3.5" fill="#e2e8f0" fillOpacity="0.9" />
+                    <text x="111" y="168" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-extrabold fill-slate-700">
+                      BÖLGE I · ÜST TORAKS &amp; KOL
+                    </text>
+                  </g>
+                  <g>
+                    <rect x="52" y="288" width="118" height="14" rx="3.5" fill="#ffe4e6" fillOpacity="0.9" />
+                    <text x="111" y="298" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-extrabold fill-rose-700">
+                      BÖLGE II · MERKEZ GÖVDE (CORE)
+                    </text>
+                  </g>
+                  <g>
+                    <rect x="52" y="382" width="118" height="14" rx="3.5" fill="#dcfce7" fillOpacity="0.9" />
+                    <text x="111" y="392" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-extrabold fill-emerald-800">
+                      BÖLGE III · ALT EKSTREMİTE
+                    </text>
+                  </g>
 
                   {/* 2. Left Vertical Stadiometer Ruler (180 cm down to 0 cm) */}
                   <line x1="44" y1="60" x2="44" y2="582" stroke="#64748b" strokeWidth="1.5" />
@@ -2479,14 +2499,18 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   />
 
                   {/* 06. Humerus Elbow Breadth Caliper Bracket (Right Arm x=390, y=272) */}
-                  <line x1="372" y1="274" x2="408" y2="258" stroke="#d97706" strokeWidth="2.2" />
-                  <line x1="370" y1="269" x2="374" y2="279" stroke="#d97706" strokeWidth="2.2" />
-                  <line x1="406" y1="253" x2="410" y2="263" stroke="#d97706" strokeWidth="2.2" />
+                  <line x1="372" y1="274" x2="408" y2="258" stroke="#ea580c" strokeWidth="2.2" />
+                  <line x1="370" y1="269" x2="374" y2="279" stroke="#ea580c" strokeWidth="2.2" />
+                  <line x1="406" y1="253" x2="410" y2="263" stroke="#ea580c" strokeWidth="2.2" />
 
-                  {/* 06b. Femur Knee Breadth Caliper Bracket (Left Knee x=257, y=478) */}
-                  <line x1="241" y1="478" x2="273" y2="478" stroke="#d97706" strokeWidth="2.2" />
-                  <line x1="241" y1="472" x2="241" y2="484" stroke="#d97706" strokeWidth="2.2" />
-                  <line x1="273" y1="472" x2="273" y2="484" stroke="#d97706" strokeWidth="2.2" />
+                  {/* 06b. Femur Knee Breadth Caliper Bracket & Direct Value Tag (Left Knee x=257, y=478) */}
+                  <line x1="241" y1="478" x2="273" y2="478" stroke="#ea580c" strokeWidth="2.2" />
+                  <line x1="241" y1="472" x2="241" y2="484" stroke="#ea580c" strokeWidth="2.2" />
+                  <line x1="273" y1="472" x2="273" y2="484" stroke="#ea580c" strokeWidth="2.2" />
+                  <rect x="238" y="490" width="38" height="14" rx="3" fill="#ea580c" />
+                  <text x="257" y="500" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-black fill-white">
+                    {femurBr} cm
+                  </text>
 
                   {/* 07. Waist & Hip Ratio (WHR) 3D Elliptical Measurement Rings */}
                   <ellipse
@@ -2603,20 +2627,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
                   {/* 06 Humerus & Femur Breadth */}
                   <polyline
-                    points="392,266 432,244 456,244"
+                    points="392,266 428,244 454,244"
                     fill="none"
-                    stroke="#d97706"
+                    stroke="#ea580c"
                     strokeWidth="1.5"
                   />
-                  <polyline
-                    points="273,478 416,252 454,248"
-                    fill="none"
-                    stroke="#d97706"
-                    strokeWidth="1"
-                    strokeDasharray="3,2"
-                  />
-                  <rect x="454" y="231" width="82" height="24" rx="5" fill="#d97706" />
-                  <text x="495" y="242" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-bold fill-white/85">
+                  <rect x="454" y="231" width="82" height="24" rx="5" fill="#ea580c" />
+                  <text x="495" y="242" textAnchor="middle" className="text-[7px] font-sans tabular-nums font-bold fill-white/90">
                     06 KEMİK ÇAPI
                   </text>
                   <text x="495" y="251" textAnchor="middle" className="text-[8.5px] font-sans tabular-nums font-black fill-white">
@@ -2660,7 +2677,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     { cx: 248, cy: 206, code: '3', fill: '#059669' },
                     { cx: 244, cy: 324, code: '4', fill: '#10b981' },
                     { cx: 382, cy: 232, code: '5', fill: effectivePrimaryHex },
-                    { cx: 392, cy: 266, code: '6', fill: '#d97706' },
+                    { cx: 392, cy: 266, code: '6', fill: '#ea580c' },
                     { cx: 333, cy: 298, code: '7', fill: '#e11d48' },
                     { cx: 329, cy: 522, code: '8', fill: '#0f766e' },
                   ].map((pin) => (
@@ -2688,7 +2705,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     <span>Skinfold Deri Kıvrımı (mm)</span>
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-600 inline-block" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-orange-600 inline-block" />
                     <span>Kemik Çapı (cm)</span>
                   </span>
                   <span className="flex items-center gap-1">
@@ -2890,10 +2907,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             {/* Normative Reference Badges for Parent Report */}
             <div className="flex flex-wrap items-center justify-between gap-2 mt-2.5 pt-2 border-t border-white/20 text-[10.5px] font-sans">
               <span className="px-3 py-1 rounded-lg bg-slate-900/90 text-sky-200 border border-sky-400/40 flex items-center gap-1.5 font-semibold shadow-xs">
-                📚 Antropometrik Referans: WHO (Dünya Sağlık Örgütü) Uluslararası Büyüme &amp; ISAK Standartları
+                Antropometrik Referans: WHO (Dünya Sağlık Örgütü) Uluslararası Büyüme &amp; ISAK Standartları
               </span>
               <span className="px-3 py-1 rounded-lg bg-slate-900/90 text-emerald-200 border border-emerald-400/40 flex items-center gap-1.5 font-semibold shadow-xs">
-                 Motorik Test Referansı: Eurofit &amp; ACSM Gençlik Fiziksel Uygunluk Normları
+                Motorik Test Referansı: Eurofit &amp; ACSM Gençlik Fiziksel Uygunluk Normları
               </span>
             </div>
           </div>
@@ -2924,7 +2941,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               <div className="p-3 rounded-xl bg-white border-2 border-emerald-500 shadow-2xs">
                 <div className="text-[10px] font-bold text-emerald-800 uppercase">3. Ölçüm (Güncel)</div>
                 <div className="text-xl font-black font-sans tabular-nums text-emerald-600 mt-0.5">%{p3Score}</div>
-                <div className="text-[9.5px] text-emerald-700 font-extrabold mt-0.5">✨ Harika Gelişim</div>
+                <div className="text-[9.5px] text-emerald-700 font-extrabold mt-0.5">İleri Düzey Gelişim</div>
               </div>
             </div>
 
@@ -2953,7 +2970,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="p-3 rounded-xl bg-white border border-sky-200 shadow-2xs flex items-start gap-2.5">
-                <span className="text-lg shrink-0">🚀</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-sky-500 shrink-0 mt-1.5 inline-block" />
                 <div>
                   <div className="text-xs font-black text-slate-900">Sıçrama &amp; Patlayıcı Kuvvet</div>
                   <p className="text-[11px] text-slate-600 mt-1 leading-snug">
@@ -2963,7 +2980,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               </div>
 
               <div className="p-3 rounded-xl bg-white border border-sky-200 shadow-2xs flex items-start gap-2.5">
-                <span className="text-lg shrink-0">💪</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-sky-500 shrink-0 mt-1.5 inline-block" />
                 <div>
                   <div className="text-xs font-black text-slate-900">Kavrama &amp; Üst Gövde Gücü</div>
                   <p className="text-[11px] text-slate-600 mt-1 leading-snug">
@@ -2973,7 +2990,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               </div>
 
               <div className="p-3 rounded-xl bg-white border border-sky-200 shadow-2xs flex items-start gap-2.5">
-                <span className="text-lg shrink-0"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-sky-500 shrink-0 mt-1.5 inline-block" />
                 <div>
                   <div className="text-xs font-black text-slate-900">Sürat &amp; Reaksiyon Çabukluğu</div>
                   <p className="text-[11px] text-slate-600 mt-1 leading-snug">
@@ -2993,31 +3010,31 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="p-3 rounded-xl bg-white border border-amber-200 shadow-2xs flex items-start gap-2.5">
-                <span className="text-lg shrink-0">🎯</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 mt-1.5 inline-block" />
                 <div>
                   <div className="text-xs font-black text-slate-900">Denge &amp; Stabilizasyon</div>
                   <p className="text-[11px] text-slate-600 mt-1 leading-snug">
-                    Denge alanında <strong className="text-amber-700">henüz gelişim alanın var</strong>; düzenli tek ayak oyunlarıyla zamanla çok daha güçlü hale gelecek.
+                    Denge alanında <strong className="text-slate-900 bg-amber-100/90 px-1.5 py-0.5 rounded font-black border border-amber-300 inline-block">henüz gelişim alanın var</strong>; düzenli tek ayak oyunlarıyla zamanla çok daha güçlü hale gelecek.
                   </p>
                 </div>
               </div>
 
               <div className="p-3 rounded-xl bg-white border border-amber-200 shadow-2xs flex items-start gap-2.5">
-                <span className="text-lg shrink-0">🧘</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 mt-1.5 inline-block" />
                 <div>
                   <div className="text-xs font-black text-slate-900">Esneklik &amp; Eklem Genişliği</div>
                   <p className="text-[11px] text-slate-600 mt-1 leading-snug">
-                    Esneklikte <strong className="text-amber-700">henüz hedef seviyene yaklaşma aşamasındasın</strong>; antrenman sonu esneme hareketleriyle gelişmeye devam ediyor.
+                    Esneklikte <strong className="text-slate-900 bg-amber-100/90 px-1.5 py-0.5 rounded font-black border border-amber-300 inline-block">henüz hedef seviyene yaklaşma aşamasındasın</strong>; antrenman sonu esneme hareketleriyle gelişmeye devam ediyor.
                   </p>
                 </div>
               </div>
 
               <div className="p-3 rounded-xl bg-white border border-amber-200 shadow-2xs flex items-start gap-2.5">
-                <span className="text-lg shrink-0">🏃</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 mt-1.5 inline-block" />
                 <div>
                   <div className="text-xs font-black text-slate-900">Aerobik Dayanıklılık</div>
                   <p className="text-[11px] text-slate-600 mt-1 leading-snug">
-                    Dayanıklılıkta <strong className="text-amber-700">henüz gelişmekte olan güzel bir temelin var</strong>; tempolu eğlenceli oyunlarla zamanla yükselecek.
+                    Dayanıklılıkta <strong className="text-slate-900 bg-amber-100/90 px-1.5 py-0.5 rounded font-black border border-amber-300 inline-block">henüz gelişmekte olan güzel bir temelin var</strong>; tempolu eğlenceli oyunlarla zamanla yükselecek.
                   </p>
                 </div>
               </div>
@@ -3035,7 +3052,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               <div className="flex items-center justify-between text-xs font-bold font-sans tabular-nums">
                 <span className="text-slate-600">Başlangıç: %{p1Score}</span>
                 <span className="text-emerald-700">Bugün: %{p3Score}</span>
-                <span className="text-indigo-700 font-extrabold">🎯 Bir Sonraki Ölçüm Hedefi: %{nextGoalScore}</span>
+                <span className="text-indigo-700 font-extrabold">Bir Sonraki Ölçüm Hedefi: %{nextGoalScore}</span>
               </div>
 
               <div className="relative w-full h-3 rounded-full bg-slate-200 overflow-hidden">
@@ -3201,7 +3218,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               </div>
               <div className="bg-slate-800/80 rounded-lg p-2 border border-slate-700">
                 <span className="text-[9px] text-slate-400 block font-sans uppercase">Grup</span>
-                <span className="font-bold text-amber-300">{currentReport.groupInfo.groupNo}. Grup ({currentReport.groupInfo.ageRange})</span>
+                <span className="font-bold text-slate-200">{currentReport.groupInfo.groupNo}. Grup ({currentReport.groupInfo.ageRange})</span>
               </div>
               <div className="bg-slate-800/80 rounded-lg p-2 border border-emerald-500/50">
                 <span className="text-[9px] text-emerald-300 block font-sans uppercase">Skor / Konum</span>
@@ -3212,10 +3229,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             {/* Normative Reference Badges for Coach/Club Report */}
             <div className="flex flex-wrap items-center justify-between gap-2 mt-2.5 pt-2 border-t border-slate-800 text-[10.5px] font-sans">
               <span className="px-3 py-1 rounded-lg bg-slate-800 text-emerald-200 border border-emerald-500/40 font-semibold flex items-center gap-1.5 shadow-xs">
-                📚 Morfolojik Referans: WHO &amp; ISAK L2 Kinantropometrik Normlar
+                Morfolojik Referans: WHO &amp; ISAK L2 Kinantropometrik Normlar
               </span>
               <span className="px-3 py-1 rounded-lg bg-slate-800 text-sky-200 border border-sky-500/40 font-semibold flex items-center gap-1.5 shadow-xs">
-                 Biyomotorik Referans: Eurofit, Fleishman &amp; NSCA Biyomekanik Test Normları
+                Biyomotorik Referans: Eurofit, Fleishman &amp; NSCA Biyomekanik Test Normları
               </span>
             </div>
           </div>
@@ -3266,9 +3283,9 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         </td>
                         <td className="py-2 px-2 text-right font-sans font-bold">
                           {isPositive ? (
-                            <span className="text-emerald-700 font-sans tabular-nums text-[11px]">📈 İlerleme</span>
+                            <span className="text-emerald-700 font-sans tabular-nums text-[11px] font-extrabold">İlerleme (Pozitif)</span>
                           ) : (
-                            <span className="text-rose-600 font-sans tabular-nums text-[11px]">📉 Takip Edilmeli</span>
+                            <span className="text-rose-600 font-sans tabular-nums text-[11px] font-extrabold">Takip Edilmeli</span>
                           )}
                         </td>
                       </tr>
@@ -3360,27 +3377,27 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     <span className="font-sans tabular-nums text-rose-700">19.00 sn (-0.89 SD · %19 Yüzdelik)</span>
                   </div>
                   <p className="text-[10.5px] text-rose-900 mt-1 leading-snug font-medium">
-                    ⚠️ <strong>Sakatlık Riski Notu:</strong> Ayak bileği ve diz çevresi propriosepsiyon eksikliği eklem yükünü artırabilir. Tek ayak stabilizasyon antrenmanı gerekçelendirilmiştir.
+                    <strong>Sakatlık Riski Notu:</strong> Ayak bileği ve diz çevresi propriosepsiyon eksikliği eklem yükünü artırabilir. Tek ayak stabilizasyon antrenmanı gerekçelendirilmiştir.
                   </p>
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-white border border-rose-200 shadow-2xs">
                   <div className="flex justify-between font-bold">
                     <span className="text-slate-900">Aerobik Kapasite (VO2peak)</span>
-                    <span className="font-sans tabular-nums text-amber-700">35 ml/kg/dk (-0.42 SD · %27 Yüzdelik)</span>
+                    <span className="font-sans tabular-nums font-extrabold text-slate-900 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300">35 ml/kg/dk (-0.42 SD · %27 Yüzdelik)</span>
                   </div>
-                  <p className="text-[10.5px] text-amber-900 mt-1 leading-snug font-medium">
-                     <strong>Kondisyonel Darboğaz:</strong> Maksimal laktat toparlanma süresi uzamaktadır; HIIT ve aerobik baz yüklenmesi önerilir.
+                  <p className="text-[10.5px] text-slate-800 mt-1 leading-snug font-medium">
+                     <strong className="text-slate-900 font-bold">Kondisyonel Darboğaz:</strong> Maksimal laktat toparlanma süresi uzamaktadır; HIIT ve aerobik baz yüklenmesi önerilir.
                   </p>
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-white border border-rose-200 shadow-2xs">
                   <div className="flex justify-between font-bold">
                     <span className="text-slate-900">Beden Yağ Oranı (Beden Yağ %)</span>
-                    <span className="font-sans tabular-nums text-amber-700">%33.8 (+1.83 SD · %97 Yüzdelik)</span>
+                    <span className="font-sans tabular-nums font-extrabold text-slate-900 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300">%33.8 (+1.83 SD · %97 Yüzdelik)</span>
                   </div>
                   <p className="text-[10.5px] text-slate-700 mt-1 leading-snug font-medium">
-                    📉 <strong>Mekanik Verimlilik Riski:</strong> Relatif güç (W/kg) çıktısını düşürmektedir; beslenme takibi ve Zone-2 aerobik blok önerilir.
+                    <strong>Mekanik Verimlilik Riski:</strong> Relatif güç (W/kg) çıktısını düşürmektedir; beslenme takibi ve Zone-2 aerobik blok önerilir.
                   </p>
                 </div>
               </div>
@@ -3423,7 +3440,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     <td className="py-2 px-1.5 text-center text-slate-600">32.00</td>
                     <td className="py-2 px-1.5 text-center font-bold text-slate-900">40.50</td>
                     <td className="py-2 px-1.5 text-center font-bold text-emerald-700">40.00</td>
-                    <td className="py-2 px-2 text-right font-extrabold text-emerald-700">%100 Gerçekleşti ✓</td>
+                    <td className="py-2 px-2 text-right font-extrabold text-emerald-700">%100 Gerçekleşti</td>
                   </tr>
                   <tr className="hover:bg-slate-50">
                     <td className="py-2 px-2.5 font-sans font-bold text-slate-800">VO2peak Kapasite (ml/kg/dk)</td>
@@ -3517,7 +3534,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
 
               <div className="p-3 rounded-xl bg-slate-800 border border-slate-700">
                 <div className="text-[10px] font-bold text-slate-400 uppercase">Hedef Parametreler</div>
-                <div className="font-bold text-amber-300 mt-1">Stabilizasyon &amp; VO2peak</div>
+                <div className="font-bold text-slate-300 mt-1">Stabilizasyon &amp; VO2peak</div>
                 <p className="text-[11px] text-slate-300 mt-0.5">Proprioseptif denge, VO2peak laktat eşiği ve W/kg relatif güç.</p>
               </div>
 
@@ -3638,14 +3655,14 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     ? 'border-l-4 border-l-amber-500'
                     : 'border-l-4 border-l-rose-500';
                   const targetStateLabel = isOptimalBody
-                    ? 'Hedef Bölgede ✓'
+                    ? 'Hedef Bölgede'
                     : isWatchBody
                     ? 'Takip Edilmeli'
                     : 'Gelişim / Denge Odağı';
                   const targetStateClass = isOptimalBody
                     ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
                     : isWatchBody
-                    ? 'bg-amber-50 text-amber-900 border-amber-300'
+                    ? 'bg-amber-100 text-slate-900 border-amber-400 font-extrabold'
                     : 'bg-rose-50 text-rose-900 border-rose-300';
                   return (
                     <tr
@@ -3745,7 +3762,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         <span className="text-sm font-black text-slate-900">{sf.m3} mm</span>
                         <span
                           className={`text-[10px] font-black px-1.5 py-0.5 rounded ${
-                            delta <= 0 ? 'bg-emerald-100 text-emerald-950 border border-emerald-300' : 'bg-amber-100 text-amber-950 border border-amber-300'
+                            delta <= 0 ? 'bg-emerald-100 text-emerald-900 border border-emerald-400 font-black' : 'bg-amber-100 text-slate-900 border border-amber-400 font-black'
                           }`}
                         >
                           {delta > 0 ? `+${delta}` : delta} mm
@@ -3840,6 +3857,37 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             </div>
           </div>
         </div>
+
+        {/* Somatotip Analiz (Heath-Carter 2D Somato-Grafik ve Radar Analizi) - Direct Page 1 View */}
+        {(() => {
+          const somatoM3 = currentReport.somatotype?.m3 || { endo: 3.2, meso: 5.4, ecto: 2.1, category: 'Mezomorfik-Endomorf' };
+          return (
+            <div className="mt-3 pt-3 border-t-2 border-slate-200 relative z-10">
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="font-extrabold text-slate-900 text-xs flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-indigo-600" />
+                  <span>Heath-Carter Somatotip &amp; Biomekanik Değişim Tablosu</span>
+                </h4>
+                <span className="text-[10.5px] font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-md">
+                  {somatoM3.category} ({somatoM3.endo}-{somatoM3.meso}-{somatoM3.ecto})
+                </span>
+              </div>
+              <SomatotypeRadarAndChart
+                somatotype={{
+                  endo: somatoM3.endo,
+                  meso: somatoM3.meso,
+                  ecto: somatoM3.ecto,
+                  category: somatoM3.category,
+                  eliteRef: { endo: 2.5, meso: 5.2, ecto: 3.5 }
+                }}
+                athleteName={currentReport.athleteName}
+                branch={currentReport.branch}
+                defaultView="table"
+                onlyTable={true}
+              />
+            </div>
+          );
+        })()}
 
         {renderPageFooter(1)}
       </div>
@@ -4088,13 +4136,13 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     <span className="px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-sans tabular-nums text-[9px] font-black uppercase tracking-wider">
                       2. TAKİP EDİLMELİ ({watchList.length} TEST)
                     </span>
-                    <span className="text-[9px] font-extrabold text-amber-950">İzlem &amp; Koruma</span>
+                    <span className="text-[9px] font-black text-slate-900">İzlem &amp; Koruma</span>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {watchList.map((item) => (
                       <span
                         key={item.id}
-                        className="px-1.5 py-0.5 rounded bg-white border border-amber-300 text-amber-950 text-[9.5px] font-extrabold font-sans tabular-nums"
+                        className="px-1.5 py-0.5 rounded bg-white border border-amber-400 text-slate-900 text-[9.5px] font-black font-sans tabular-nums"
                       >
                         • {item.name.replace(' Testi', '')}: {item.m3}→{item.refHigh} {item.unit}
                       </span>
@@ -4106,7 +4154,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 <div className="p-2.5 rounded-xl border-2 border-emerald-400 bg-emerald-50 flex flex-col justify-between shadow-2xs">
                   <div className="flex items-center justify-between gap-1.5 mb-1">
                     <span className="px-2 py-0.5 rounded bg-emerald-600 text-white font-sans tabular-nums text-[9px] font-black uppercase tracking-wider">
-                      3. HEDEFE ULAŞTI ✓ ({reachedList.length} TEST)
+                      3. HEDEFE ULAŞTI ({reachedList.length} TEST)
                     </span>
                     <span className="text-[9px] font-extrabold text-emerald-950">Üst Performans</span>
                   </div>
@@ -4116,7 +4164,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         key={item.id}
                         className="px-1.5 py-0.5 rounded bg-white border border-emerald-300 text-emerald-950 text-[9.5px] font-extrabold font-sans tabular-nums"
                       >
-                        ✓ {item.name.replace(' Testi', '')}: {item.m3} {item.unit} (%{item.percentile})
+                        {item.name.replace(' Testi', '')}: {item.m3} {item.unit} (%{item.percentile})
                       </span>
                     ))}
                   </div>
@@ -4190,7 +4238,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     ? 'GELİŞİM GÖSTERMELİ'
                     : isMaintain
                     ? 'TAKİP EDİLMELİ'
-                    : 'HEDEFE ULAŞTI ✓';
+                    : 'HEDEFE ULAŞTI';
 
                   const statusHeaderPill = isNeedsDev
                     ? 'bg-rose-600 text-white border-rose-700'
@@ -4228,7 +4276,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                             isNeedsDev
                               ? 'bg-rose-50 text-rose-950 border-rose-500'
                               : isMaintain
-                              ? 'bg-amber-50 text-amber-950 border-amber-500'
+                              ? 'bg-amber-100 text-slate-900 border-amber-500 font-black'
                               : 'bg-emerald-50 text-emerald-950 border-emerald-500'
                           }`}
                         >
@@ -4299,7 +4347,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               </span>
             </div>
             <span className="text-[10px] font-sans font-semibold text-slate-600 shrink-0">
-              📊 Yaş &amp; Cinsiyet Normatif Standartları
+              Yaş &amp; Cinsiyet Normatif Standartları
             </span>
           </div>
 
@@ -4577,6 +4625,37 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               </div>
             </div>
 
+            {/* Somatotip Analiz (2D Somato-Grafik Plane & 3-Axis Radar Chart) */}
+            {(() => {
+              const somatoM3 = currentReport.somatotype?.m3 || { endo: 3.2, meso: 5.4, ecto: 2.1, category: 'Mezomorfik-Endomorf' };
+              return (
+                <div className="mt-2 p-3 rounded-xl bg-white border border-slate-200/90 shadow-2xs">
+                  <div className="mb-2 flex items-center justify-between">
+                    <h4 className="font-extrabold text-slate-900 text-xs flex items-center gap-2">
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Heath-Carter Somatotip &amp; Biomekanik Değişim Tablosu</span>
+                    </h4>
+                    <span className="text-[10px] font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">
+                      {somatoM3.category} ({somatoM3.endo}-{somatoM3.meso}-{somatoM3.ecto})
+                    </span>
+                  </div>
+                  <SomatotypeRadarAndChart
+                    somatotype={{
+                      endo: somatoM3.endo,
+                      meso: somatoM3.meso,
+                      ecto: somatoM3.ecto,
+                      category: somatoM3.category,
+                      eliteRef: { endo: 2.5, meso: 5.2, ecto: 3.5 }
+                    }}
+                    athleteName={currentReport.athleteName}
+                    branch={currentReport.branch}
+                    defaultView="table"
+                    onlyTable={true}
+                  />
+                </div>
+              );
+            })()}
+
             {/* Executive Evaluator Guidance Note */}
             <div className="mt-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
               <p className="text-[11px] text-slate-600 leading-relaxed font-sans">
@@ -4653,7 +4732,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     <h3 className="font-extrabold text-slate-800 text-[11px] sm:text-xs">
                       {item.metricName}
                     </h3>
-                    <span className="text-[9.5px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200/60 shrink-0">
+                    <span className="text-[9.5px] font-black text-slate-900 bg-amber-100 px-1.5 py-0.5 rounded-md border border-amber-300 shrink-0">
                       Gelişim Takibi
                     </span>
                   </div>
@@ -4982,9 +5061,9 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               </button>
 
               {openHeaderMenu === 'excel' && (
-                <div className="absolute left-0 top-full mt-1.5 w-72 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl p-1.5 z-40 space-y-1">
+                <div className="absolute left-0 top-full mt-1.5 w-80 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl p-1.5 z-40 space-y-1">
                   <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Excel Yükleme &amp; Şablonlar
+                    Excel Yükleme &amp; Şablon İşlemleri
                   </div>
                   <button
                     type="button"
@@ -4998,7 +5077,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     <div>
                       <div>Excel Verisi Yükle (.xlsx / .csv)</div>
                       <div className="text-[10px] font-normal text-slate-500">
-                        Tekil veya çoklu sporcu ölçüm dosyası yükle
+                        Mevcut karne içeriğine uygun parametre veya çoklu sporcu dosyası yükle
                       </div>
                     </div>
                   </button>
@@ -5013,9 +5092,9 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   >
                     <Users className="w-4 h-4 text-violet-600 shrink-0" />
                     <div>
-                      <div>Toplu Karne Oluştur (Excel)</div>
+                      <div>Toplu Karne Oluşturma Alanı</div>
                       <div className="text-[10px] font-normal text-slate-500">
-                        Çoklu sporcu tablosundan toplu karne üret
+                        Çoklu sporcu tablosu, sütun eşleştirme ve toplu PDF üretimi
                       </div>
                     </div>
                   </button>
@@ -5034,7 +5113,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     <div>
                       <div>Örnek Excel Şablonu İndir (.xlsx)</div>
                       <div className="text-[10px] font-normal text-slate-500">
-                        Standart karne ölçüm şablonunu indir
+                        Mevcut karne parametreleri + Toplu sporcu listesi (3 Sayfa)
                       </div>
                     </div>
                   </button>
@@ -5049,9 +5128,29 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   >
                     <FileSpreadsheet className="w-4 h-4 text-emerald-600 shrink-0" />
                     <div>
-                      <div>Toplu Sporcu Excel Şablonu İndir</div>
+                      <div>Toplu Sporcu Excel Şablonu İndir (.xlsx)</div>
                       <div className="text-[10px] font-normal text-slate-500">
-                        Çoklu sporcu satırlı örnek tablo (.xlsx)
+                        Her satırda 1 sporcunun tüm karne verileri (Çoklu liste)
+                      </div>
+                    </div>
+                  </button>
+
+                  <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenHeaderMenu(null);
+                      setActiveLabTab('batch');
+                      handleLoadSampleBatchData();
+                    }}
+                    className="w-full px-3 py-2 rounded-lg text-left text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+                  >
+                    <RefreshCw className="w-4 h-4 text-violet-600 shrink-0" />
+                    <div>
+                      <div>Örnek Sporcu Veri Seti Yükle (6 Sporcu)</div>
+                      <div className="text-[10px] font-normal text-slate-500">
+                        Farklı branşlardan hazır karne verileri ile hemen test et
                       </div>
                     </div>
                   </button>
@@ -5467,6 +5566,23 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             >
               {totalReportPages} Sayfa Tam Görünüm
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveLabTab('studio');
+                setViewMode('single');
+                setActivePage(3);
+              }}
+              title="Endomorfi, Mezomorfi, Ektomorfi Somatotip Değişim Tablosuna Git"
+              className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1 ${
+                activeLabTab === 'studio' && viewMode === 'single' && activePage === 3
+                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+              <span>Somatotip Değişim Tablosu</span>
+            </button>
             {showBodyMapInfographic && (
               <button
                 type="button"
@@ -5810,6 +5926,27 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
             </div>
 
             <div className="flex flex-wrap items-center gap-2 shrink-0">
+              {/* Quick Template Download Buttons */}
+              <button
+                type="button"
+                onClick={() => downloadSportsFlyLabExcelTemplate(currentReport)}
+                className="px-3 py-1.5 rounded-xl border border-sky-200 dark:border-sky-800 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+                title="Mevcut 7 sayfalık karne içeriğine uygun tam Excel şablonunu (Parametre Bazlı + Çoklu Sporcu + Kılavuz) indir"
+              >
+                <Download className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                <span>Örnek Excel Şablonu (.xlsx)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => downloadBatchSportsFlyLabExcelTemplate(currentReport)}
+                className="px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+                title="Her satırında bir sporcunun tüm karne parametrelerinin yer aldığı çoklu sporcu Excel tablosunu indir"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>Toplu Sporcu Şablonu (.xlsx)</span>
+              </button>
+
               {/* Grouped Sample Data & Template Dropdown in Batch View */}
               <div className="relative">
                 <button
@@ -5819,18 +5956,36 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                       prev === 'batchSamples' ? null : 'batchSamples'
                     )
                   }
-                  className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
                 >
-                  <FileSpreadsheet className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Şablon &amp; Örnek Veriler</span>
+                  <Sparkles className="w-3.5 h-3.5 text-violet-600 shrink-0" />
+                  <span>Örnek Veriler</span>
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                 </button>
 
                 {openHeaderMenu === 'batchSamples' && (
-                  <div className="absolute right-0 top-full mt-1.5 w-72 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl p-1.5 z-40 space-y-1">
+                  <div className="absolute right-0 top-full mt-1.5 w-80 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl p-1.5 z-40 space-y-1">
                     <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      Excel Şablonu &amp; Test Verileri
+                      Excel Şablonları &amp; Test Verileri
                     </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenHeaderMenu(null);
+                        downloadSportsFlyLabExcelTemplate(currentReport);
+                      }}
+                      className="w-full px-3 py-2 rounded-lg text-left text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+                    >
+                      <Download className="w-4 h-4 text-sky-600 shrink-0" />
+                      <div>
+                        <div>Örnek Karne Excel Şablonu İndir (.xlsx)</div>
+                        <div className="text-[10px] font-normal text-slate-500">
+                          Parametre Bazlı Karne + Toplu Sporcu Listesi (3 Sayfa)
+                        </div>
+                      </div>
+                    </button>
+
                     <button
                       type="button"
                       onClick={() => {
@@ -5841,12 +5996,14 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     >
                       <FileSpreadsheet className="w-4 h-4 text-emerald-600 shrink-0" />
                       <div>
-                        <div>Toplu Sporcu Excel Şablonu İndir</div>
+                        <div>Toplu Sporcu Excel Şablonu İndir (.xlsx)</div>
                         <div className="text-[10px] font-normal text-slate-500">
-                          Her satırda 1 sporcu yer alan örnek .xlsx
+                          Her satırda 1 sporcu yer alan çoklu sporcu tablosu
                         </div>
                       </div>
                     </button>
+
+                    <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
 
                     <button
                       type="button"
@@ -5858,9 +6015,26 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     >
                       <RefreshCw className="w-4 h-4 text-violet-600 shrink-0" />
                       <div>
-                        <div>Örnek Sporcu Veri Seti Yükle (6 Sporcu)</div>
+                        <div>Standart Örnek Veri Seti Yükle (6 Sporcu)</div>
                         <div className="text-[10px] font-normal text-slate-500">
-                          6 farklı branştan hazır örnek sporcu tablosu
+                          Tüm karne parametrelerini içeren 6 farklı branş örneği
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenHeaderMenu(null);
+                        handleLoadCustomFormatSampleExcel();
+                      }}
+                      className="w-full px-3 py-2 rounded-lg text-left text-xs font-bold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+                    >
+                      <SlidersHorizontal className="w-4 h-4 text-amber-600 shrink-0" />
+                      <div>
+                        <div>Özel Okul Formatı Yükle (Sütun Eşleştirme Testi)</div>
+                        <div className="text-[10px] font-normal text-slate-500">
+                          Farklı Türkçe başlıklara sahip 4 sporcu tablosu
                         </div>
                       </div>
                     </button>
@@ -5871,7 +6045,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
               <button
                 type="button"
                 onClick={() => setActiveLabTab('studio')}
-                className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+                className="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
               >
                 <FileText className="w-4 h-4 text-sky-600 shrink-0" />
                 <span>Tekil Karne Görünümü</span>
@@ -5984,6 +6158,255 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                 </span>
               </div>
             </div>
+          </div>
+
+          {/* SÜTUN EŞLEŞTİRME & EXCEL VERİ ENTEGRASYON PANELİ (COLUMN MAPPING PANEL) */}
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-xs overflow-hidden">
+            {/* Header / Toggle Bar */}
+            <div
+              onClick={() => setShowColumnMappingPanel((prev) => !prev)}
+              className="p-3.5 sm:p-4 bg-slate-50/80 hover:bg-slate-100/70 dark:bg-slate-800/60 dark:hover:bg-slate-800 flex flex-wrap items-center justify-between gap-3 cursor-pointer transition-colors border-b border-slate-200/80 dark:border-slate-800"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-violet-600/10 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+                  <SlidersHorizontal className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                      Excel Sütun Eşleştirme &amp; Karne Veri Haritalandırma Paneli
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-sans tabular-nums font-extrabold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                      {mappedFieldsCount} / {LAB_BATCH_MAPPABLE_FIELDS.length} Karne Parametresi Eşleşti
+                    </span>
+                    {activeExcelSheet && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
+                        {activeExcelSheet.sheetName} ({activeExcelSheet.headers.length} Sütun · {activeExcelSheet.rows.length} Satır)
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Excel tablonuzdaki sütun başlıklarını sistemin 7 sayfalık karne parametreleriyle eşleştirin. Değişiklikler önizleme tablosuna ve karne çıktılarına anında yansır.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-violet-600 dark:text-violet-400">
+                  {showColumnMappingPanel ? 'Paneli Daralt' : 'Eşleştirmeleri Düzenle'}
+                </span>
+                <div className="w-7 h-7 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500">
+                  {showColumnMappingPanel ? (
+                    <ChevronDown className="w-4 h-4 rotate-180 transition-transform" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 transition-transform" />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Collapsible Mapping Body */}
+            {showColumnMappingPanel && (
+              <div className="p-4 sm:p-5 space-y-4">
+                {/* Multi-Sheet Selector Tabs (if uploaded Excel workbook contains multiple sheets) */}
+                {rawExcelSheets.length > 1 && (
+                  <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300 px-2 flex items-center gap-1.5">
+                      <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Excel Sayfası Seç:</span>
+                    </span>
+                    {rawExcelSheets.map((sh, idx) => (
+                      <button
+                        key={sh.sheetName}
+                        type="button"
+                        onClick={() => handleSwitchExcelSheet(idx)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          activeExcelSheetIndex === idx
+                            ? 'bg-violet-600 text-white shadow-2xs'
+                            : 'bg-white dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'
+                        }`}
+                      >
+                        {sh.sheetName} ({sh.rows.length} {sh.isParameterVerticalSheet ? 'Parametre' : 'Sporcu'})
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Toolbar: Category Filters + Search + Batch Mapping Actions */}
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pt-1">
+                  {/* Category Pills */}
+                  <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                    {[
+                      { id: 'all', label: `Tümü (${LAB_BATCH_MAPPABLE_FIELDS.length})` },
+                      { id: 'essential', label: 'Önemli Alanlar' },
+                      { id: 'identity', label: '1. Kimlik & Dönem' },
+                      { id: 'body', label: '2. Beden Kompozisyonu' },
+                      { id: 'somatotype', label: '3. Somatotip Değişimi' },
+                      { id: 'motor', label: '4. Biyomotor Yetenek' },
+                      { id: 'cardio', label: '5. Kardiyo & Kondisyon' },
+                      { id: 'advanced', label: '6. PHV & Skorlar' },
+                    ].map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setMappingCategoryFilter(cat.id as any)}
+                        className={`px-2.5 py-1 rounded-lg font-bold transition-colors cursor-pointer text-xs ${
+                          mappingCategoryFilter === cat.id
+                            ? 'bg-violet-600 text-white shadow-2xs'
+                            : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Search and Action Buttons */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="relative min-w-[200px]">
+                      <input
+                        type="text"
+                        value={mappingSearchQuery}
+                        onChange={(e) => setMappingSearchQuery(e.target.value)}
+                        placeholder="Karne parametresi ara..."
+                        className="w-full pl-8 pr-7 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      />
+                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      {mappingSearchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setMappingSearchQuery('')}
+                          className="text-slate-400 hover:text-slate-600 absolute right-2 top-1/2 -translate-y-1/2"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleAutoDetectMappingClick}
+                      className="px-2.5 py-1.5 rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                      title="Excel başlıklarını akıllı bulanık eşleştirme algoritmasıyla otomatik tespit et"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-violet-600 shrink-0" />
+                      <span>Otomatik Eşleştir</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleSaveColumnMappingRules}
+                      className="px-2.5 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                      title="Bu eşleştirme kurallarını tarayıcı hafızasına kaydet"
+                    >
+                      <Save className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>Kaydet</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleResetColumnMapping}
+                      className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                      title="Tüm eşleştirmeleri sıfırla"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>Sıfırla</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Grid of Mappable Fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                  {visibleMappableFields.map((field) => {
+                    const mappedCol = columnMapping[field.key] || '';
+                    const isMapped = Boolean(mappedCol);
+
+                    return (
+                      <div
+                        key={field.key}
+                        className={`p-3 rounded-xl border transition-all text-xs flex flex-col justify-between space-y-2 ${
+                          isMapped
+                            ? 'border-emerald-200 dark:border-emerald-800/70 bg-emerald-50/20 dark:bg-emerald-950/20'
+                            : field.required
+                            ? 'border-amber-300 dark:border-amber-800/80 bg-amber-50/20 dark:bg-amber-950/20'
+                            : 'border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/30'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between gap-1.5 mb-1">
+                            <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1 truncate">
+                              {field.label}
+                              {field.required && (
+                                <span className="text-rose-500 font-bold" title="Zorunlu Alan">
+                                  *
+                                </span>
+                              )}
+                            </span>
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-sans font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 shrink-0">
+                              {field.unit}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                            {field.description}
+                          </p>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Eşleşen Excel Sütun Başlığı
+                          </label>
+                          <select
+                            value={mappedCol}
+                            onChange={(e) => handleColumnMappingChange(field.key, e.target.value)}
+                            className={`w-full px-2.5 py-1.5 rounded-lg border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer ${
+                              isMapped
+                                ? 'border-emerald-400 dark:border-emerald-700 bg-white dark:bg-slate-900 text-emerald-900 dark:text-emerald-200 font-bold'
+                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400'
+                            }`}
+                          >
+                            <option value="">-- Eşleştirme Yok (Sistem Varsayılanı) --</option>
+                            {activeExcelSheet?.headers.map((hdr) => (
+                              <option key={hdr} value={hdr}>
+                                {hdr}
+                              </option>
+                            ))}
+                          </select>
+
+                          <div className="flex items-center justify-between gap-1 text-[10px]">
+                            {isMapped ? (
+                              <span className="font-sans tabular-nums text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
+                                <Check className="w-3 h-3 text-emerald-600" />
+                                <span>{mappedCol}</span>
+                              </span>
+                            ) : (
+                              <span className="text-slate-400">
+                                {field.required ? (
+                                  <span className="text-amber-600 dark:text-amber-400 font-bold">
+                                    Önerilen Alan
+                                  </span>
+                                ) : (
+                                  'Varsayılan Değer Kullanılır'
+                                )}
+                              </span>
+                            )}
+
+                            <span className="text-slate-400 truncate max-w-[140px]" title={field.aliases.join(', ')}>
+                              Örn: {field.aliases.slice(0, 2).join(', ')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {visibleMappableFields.length === 0 && (
+                  <div className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
+                    Arama kriterinize ({mappingSearchQuery}) uygun bir karne parametresi bulunamadı.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Live Batch PDF Generation Progress Banner */}
@@ -6122,9 +6545,10 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                   </th>
                   <th className="py-3 px-3 font-extrabold">Sporcu Adı &amp; Kodu</th>
                   <th className="py-3 px-3 font-extrabold">Branş / Yaş / Cinsiyet</th>
-                  <th className="py-3 px-3 font-extrabold text-center">Boy / Kilo / BKİ</th>
+                  <th className="py-3 px-3 font-extrabold text-center">Boy / Kilo / Yağ %</th>
+                  <th className="py-3 px-3 font-extrabold text-center">Somatotip Değişimi</th>
                   <th className="py-3 px-3 font-extrabold text-center">20m Sürat / Sıçrama</th>
-                  <th className="py-3 px-3 font-extrabold text-center">VO2peak / Somatotip</th>
+                  <th className="py-3 px-3 font-extrabold text-center">VO2peak &amp; PACER</th>
                   <th className="py-3 px-3 font-extrabold text-center">PHV / 18 Yaş Boy</th>
                   <th className="py-3 px-3 font-extrabold text-center">Performans Puanı</th>
                   <th className="py-3 px-3 font-extrabold text-right">Bireysel Karne İşlemleri</th>
@@ -6139,10 +6563,14 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                     rep.bodyComposition.find((x) => x.id === 'weight')?.m3 ?? 43.2;
                   const bmiM3 =
                     rep.bodyComposition.find((x) => x.id === 'bmi')?.m3 ?? 19.3;
+                  const fatM3 =
+                    rep.bodyComposition.find((x) => x.id === 'body_fat')?.m3 ?? 20.6;
                   const sprintM3 =
                     rep.motorPerformance.find((x) => x.id === 'sprint')?.m3 ?? 3.85;
                   const vjM3 =
                     rep.motorPerformance.find((x) => x.id === 'vertical_jump')?.m3 ?? 29.0;
+                  const agilityM3 =
+                    rep.motorPerformance.find((x) => x.id === 'agility')?.m3 ?? 19.2;
 
                   return (
                     <tr
@@ -6193,14 +6621,24 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                         <div className="font-bold text-slate-900 dark:text-white">
                           {heightM3} cm / {weightM3} kg
                         </div>
-                        <div className="text-[10px] text-slate-500">BKİ: {bmiM3} kg/m²</div>
+                        <div className="text-[10px] text-slate-500">
+                          BKİ: {bmiM3} · Yağ: %{fatM3}
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-center font-sans tabular-nums">
+                        <div className="font-extrabold text-amber-700 dark:text-amber-400 text-[11px]">
+                          {rep.somatotype.m3.endo} - {rep.somatotype.m3.meso} - {rep.somatotype.m3.ecto}
+                        </div>
+                        <div className="text-[10px] text-slate-500 truncate max-w-[150px] mx-auto font-medium">
+                          {rep.somatotype.m3.category}
+                        </div>
                       </td>
                       <td className="py-3 px-3 text-center font-sans tabular-nums">
                         <div className="font-bold text-slate-900 dark:text-white">
-                          {sprintM3} sn
+                          {sprintM3} sn · {vjM3} cm
                         </div>
                         <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
-                          Dikey Sıçrama: {vjM3} cm
+                          Çabukluk: {agilityM3} sn
                         </div>
                       </td>
                       <td className="py-3 px-3 text-center font-sans tabular-nums">
@@ -6208,7 +6646,7 @@ export const SportsFlyLabView: React.FC<SportsFlyLabViewProps> = ({ onToast }) =
                           {rep.cardio.test3Vo2} ml/kg/dk
                         </div>
                         <div className="text-[10px] text-slate-500">
-                          {rep.somatotype.m3.endo}-{rep.somatotype.m3.meso}-{rep.somatotype.m3.ecto}
+                          PACER: {rep.cardio.test3Distance ? `${rep.cardio.test3Distance}m` : '-'}
                         </div>
                       </td>
                       <td className="py-3 px-3 text-center font-sans tabular-nums">

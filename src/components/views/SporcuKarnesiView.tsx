@@ -36,9 +36,12 @@ import {
   Flame,
   Trophy,
   Eye,
-  BarChart3
+  BarChart3,
+  Dumbbell,
+  Info
 } from 'lucide-react';
 import { SporcuKarnePerformanceCharts } from '../charts/KarnePerformansGrafikleri';
+import { SomatotypeRadarAndChart } from '../charts/SomatotypeRadarAndChart';
 import { SportsFlyIcon, SportsFlyVectorMark } from '../SportsFlyLogo';
 import {
   RotaSportsFlyHeaderBadge,
@@ -426,18 +429,27 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
     });
   };
 
-  const handlePrintKarne = () => {
+  const handlePrintKarne = async () => {
     setShowPerformanceCharts(true);
     setActiveReportPage('all');
     setPdfZoom(100);
     setIsPdfPreviewMode(true);
+
+    const inIframe = window.self !== window.top;
+    if (inIframe) {
+      showToast('A4 Düzeni Hazırlandı! İframe ortamı nedeniyle temiz A4 PDF dosyanız oluşturulup indiriliyor...');
+      await handleDownloadPDF();
+      return;
+    }
+
     showToast('A4 Yazdırma diyaloğu hazırlanıyor...');
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
         window.print();
       } catch (err) {
         console.warn('window.print çağrısı uyarısı:', err);
-        showToast('Tarayıcı yazdırma penceresi açılamadı. "Tüm Karneyi İndir" ile temiz A4 PDF dosyasını indirebilirsiniz.');
+        showToast('Yazdırma diyaloğu engellendi. Temiz A4 PDF dosyanız oluşturulup indiriliyor...');
+        await handleDownloadPDF();
       }
     }, 250);
   };
@@ -486,20 +498,65 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
     ) / 5
   ).toFixed(1) : '0.0';
 
+  const getSomatotypeProfile = (karne: SporcuKarne) => {
+    if (karne.somatotype) {
+      return {
+        endo: karne.somatotype.endo,
+        meso: karne.somatotype.meso,
+        ecto: karne.somatotype.ecto,
+        category: karne.somatotype.category,
+        eliteRef: karne.somatotype.eliteRef || { endo: 2.5, meso: 5.2, ecto: 3.5 },
+      };
+    }
+    const heightM = (karne.boy || 165) / 100;
+    const weight = karne.kilo || 58;
+    const bmi = weight / (heightM * heightM);
+    const ponderalIndex = (karne.boy || 165) / Math.cbrt(weight || 50);
+
+    const endo = Number(Math.max(1.5, Math.min(8.0, (bmi - 14) * 0.35 + 1.8)).toFixed(1));
+    const meso = Number(Math.max(2.0, Math.min(8.5, (karne.fiziksel?.guc || 7) * 0.5 + (karne.fiziksel?.hiz || 7) * 0.2)).toFixed(1));
+    const ecto = Number(Math.max(1.2, Math.min(8.0, (ponderalIndex - 37) * 0.8 + 2.0)).toFixed(1));
+
+    let category = 'Dengeli Mezomorf';
+    if (meso >= endo && meso >= ecto) {
+      if (ecto > endo + 0.5) category = 'Ektomorfik Mezomorf';
+      else if (endo > ecto + 0.5) category = 'Endomorfik Mezomorf';
+      else category = 'Dengeli Mezomorf';
+    } else if (ecto > meso) {
+      category = 'Mezomorfik Ektomorf';
+    } else {
+      category = 'Mezomorf-Endomorf';
+    }
+
+    const bransLower = (karne.brans || '').toLowerCase();
+    let eliteRef = { endo: 2.2, meso: 5.5, ecto: 3.8 };
+    if (bransLower.includes('basket')) {
+      eliteRef = { endo: 2.0, meso: 4.8, ecto: 4.5 };
+    } else if (bransLower.includes('voley')) {
+      eliteRef = { endo: 2.2, meso: 4.5, ecto: 4.2 };
+    } else if (bransLower.includes('futbol')) {
+      eliteRef = { endo: 2.5, meso: 5.6, ecto: 3.2 };
+    } else if (bransLower.includes('yüzme') || bransLower.includes('yuzme')) {
+      eliteRef = { endo: 2.1, meso: 5.2, ecto: 3.9 };
+    }
+
+    return { endo, meso, ecto, category, eliteRef };
+  };
+
   const renderPageWatermark = () => (
     <div
       className="absolute inset-0 pointer-events-none select-none flex flex-col items-center justify-center overflow-hidden z-0"
       aria-hidden="true"
     >
-      <div className="flex flex-col items-center justify-center opacity-[0.065] -rotate-12">
-        <div className="w-[380px] h-[380px] sm:w-[440px] sm:h-[440px] rounded-full border-[5px] border-dashed border-cyan-600 flex flex-col items-center justify-center p-8">
+      <div className="flex flex-col items-center justify-center opacity-[0.16] -rotate-12 transition-opacity">
+        <div className="w-[390px] h-[390px] sm:w-[450px] sm:h-[450px] rounded-full border-[6px] border-dashed border-cyan-600 flex flex-col items-center justify-center p-8">
           <img
             src={ROTA_PERFORMANS_LOGO_DATA_URL}
             alt="Rota Performans Logo"
-            className="w-[250px] h-[250px] sm:w-[290px] sm:h-[290px] object-contain"
+            className="w-[260px] h-[260px] sm:w-[300px] sm:h-[300px] object-contain filter drop-shadow-xs"
           />
           <div className="mt-2 text-center text-2xl sm:text-3xl font-black tracking-tight uppercase text-slate-900">
-            ROTA <span className="text-cyan-600">PERFORMANS</span>
+            ROTA <span className="text-cyan-600 font-black">PERFORMANS</span>
           </div>
         </div>
       </div>
@@ -855,7 +912,7 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
 
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
                 {[
-                  { page: 1, title: 'Sayfa 1: Özet & Künye' },
+                  { page: 1, title: 'Sayfa 1: Özet & Somatotip' },
                   { page: 2, title: 'Sayfa 2: Fiziksel & Ölçüm' },
                   { page: 3, title: 'Sayfa 3: Teknik & Taktik' },
                   { page: 4, title: 'Sayfa 4: Rozetler & Süreç' },
@@ -1110,7 +1167,7 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
 
                     {/* Attendance & Group Comparison & Trainer Summary */}
                     <div className="p-6 md:p-8 space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {/* Attendance */}
                         <div className="flex items-center justify-between bg-slate-50/80 border border-slate-200 rounded-xl p-4 shadow-2xs">
                           <div>
@@ -1128,6 +1185,36 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                           </div>
                         </div>
 
+                        {/* Somatotype Quick Summary Card */}
+                        {(() => {
+                          const somato = getSomatotypeProfile(activeKarne);
+                          return (
+                            <div className="bg-indigo-50/60 border border-indigo-200/90 rounded-xl p-4 flex flex-col justify-between">
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-bold text-indigo-950 text-sm flex items-center gap-1.5">
+                                  <Dumbbell className="w-4 h-4 text-indigo-600 shrink-0" />
+                                  Somatotip Beden Yapısı
+                                </h4>
+                                <span className="px-2 py-0.5 rounded-md bg-indigo-600 text-white font-black text-[10px] uppercase">
+                                  {somato.category}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between text-xs font-semibold text-slate-700 mt-2">
+                                <span className="text-amber-800 font-bold">Endo: {somato.endo}</span>
+                                <span className="text-cyan-800 font-bold">Mezo: {somato.meso}</span>
+                                <span className="text-indigo-800 font-bold">Ekto: {somato.ecto}</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setActiveReportPage(2)}
+                                className="print:hidden mt-2 text-[10.5px] font-extrabold text-indigo-700 hover:text-indigo-900 text-left flex items-center gap-1 cursor-pointer"
+                              >
+                                <span>Sayfa 2'de Somatotip Detaylarını İncele →</span>
+                              </button>
+                            </div>
+                          );
+                        })()}
+
                         {/* Trainer Summary */}
                         <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4">
                           <h4 className="font-bold text-blue-900 mb-1 text-sm flex items-center gap-1.5">
@@ -1139,6 +1226,31 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                           </p>
                         </div>
                       </div>
+
+                      {/* Somatotip Analiz (Somato-Grafik 2D Plane & 3-Axis Radar Chart) - Page 1 Direct View */}
+                      {(() => {
+                        const somato = getSomatotypeProfile(activeKarne);
+                        return (
+                          <div className="mt-4 pt-4 border-t border-slate-200/80">
+                            <div className="mb-2 flex items-center justify-between">
+                              <h4 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                                <Sparkles className="w-4 h-4 text-indigo-600" />
+                                Heath-Carter Somatotip &amp; Biomekanik Değişim Tablosu
+                              </h4>
+                              <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">
+                                Gelişim Tablosu
+                              </span>
+                            </div>
+                            <SomatotypeRadarAndChart
+                              somatotype={somato}
+                              athleteName={activeKarne.adSoyad}
+                              branch={activeKarne.brans}
+                              defaultView="table"
+                              onlyTable={true}
+                            />
+                          </div>
+                        );
+                      })()}
 
                       {/* Grup Karşılaştırması */}
                       {isSimplifiedView ? (
@@ -1261,8 +1373,8 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                       <SporcuKarnePerformanceCharts karne={activeKarne} />
                     )}
 
-                    {/* Physical Skills Grid */}
-                    <div className="p-6 md:p-8">
+                    {/* Physical Skills Grid & Somatotype Analysis */}
+                    <div className="p-6 md:p-8 space-y-5">
                       <div className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-5 shadow-2xs">
                         <div className="flex items-center justify-between mb-4">
                           <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
@@ -1291,6 +1403,137 @@ export const SporcuKarnesiView: React.FC<SporcuKarnesiViewProps> = ({ onNavigate
                           </div>
                         </div>
                       </div>
+
+                      {/* HEATH-CARTER SOMATOTİP (BEDEN YAPISI) ANALİZİ KARTI */}
+                      {(() => {
+                        const somato = getSomatotypeProfile(activeKarne);
+                        return (
+                          <div className="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-5 shadow-2xs space-y-4">
+                            {/* Header */}
+                            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 border border-indigo-200 shadow-2xs">
+                                  <Dumbbell className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h3 className="font-extrabold text-slate-900 text-xs sm:text-sm tracking-tight uppercase">
+                                    Heath-Carter Somatotip &amp; Beden Yapısı Analizi
+                                  </h3>
+                                  <p className="text-[10px] text-slate-500 font-medium">
+                                    Biyometrik yağlılık, kas-iskelet kuvveti ve lineer boy oranları
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="bg-gradient-to-r from-indigo-600 to-blue-700 text-white font-extrabold px-3 py-1 rounded-lg text-xs shadow-2xs tracking-wide">
+                                  {somato.category}
+                                </span>
+                                <span className="text-[10px] font-bold text-slate-500 bg-white border border-slate-200 px-2 py-1 rounded-lg">
+                                  ISAK Normatif
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* 3 Metric Progress Columns */}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              {/* Endomorfi */}
+                              <div className="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-2xs space-y-2">
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="font-bold text-amber-900 flex items-center gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
+                                    Endomorfi
+                                  </span>
+                                  <span className="font-black text-amber-700 tabular-nums">{somato.endo} / 10</span>
+                                </div>
+                                <div className="text-[10px] text-slate-500 leading-snug">
+                                  Yağ dokusu ve göreceli beden hacmi bileşeni
+                                </div>
+                                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                  <div
+                                    className="bg-gradient-to-r from-amber-400 to-amber-600 h-full rounded-full transition-all duration-500"
+                                    style={{ width: `${Math.min(100, Math.max(5, (somato.endo / 8) * 100))}%` }}
+                                  />
+                                </div>
+                                <div className="text-[9.5px] font-semibold text-slate-400 flex justify-between pt-0.5">
+                                  <span>İnce</span>
+                                  <span>Elit: {somato.eliteRef.endo}</span>
+                                  <span>Hacimli</span>
+                                </div>
+                              </div>
+
+                              {/* Mezomorfi */}
+                              <div className="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-2xs space-y-2">
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="font-bold text-cyan-900 flex items-center gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-cyan-600 shrink-0" />
+                                    Mezomorfi
+                                  </span>
+                                  <span className="font-black text-cyan-700 tabular-nums">{somato.meso} / 10</span>
+                                </div>
+                                <div className="text-[10px] text-slate-500 leading-snug">
+                                  Kas-iskelet yoğunluğu ve atletik kuvvet bileşeni
+                                </div>
+                                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                  <div
+                                    className="bg-gradient-to-r from-cyan-500 to-blue-600 h-full rounded-full transition-all duration-500"
+                                    style={{ width: `${Math.min(100, Math.max(5, (somato.meso / 8) * 100))}%` }}
+                                  />
+                                </div>
+                                <div className="text-[9.5px] font-semibold text-slate-400 flex justify-between pt-0.5">
+                                  <span>Hafif</span>
+                                  <span>Elit: {somato.eliteRef.meso}</span>
+                                  <span>Atletik</span>
+                                </div>
+                              </div>
+
+                              {/* Ektomorfi */}
+                              <div className="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-2xs space-y-2">
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="font-bold text-indigo-900 flex items-center gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-indigo-600 shrink-0" />
+                                    Ektomorfi
+                                  </span>
+                                  <span className="font-black text-indigo-700 tabular-nums">{somato.ecto} / 10</span>
+                                </div>
+                                <div className="text-[10px] text-slate-500 leading-snug">
+                                  Lineer boy, uzunluk ve kemik inceliği bileşeni
+                                </div>
+                                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                  <div
+                                    className="bg-gradient-to-r from-indigo-500 to-purple-600 h-full rounded-full transition-all duration-500"
+                                    style={{ width: `${Math.min(100, Math.max(5, (somato.ecto / 8) * 100))}%` }}
+                                  />
+                                </div>
+                                <div className="text-[9.5px] font-semibold text-slate-400 flex justify-between pt-0.5">
+                                  <span>Kısa/Kalıp</span>
+                                  <span>Elit: {somato.eliteRef.ecto}</span>
+                                  <span>Uzun/İnce</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Branch Benchmark Advice Box */}
+                            <div className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 flex items-start gap-2.5">
+                              <Info className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                              <div className="text-[11px] text-slate-700 leading-relaxed">
+                                <strong className="text-indigo-950 font-bold uppercase mr-1">
+                                  {activeKarne.brans} Branş Biyomotor Analizi:
+                                </strong>
+                                Sporcumuz <strong className="text-slate-900 font-bold">{activeKarne.adSoyad}</strong>, <strong className="text-indigo-700 font-bold">{somato.category}</strong> somatotip yapısına sahiptir ({somato.endo}-{somato.meso}-{somato.ecto}). Bu yapı {activeKarne.brans} elit atlet referans ortalamalarına ({somato.eliteRef.endo}-{somato.eliteRef.meso}-{somato.eliteRef.ecto}) yüksek uyum göstermekte olup patlayıcı sıçrama, ivmelenme ve çabuk yön değiştirme potansiyelini desteklemektedir.
+                              </div>
+                            </div>
+
+                            {/* Somatotype Radar & 2D Somatochart Progression Interactive Component */}
+                            <SomatotypeRadarAndChart
+                              athleteName={activeKarne.adSoyad}
+                              branch={activeKarne.brans}
+                              somatotype={somato}
+                              defaultView="table"
+                              onlyTable={true}
+                            />
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                   {renderPageFooterBadge(2)}

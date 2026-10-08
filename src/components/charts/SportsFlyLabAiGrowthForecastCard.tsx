@@ -211,7 +211,7 @@ export const SportsFlyLabAiGrowthForecastCard: React.FC<SportsFlyLabAiGrowthFore
       {predictionData && predictionData.timelinePoints && (
         <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700 space-y-1.5">
           <div className="flex items-center justify-between text-[10px] font-sans tabular-nums font-bold text-slate-300 mb-1">
-            <span>📊 ÖNÜMÜZDEKİ 6 AYLIK PROJEKSİYON EĞRİSİ (Aylık Büyüme Hızı)</span>
+            <span>ÖNÜMÜZDEKİ 6 AYLIK PROJEKSİYON EĞRİSİ (Aylık Büyüme Hızı)</span>
             <span className="text-sky-300">● Boy (cm) &nbsp;&nbsp; ● Kilo (kg)</span>
           </div>
 
@@ -240,9 +240,9 @@ export const SportsFlyLabAiGrowthForecastCard: React.FC<SportsFlyLabAiGrowthFore
                           <div className="font-extrabold text-sky-300 border-b border-slate-700 pb-1 mb-1">
                             {data.monthLabel} Tahmini
                           </div>
-                          <div>📏 Boy: <strong>{data.height} cm</strong></div>
-                          <div>⚖️ Kilo: <strong>{data.weight} kg</strong></div>
-                          <div>📊 BKİ: <strong>{data.bmi} kg/m²</strong></div>
+                          <div>Boy: <strong>{data.height} cm</strong></div>
+                          <div>Kilo: <strong>{data.weight} kg</strong></div>
+                          <div>BKİ: <strong>{data.bmi} kg/m²</strong></div>
                         </div>
                       );
                     }

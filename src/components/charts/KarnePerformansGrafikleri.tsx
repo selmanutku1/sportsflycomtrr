@@ -13,6 +13,10 @@ import {
 import {
   Activity,
   TrendingUp,
+  TrendingDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  Calendar,
   Target,
   Compass,
   Layers,
@@ -346,17 +350,19 @@ export const InitialMeasurementGroupComparisonChart: React.FC<InitialMeasurement
       {/* Header ribbon */}
       <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-700 font-sans">
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-md bg-sky-500 text-slate-950 font-extrabold text-[10px] uppercase tracking-wider">
-            📊 İLK ÖLÇÜM (1. TEST) GRUP KARŞILAŞTIRMASI
+          <span className="px-2.5 py-1 rounded-md bg-sky-500/20 text-sky-300 border border-sky-400/30 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5">
+            <BarChart3 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+            1. Ölçüm Grup Karşılaştırması
           </span>
           <span className="text-xs font-bold text-white uppercase tracking-tight">
             Başlangıç Seviyesi vs Grup Ortalaması Konum Grafiği
           </span>
         </div>
-        <span className={`px-2.5 py-1 rounded-md text-[10.5px] font-bold border ${
+        <span className={`px-2.5 py-1 rounded-md text-[10.5px] font-bold border flex items-center gap-1.5 ${
           p1Diff >= 0 ? 'bg-emerald-950 text-emerald-300 border-emerald-400' : 'bg-rose-950 text-rose-300 border-rose-400'
         }`}>
-          {p1Diff >= 0 ? `🟢 İlk Ölçümde Grubun +${p1Diff} Puan Üzerindeydi` : `🔴 İlk Ölçümde Grubun ${p1Diff} Puan Altındaydı`}
+          <span className={`w-2 h-2 rounded-full ${p1Diff >= 0 ? 'bg-emerald-400' : 'bg-rose-400'} shrink-0`} />
+          <span>{p1Diff >= 0 ? `İlk Ölçümde Grubun +${p1Diff} Puan Üzerinde` : `İlk Ölçümde Grubun ${p1Diff} Puan Altında`}</span>
         </span>
       </div>
 
@@ -2580,56 +2586,86 @@ export const SecondMeasurementComparisonPanel: React.FC<SecondMeasurementPanelPr
   }, [report]);
 
   return (
-    <div className={`p-4 rounded-2xl border-2 border-sky-300 bg-white text-slate-900 shadow-xs space-y-3.5 ${className}`}>
-      {/* Header Banner */}
-      <div className="p-3 rounded-xl bg-gradient-to-r from-[#0b192c] via-[#0f2942] to-[#1e3a8a] text-white flex flex-wrap items-center justify-between gap-2 shadow-2xs">
-        <div className="flex items-center gap-2.5">
-          <span className="px-2.5 py-1 rounded-lg bg-sky-500 text-slate-950 font-extrabold text-[10.5px] uppercase tracking-wider font-sans">
-            📊 2. ÖLÇÜM GELİŞİM VE KARŞILAŞTIRMA BÖLÜMÜ
-          </span>
+    <div className={`p-4 sm:p-5 rounded-2xl border border-slate-200/90 bg-white text-slate-900 shadow-xs space-y-4 ${className}`}>
+      {/* Header Banner - Executive Corporate Protocol */}
+      <div className="p-4 rounded-xl bg-gradient-to-r from-slate-950 via-slate-900 to-[#0e2439] text-white flex flex-col md:flex-row md:items-center justify-between gap-3.5 border border-slate-800 shadow-sm">
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-sky-500/20 text-sky-300 border border-sky-400/30 text-[10px] font-bold uppercase tracking-wider font-sans">
+              <Activity className="w-3 h-3 text-sky-400 shrink-0" />
+              2. Ölçüm Karşılaştırma Protokolü
+            </span>
+            <span className="text-[10.5px] text-slate-400 font-sans font-medium">
+              Kinantropometrik &amp; Biyomotor Değerlendirme
+            </span>
+          </div>
           <div>
-            <h3 className="text-xs sm:text-sm font-extrabold text-white uppercase tracking-tight font-sans">
-              1. Ölçüm ({report.date1}) → 2. Ölçüm ({report.date2}) Dönemsel Karşılaştırma Analizi
+            <h3 className="text-sm sm:text-base font-extrabold text-white tracking-tight uppercase font-sans">
+              Dönemsel Performans ve Gelişim Analizi
             </h3>
-            <p className="text-[10px] text-sky-200 font-medium font-sans">
-              İkinci ölçüm sonuçları alındığında sporcumuzun katettiği gelişim ve performans değişimi
+            <p className="text-[11px] text-slate-300 font-medium font-sans mt-0.5 leading-relaxed">
+              İlk ölçüm referansına kıyasla sporcunun katettiği net biyomotorik ilerleme ve performans değişimi
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className={`px-3 py-1 rounded-xl text-xs font-extrabold font-sans border ${
-            isProgress ? 'bg-emerald-950 text-emerald-300 border-emerald-400' : 'bg-amber-950 text-amber-300 border-amber-400'
+
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          <div className="px-3 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700/80 text-right">
+            <div className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Ölçüm Takvimi</div>
+            <div className="text-xs font-bold text-sky-300 font-sans tabular-nums flex items-center gap-1.5 mt-0.5">
+              <Calendar className="w-3 h-3 text-sky-400 shrink-0" />
+              <span>{report.date1} → {report.date2}</span>
+            </div>
+          </div>
+          <div className={`px-3.5 py-1.5 rounded-lg border flex items-center gap-2.5 ${
+            isProgress
+              ? 'bg-emerald-950/90 text-emerald-200 border-emerald-500/60 shadow-2xs'
+              : 'bg-amber-950/90 text-amber-200 border-amber-500/60 shadow-2xs'
           }`}>
-            {isProgress ? `📈 Net İlerleme: +${scoreDiff} Puan` : `📉 Değişim: ${scoreDiff} Puan`}
-          </span>
+            {isProgress ? (
+              <TrendingUp className="w-4 h-4 text-emerald-400 shrink-0" />
+            ) : (
+              <TrendingDown className="w-4 h-4 text-amber-400 shrink-0" />
+            )}
+            <div>
+              <div className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Net Gelişim</div>
+              <div className="text-xs font-black font-sans tabular-nums text-white">
+                {isProgress ? `+${scoreDiff} Puan` : `${scoreDiff} Puan`}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* KPI Cards: Önceki Ölçüm vs Mevcut Ölçüm */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-sans">
-        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-          <span className="text-[9.5px] font-bold text-slate-500 uppercase block">1. Ölçüm (Önceki - {report.date1})</span>
-          <span className="text-base font-black text-slate-700 mt-0.5 block font-sans tabular-nums">%{p1Score} Puan</span>
-          <span className="text-[9px] text-slate-500">Başlangıç Seviyesi</span>
+        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between">
+          <span className="text-[9.5px] font-bold text-slate-500 uppercase block">1. Ölçüm ({report.date1})</span>
+          <span className="text-base font-black text-slate-700 mt-1 block font-sans tabular-nums">%{p1Score} Puan</span>
+          <span className="text-[9px] text-slate-500 font-medium">Başlangıç Referansı</span>
         </div>
-        <div className="p-2.5 rounded-xl bg-sky-50/80 border-2 border-sky-400">
-          <span className="text-[9.5px] font-extrabold text-sky-900 uppercase block">2. Ölçüm (Mevcut - {report.date2})</span>
-          <span className="text-lg font-black text-sky-700 mt-0.5 block font-sans tabular-nums">%{p2Score} Puan</span>
-          <span className="text-[9.5px] font-bold text-emerald-700">+%{p2Score - p1Score} İlerleme</span>
+        <div className="p-3 rounded-xl bg-sky-50/80 border-2 border-sky-400/90 flex flex-col justify-between">
+          <span className="text-[9.5px] font-extrabold text-sky-900 uppercase block">2. Ölçüm ({report.date2})</span>
+          <span className="text-lg font-black text-sky-700 mt-1 block font-sans tabular-nums">%{p2Score} Puan</span>
+          <span className="text-[9.5px] font-extrabold text-emerald-700 flex items-center gap-0.5 mt-0.5">
+            <ArrowUpRight className="w-3 h-3 text-emerald-600 shrink-0" />
+            <span>+%{p2Score - p1Score} İlerleme</span>
+          </span>
         </div>
-        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between">
           <span className="text-[9.5px] font-bold text-slate-500 uppercase block">Dönemsel Değişim (Δ)</span>
-          <span className={`text-base font-black mt-0.5 block font-sans tabular-nums ${isProgress ? 'text-emerald-700' : 'text-amber-700'}`}>
+          <span className={`text-base font-black mt-1 block font-sans tabular-nums ${isProgress ? 'text-emerald-700' : 'text-slate-800'}`}>
             {isProgress ? `+${scoreDiff}` : scoreDiff} Puan
           </span>
-          <span className="text-[9px] text-slate-500">1. → 2. Ölçüm Farkı</span>
+          <span className="text-[9px] text-slate-500 font-medium">1. → 2. Ölçüm Farkı</span>
         </div>
-        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-          <span className="text-[9.5px] font-bold text-slate-500 uppercase block font-sans">Gelişim Yönü</span>
-          <span className="text-sm font-extrabold text-emerald-800 mt-0.5 block">
-            {isProgress ? '✨ Başarılı İlerleme' : ' Takip Edilmeli'}
+        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between">
+          <span className="text-[9.5px] font-bold text-slate-500 uppercase block font-sans">Gelişim Durumu</span>
+          <span className="text-xs font-black text-emerald-800 mt-1 flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <span>{isProgress ? 'Pozitif İlerleme' : 'Takip ve İzlem'}</span>
           </span>
-          <span className="text-[9px] text-slate-500">10 Motor Test İncelemesi</span>
+          <span className="text-[9px] text-slate-500 font-medium">10 Motor Test İncelemesi</span>
         </div>
       </div>
 
@@ -2660,12 +2696,14 @@ export const SecondMeasurementComparisonPanel: React.FC<SecondMeasurementPanelPr
                   </td>
                   <td className="py-1.5 px-2 text-right font-bold">
                     {row.isPositive ? (
-                      <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-950 text-[9.5px] inline-block">
-                        📈 İlerleme
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10px] font-bold inline-flex items-center gap-1">
+                        <ArrowUpRight className="w-3 h-3 text-emerald-700 shrink-0" />
+                        <span>İlerleme</span>
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-950 text-[9.5px] inline-block">
-                        📉 Takip Edilmeli
+                      <span className="px-2 py-0.5 rounded-md bg-amber-100 text-slate-900 border border-amber-300 font-extrabold text-[10px] inline-flex items-center gap-1">
+                        <ArrowDownRight className="w-3 h-3 text-amber-700 shrink-0" />
+                        <span>Takip Edilmeli</span>
                       </span>
                     )}
                   </td>

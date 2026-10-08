@@ -5,7 +5,7 @@ export const INITIAL_INTEGRATIONS: EntegrasyonItem[] = [
     id: 'int-sportsfly-lab',
     name: 'SportsFly Lab',
     category: 'Kulüp & Spor Modülleri',
-    description: 'Beden kompozisyonu, motor performans, Heath-Carter somatotip, kardiyorespiratuar (VO2peak), D3 radar/gelişim grafikleri ve yapay zeka önerilerini Excel ile içe aktararak 7 sayfalık profesyonel sporcu karnesi oluşturur.',
+    description: 'Beden kompozisyonu, motor performans, Heath-Carter Somatotip Analizi (Endomorfi, Mezomorfi, Ektomorfi Değişim Tablosu), kardiyorespiratuar (VO2peak) ve gelişim grafiklerini Excel ile içe aktararak profesyonel sporcu karnesi oluşturur.',
     logoUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=200&auto=format&fit=crop&q=80',
     iconName: 'Activity',
     isRecommended: true,
