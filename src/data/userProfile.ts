@@ -17,7 +17,7 @@ export interface UserProfileData {
   avatarUrl?: string;
   bio: string;
   twoFactorEnabled: boolean;
-  authProvider?: 'google' | 'standard';
+  authProvider?: 'google' | 'standard' | 'integration';
   hasActivePackage?: boolean;
   notifications: {
     newRegistrationEmail: boolean;

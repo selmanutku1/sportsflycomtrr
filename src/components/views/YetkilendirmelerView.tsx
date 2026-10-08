@@ -56,6 +56,7 @@ import {
 import { getStoredUserProfile } from '../../data/userProfile';
 import { isSuperAdminUser } from '../../data/packagePermissions';
 import { GoogleUsersAccessManagerPanel } from '../admin/GoogleUsersAccessManagerPanel';
+import { IntegrationAccessManagerPanel } from '../admin/IntegrationAccessManagerPanel';
 import {
   secureFetch,
   encryptSensitivePII,
@@ -474,6 +475,7 @@ export const YetkilendirmelerView: React.FC = () => {
 
       {/* Google İle Giriş Yapan Kullanıcılar & Aktif Alan Yönetimi */}
       <GoogleUsersAccessManagerPanel />
+      <IntegrationAccessManagerPanel />
 
       {/* Role Switcher Tabs (Mobile Optimized Horizontal Scroll + Desktop Grid) */}
       <div className="space-y-1.5">

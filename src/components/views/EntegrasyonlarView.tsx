@@ -25,6 +25,7 @@ import {
   ArrowRight,
   Sparkles,
   SlidersHorizontal,
+  LogOut,
 } from 'lucide-react';
 import { EntegrasyonItem, NavPage } from '../../types';
 import { getStoredIntegrations, saveStoredIntegrations } from '../../data/entegrasyonlarData';
@@ -37,6 +38,7 @@ import { SportsFlyVectorMark } from '../SportsFlyLogo';
 interface EntegrasyonlarViewProps {
   onNavigate?: (page: NavPage) => void;
   onToast?: (msg: string) => void;
+  onLogout?: () => void;
 }
 
 const CATEGORIES = [
@@ -47,6 +49,7 @@ const CATEGORIES = [
 export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
   onNavigate,
   onToast,
+  onLogout,
 }) => {
   const [integrations, setIntegrations] = useState<EntegrasyonItem[]>(() =>
     getStoredIntegrations()
@@ -239,6 +242,17 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
               <span className="sm:hidden">Entegrasyonlar</span>
               <span className="hidden sm:inline">Entegrasyonlar Sayfasına Geri Dön</span>
             </button>
+
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Entegrasyon Panelinden Çıkış Yap</span>
+              </button>
+            )}
 
             <div className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate sm:hidden">
               {activeModuleMeta?.shortLabel}

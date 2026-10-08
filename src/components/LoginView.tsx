@@ -61,6 +61,7 @@ import {
 } from '../services/userService';
 import { registerOrUpdateGoogleLoginUser } from '../data/googleUsersAccess';
 import { QrYoklamaScannerModal } from './modals/QrYoklamaScannerModal';
+import { IntegrationLoginView } from './IntegrationLoginView';
 import {
   sanitizeInputString,
   detectInjectionAttempt,
@@ -83,6 +84,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
 
   // Login Mode: 'phone' or 'email'
   const [loginMode, setLoginMode] = useState<'phone' | 'email'>('phone');
+  const [loginType, setLoginType] = useState<'standard' | 'integration'>('standard');
 
   // Inputs
   const [countryCode, setCountryCode] = useState('+90');
@@ -1098,6 +1100,26 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           </div>
         </div>
 
+        {/* Tab Switcher */}
+        <div className="flex p-1 bg-slate-100 rounded-xl mb-6">
+          <button
+            onClick={() => setLoginType('standard')}
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
+              loginType === 'standard' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+            }`}
+          >
+            Standart Giriş
+          </button>
+          <button
+            onClick={() => setLoginType('integration')}
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
+              loginType === 'integration' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+            }`}
+          >
+            Entegrasyon Girişi
+          </button>
+        </div>
+
         {/* Loading overlay notification */}
         {isLoading && (
           <div className="w-full mb-4 py-3 px-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs flex items-center justify-center gap-2.5 animate-pulse">
@@ -1282,6 +1304,20 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               </button>
             </div>
           </div>
+        ) : loginType === 'integration' ? (
+          <IntegrationLoginView
+            onSuccess={async () => {
+              if (auth.currentUser) {
+                sessionStorage.setItem('sportsfly_integration_active', 'true');
+                window.location.reload();
+              } else {
+                setLoginError('Entegrasyon girişini tamamlamak için lütfen önce sistem girişi yapınız.');
+              }
+            }}
+            onError={(err) => setLoginError(err)}
+            setIsLoading={setIsLoading}
+            onBack={() => setLoginType('standard')}
+          />
         ) : (
           <>
         {/* 2. Google Girişi (Clean White Button with Subtle Border & Brand Colors) */}

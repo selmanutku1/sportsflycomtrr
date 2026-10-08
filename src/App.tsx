@@ -6,6 +6,7 @@ import { Sidebar } from './components/Sidebar';
 import { INITIAL_SPORCULAR } from './data/mockData';
 import { PackageAccessRestrictedView } from './components/views/PackageAccessRestrictedView';
 import { LoginView } from './components/LoginView';
+import { IntegrationSelectorView } from './components/views/IntegrationSelectorView';
 import { PointEarnedPushToast } from './components/notifications/PointEarnedPushToast';
 import { ReminderPushToast } from './components/notifications/ReminderPushToast';
 import {
@@ -166,6 +167,16 @@ export default function App() {
     return false;
   });
 
+  const [isIntegrationActive, setIsIntegrationActive] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return sessionStorage.getItem('sportsfly_integration_active') === 'true';
+      } catch (e) {}
+    }
+    return false;
+  });
+  const [selectedIntegrationId, setSelectedIntegrationId] = useState<string | null>(null);
+
   const handleLoginSuccess = async (
     userData: { email?: string; name?: string; photoURL?: string; uid?: string; role?: string } | string
   ) => {
@@ -208,6 +219,7 @@ export default function App() {
     try {
       sessionStorage.setItem('sportsfly_auth_active', 'false');
       sessionStorage.removeItem('sportsfly_active_page');
+      sessionStorage.removeItem('sportsfly_integration_active');
       if (typeof BroadcastChannel !== 'undefined') {
         const ch = new BroadcastChannel('sportsfly_auth_channel');
         ch.postMessage({ type: 'LOGOUT' });
@@ -540,6 +552,12 @@ export default function App() {
   }, [currentPage, isAuthenticated]);
 
   const renderActiveView = () => {
+    // Force integration page if integration active
+    if (isIntegrationActive && currentPage !== 'entegrasyonlar') {
+      setCurrentPage('entegrasyonlar');
+      return <EntegrasyonlarView onNavigate={handlePageSelect} onLogout={handleLogout} />;
+    }
+
     // 0. Users registered/logged in via Google (except Super Admin selmanutkumarmara@gmail.com) can see Packages + Admin-enabled areas
     if (
       isGoogleRestrictedUser(userProfile?.role, userProfile?.email) &&
@@ -647,7 +665,7 @@ export default function App() {
       case 'eposta-servis-yapilandirmasi':
         return <EpostaServisYapilandirmasiView />;
       case 'entegrasyonlar':
-        return <EntegrasyonlarView onNavigate={handlePageSelect} />;
+        return <EntegrasyonlarView onNavigate={handlePageSelect} onLogout={handleLogout} />;
       case 'paketler':
       case 'paket-yonetimi':
         return <PaketlerView />;
@@ -665,8 +683,15 @@ export default function App() {
     }
   };
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isIntegrationActive) {
     return <LoginView onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  if (isIntegrationActive && !selectedIntegrationId) {
+    return <IntegrationSelectorView onSelect={(id) => {
+        setSelectedIntegrationId(id);
+        setCurrentPage('entegrasyonlar');
+    }} />;
   }
 
   return (
@@ -678,24 +703,28 @@ export default function App() {
 
       <div className="flex flex-1 overflow-hidden h-full print:h-auto print:overflow-visible print:block">
         {/* Sidebar */}
-        <Sidebar
-          currentPage={currentPage}
-          onSelectPage={handlePageSelect}
-          isOpen={isSidebarOpen}
-          onCloseMobile={() => setIsSidebarOpen(false)}
-          currentPlan={currentPlan}
-        />
+        {!isIntegrationActive && (
+          <Sidebar
+            currentPage={currentPage}
+            onSelectPage={handlePageSelect}
+            isOpen={isSidebarOpen}
+            onCloseMobile={() => setIsSidebarOpen(false)}
+            currentPlan={currentPlan}
+          />
+        )}
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden print:h-auto print:overflow-visible print:block">
           {/* Header - Permanently pinned at the top on both web & mobile */}
-          <Header
-            currentPage={currentPage}
-            onToggleSidebar={toggleSidebar}
-            isSidebarOpen={isSidebarOpen}
-            onNavigate={handlePageSelect}
-            onLogout={handleLogout}
-          />
+          {!isIntegrationActive && (
+            <Header
+              currentPage={currentPage}
+              onToggleSidebar={toggleSidebar}
+              isSidebarOpen={isSidebarOpen}
+              onNavigate={handlePageSelect}
+              onLogout={handleLogout}
+            />
+          )}
 
           {/* Body Content - Dedicated scrollable viewport */}
           <main

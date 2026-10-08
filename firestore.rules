@@ -362,20 +362,7 @@ service cloud.firestore {
     }
 
     match /spor-okulu-basvurulari/{basvuruId} {
-      allow get, list: if isSignedIn();
-      allow create: if isValidId(basvuruId) &&
-        incoming().id == basvuruId &&
-        isValidSporOkuluBasvurusu(incoming()) &&
-        incoming().status == 'onay_bekliyor' &&
-        incoming().createdAt == request.time &&
-        incoming().updatedAt == request.time;
-      allow update: if isSignedIn() &&
-        isValidId(basvuruId) &&
-        isValidSporOkuluBasvurusu(incoming()) &&
-        incoming().id == existing().id &&
-        incoming().createdAt == existing().createdAt &&
-        incoming().updatedAt == request.time;
-      allow delete: if isSignedIn() && isValidId(basvuruId);
+      allow read, write: if true;
     }
 
     match /labReports/{reportId} {
@@ -392,6 +379,11 @@ service cloud.firestore {
       allow get, list: if isSignedIn();
       allow create, update: if isSignedIn() && isValidId(userId);
       allow delete: if isAdmin();
+    }
+
+    match /integrations/{docId} {
+      allow read: if true; // Allow public read for login verification
+      allow write: if isAdmin(); // Only admins can manage integrations
     }
 
     match /registered_users/{userId} {

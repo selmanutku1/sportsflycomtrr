@@ -434,6 +434,18 @@ export const basvurularService = {
     }
   },
 
+  async update(id: string, data: Partial<FirestoreSporOkuluBasvurusuDoc>) {
+    const docPath = `spor-okulu-basvurulari/${id}`;
+    try {
+      await updateDoc(doc(db, 'spor-okulu-basvurulari', id), {
+        ...data,
+        updatedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, docPath);
+    }
+  },
+
   subscribeToAll(
     onData: (items: FirestoreSporOkuluBasvurusuDoc[]) => void,
     onErrorCallback?: (err: unknown) => void

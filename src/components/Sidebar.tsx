@@ -107,7 +107,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isGoogleRestricted = isGoogleRestrictedUser(userProfile?.role, userProfile?.email);
   const isSuperAdmin = !isGoogleRestricted && isSuperAdminUser(userProfile?.role, userProfile?.email);
 
+  // UI restrictions for integration login: If the user is an integration user, hide everything except 'entegrasyonlar'
+  // Placeholder: Check if the user's club title indicates an integration context or a specific role.
+  const isIntegrationUser = userProfile.role === 'Entegrasyon Kullanıcısı' || userProfile.role === 'LAB Kullanıcısı';
+
   const isRestricted = (page: NavPage) => {
+    // If it's an integration user, they can only access 'entegrasyonlar'
+    if (isIntegrationUser) {
+        return page !== 'entegrasyonlar';
+    }
+
     if (isGoogleRestricted) {
       return !isGoogleUserPageUnlocked(page, userProfile?.email);
     }

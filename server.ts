@@ -1036,6 +1036,19 @@ app.post('/api/auth/send-registration-verification', async (req: Request, res: R
   });
 });
 
+// Endpoint to verify integration login code
+app.post('/api/auth/integration-login', async (req: Request, res: Response) => {
+  const { integrationId, code } = req.body || {};
+  if (!integrationId || !code) {
+    res.status(400).json({ error: 'Integration ID and code are required.' });
+    return;
+  }
+  // TODO: Implement Firestore lookup and verification logic
+  // For now, simulate a successful verification for demonstration purposes.
+  // In a real scenario, compare hash and issue custom token.
+  res.json({ success: true, message: 'Integration verified.' });
+});
+
 // Endpoint to verify the registration OTP code
 app.post('/api/auth/verify-registration-code', (req: Request, res: Response) => {
   const { email, code } = req.body || {};

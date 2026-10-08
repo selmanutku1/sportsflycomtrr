@@ -331,6 +331,9 @@ export const SporOkuluBasvurulariView: React.FC = () => {
 
       saveRequestsToStorage(updated);
 
+      // Update in Firestore for real-time sidebar badge update
+      await basvurularService.update(id, { status: 'onaylandi' });
+
       // Synchronize approval with persistent registered users database
       approveRegisteredUser(target.email || target.id, 'Süper Admin').catch((err) =>
         console.warn('approveRegisteredUser error:', err)
@@ -386,6 +389,9 @@ export const SporOkuluBasvurulariView: React.FC = () => {
       saveRequestsToStorage(updated);
       setIsRejectionModalOpen(false);
 
+      // Update in Firestore for real-time sidebar badge update
+      await basvurularService.update(targetId, { status: 'reddedildi' });
+
       // Sync rejection with persistent registered users database
       rejectRegisteredUser(selectedRequest.email || selectedRequest.id, reason).catch((err) =>
         console.warn('rejectRegisteredUser error:', err)
@@ -422,6 +428,9 @@ export const SporOkuluBasvurulariView: React.FC = () => {
         r.id === id ? { ...r, status: 'askida' as const } : r
       );
       saveRequestsToStorage(updated);
+
+      // Update in Firestore for real-time sidebar badge update
+      await basvurularService.update(id, { status: 'askida' });
 
       try {
         await fetchWithTimeout(`/api/demo-requests/${id}`, {
