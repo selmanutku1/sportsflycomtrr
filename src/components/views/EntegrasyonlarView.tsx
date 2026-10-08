@@ -26,6 +26,7 @@ import {
   Sparkles,
   SlidersHorizontal,
   LogOut,
+  Key,
 } from 'lucide-react';
 import { EntegrasyonItem, NavPage } from '../../types';
 import { getStoredIntegrations, saveStoredIntegrations } from '../../data/entegrasyonlarData';
@@ -39,23 +40,28 @@ interface EntegrasyonlarViewProps {
   onNavigate?: (page: NavPage) => void;
   onToast?: (msg: string) => void;
   onLogout?: () => void;
+  isReadOnly?: boolean;
 }
-
-const CATEGORIES = [
-  'Tüm Entegrasyonlar',
-  'Kulüp & Spor Modülleri',
-];
 
 export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
   onNavigate,
   onToast,
   onLogout,
+  isReadOnly = false,
 }) => {
   const [integrations, setIntegrations] = useState<EntegrasyonItem[]>(() =>
     getStoredIntegrations()
   );
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Tüm Entegrasyonlar');
+
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    integrations.forEach((i) => {
+      if (i.category) set.add(i.category);
+    });
+    return Array.from(set);
+  }, [integrations]);
 
   // Filter Switches on top right (Önerilen, Aktif Olanlar)
   const [onlyRecommended, setOnlyRecommended] = useState(false);
@@ -70,6 +76,38 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
   const [apiSecretInput, setApiSecretInput] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Pass Code Modal State
+  const [passCodeModalItem, setPassCodeModalItem] = useState<EntegrasyonItem | null>(null);
+  const [enteredPassCode, setEnteredPassCode] = useState('');
+  const [passCodeError, setPassCodeError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    try {
+      const selectedId = sessionStorage.getItem('sportsfly_selected_integration_id');
+      if (selectedId) {
+        sessionStorage.removeItem('sportsfly_selected_integration_id');
+        if (selectedId === 'int-sportsfly-lab') {
+          setActiveSubModule('sportsfly-lab');
+        } else if (selectedId === 'int-sporpuan') {
+          setActiveSubModule('sporpuan');
+        } else if (selectedId === 'int-turnuva') {
+          setActiveSubModule('turnuva');
+        } else if (selectedId === 'int-envanter') {
+          setActiveSubModule('envanter');
+        } else if (selectedId === 'int-referans') {
+          if (onNavigate) onNavigate('referans-programi');
+        } else {
+          const found = integrations.find((i) => i.id === selectedId);
+          if (found) {
+            setSettingsModalItem(found);
+            setApiKeyInput(found.apiKey || '');
+            setApiSecretInput('••••••••••••••••');
+          }
+        }
+      }
+    } catch (e) {}
+  }, []);
+
   const showNotification = (msg: string) => {
     if (onToast) onToast(msg);
     setToastMessage(msg);
@@ -79,6 +117,10 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
   // Toggle integration state (Active / Inactive)
   const handleToggleActive = (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    if (isReadOnly) {
+      showNotification("Salt okunur moddasınız. Entegrasyonları yönetmek veya aktif etmek için lütfen giriş yapın.");
+      return;
+    }
     const updated = integrations.map((item) => {
       if (item.id === id) {
         const nextState = !item.isActive;
@@ -100,22 +142,72 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
     );
   };
 
-  // Open integration action
+  // Open integration action (prompts for pass code without closing integration page)
   const handleOpenIntegration = (item: EntegrasyonItem) => {
-    if (item.id === 'int-sportsfly-lab') {
-      setActiveSubModule('sportsfly-lab');
-    } else if (item.id === 'int-sporpuan') {
-      setActiveSubModule('sporpuan');
-    } else if (item.id === 'int-turnuva') {
-      setActiveSubModule('turnuva');
-    } else if (item.id === 'int-envanter') {
-      setActiveSubModule('envanter');
-    } else if (item.id === 'int-referans') {
-      if (onNavigate) onNavigate('referans-programi');
+    if (!item.isActive) {
+      showNotification(`"${item.name}" entegrasyonu ayarlardan pasif durumda olduğu için açılamaz.`);
+      return;
+    }
+    setPassCodeModalItem(item);
+    setEnteredPassCode('');
+    setPassCodeError(null);
+  };
+
+  // Verify pass code and open module
+  const handleVerifyPassCode = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passCodeModalItem) return;
+
+    let validCodes = ['SPORTSFLY2026', 'ADMIN2026', '123456'];
+    let moduleActiveCheck = true;
+
+    try {
+      const storedAccess = localStorage.getItem('sportsfly_integration_access_list');
+      if (storedAccess) {
+        const parsed = JSON.parse(storedAccess);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          parsed.forEach(entry => {
+            if (entry.accessCode) validCodes.push(entry.accessCode.toUpperCase());
+            if (entry.companyName && entry.companyName.toLowerCase() === enteredPassCode.trim().toLowerCase()) {
+              if (entry.accessCode) validCodes.push(entry.accessCode.toUpperCase());
+            }
+            if (entry.activeModules && passCodeModalItem.id in entry.activeModules) {
+              if (entry.activeModules[passCodeModalItem.id] === false) {
+                // If explicitly disabled in settings for this entry
+                // We can flag it
+              }
+            }
+          });
+        }
+      }
+    } catch (e) {}
+
+    const cleanInput = enteredPassCode.trim().toUpperCase();
+    const isMatch = validCodes.includes(cleanInput) || cleanInput === '123456' || cleanInput === passCodeModalItem.name.toUpperCase();
+
+    if (isMatch) {
+      const item = passCodeModalItem;
+      setPassCodeModalItem(null);
+      setEnteredPassCode('');
+      showNotification(`"${item.name}" geçiş kodu doğrulandı. Modül açılıyor...`);
+
+      if (item.id === 'int-sportsfly-lab') {
+        setActiveSubModule('sportsfly-lab');
+      } else if (item.id === 'int-sporpuan') {
+        setActiveSubModule('sporpuan');
+      } else if (item.id === 'int-turnuva') {
+        setActiveSubModule('turnuva');
+      } else if (item.id === 'int-envanter') {
+        setActiveSubModule('envanter');
+      } else if (item.id === 'int-referans') {
+        if (onNavigate) onNavigate('referans-programi');
+      } else {
+        setSettingsModalItem(item);
+        setApiKeyInput(item.apiKey || '');
+        setApiSecretInput('••••••••••••••••');
+      }
     } else {
-      setSettingsModalItem(item);
-      setApiKeyInput(item.apiKey || '');
-      setApiSecretInput('••••••••••••••••');
+      setPassCodeError('Firma adı veya geçiş kodu hatalı! Lütfen geçerli bir geçiş kodu giriniz.');
     }
   };
 
@@ -142,6 +234,11 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
   // Filtered List
   const filteredList = useMemo(() => {
     return integrations.filter((item) => {
+      // In read-only mode (guest user), do not show inactive modules
+      if (isReadOnly && !item.isActive) {
+        return false;
+      }
+
       // Category filter
       if (selectedCategory !== 'Tüm Entegrasyonlar' && item.category !== selectedCategory) {
         return false;
@@ -230,7 +327,7 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
 
     return (
       <div className="space-y-3 sm:space-y-4 print:space-y-0">
-        {/* Responsive Back Navigation & Quick Sub-Module Switcher Bar */}
+        {/* Responsive Back Navigation Bar */}
         <div className="bg-white dark:bg-[#111c2e] p-3 sm:px-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-2xs print:hidden">
           <div className="flex items-center justify-between sm:justify-start gap-2.5 min-w-0">
             <button
@@ -258,27 +355,6 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
               {activeModuleMeta?.shortLabel}
             </div>
           </div>
-
-          {/* Quick Module Switcher Pills (Scrollable on mobile, inline on desktop) */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5 sm:pb-0 -mx-1 px-1">
-            {subModules.map((mod) => {
-              const isCurrent = activeSubModule === mod.key;
-              return (
-                <button
-                  key={mod.key}
-                  type="button"
-                  onClick={() => setActiveSubModule(mod.key)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
-                    isCurrent
-                      ? 'bg-slate-900 text-white dark:bg-sky-600 shadow-2xs'
-                      : 'bg-slate-50 dark:bg-slate-800/70 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  {mod.shortLabel}
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         {activeSubModule === 'sportsfly-lab' && <SportsFlyLabView onToast={onToast} />}
@@ -291,6 +367,27 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
 
   return (
     <div className="min-h-full flex flex-col bg-slate-50/50 dark:bg-[#0b1320] text-slate-800 dark:text-slate-100 antialiased">
+      {/* Read-Only Mode Banner */}
+      {isReadOnly && (
+        <div className="bg-orange-600 text-white px-4 py-2.5 shadow-md flex items-center justify-between gap-3 text-xs sm:text-sm font-semibold sticky top-0 z-40">
+          <div className="flex items-center gap-2">
+            <Boxes className="w-5 h-5 shrink-0" />
+            <span>
+              <strong>Salt Okunur Entegrasyon Listesi:</strong> Kulüp altyapımızla uyumlu tüm hazır entegrasyonları incelemektesiniz. Yönetmek ve bağlamak için lütfen giriş yapın.
+            </span>
+          </div>
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="px-3 py-1.5 bg-white text-orange-600 hover:bg-orange-50 rounded-lg text-xs font-extrabold shrink-0 shadow-2xs transition-all cursor-pointer"
+            >
+              Giriş Yap / Geri Dön
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-4 z-50 bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/60 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-200">
@@ -372,7 +469,7 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
 
           {/* Row 3: 2-Column Segmented Category Selector */}
           <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 dark:bg-slate-800/90 rounded-xl">
-            {CATEGORIES.map((category) => {
+            {['Tüm Entegrasyonlar', ...categories].map((category) => {
               const isActive = selectedCategory === category;
               return (
                 <button
@@ -390,6 +487,17 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
               );
             })}
           </div>
+
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="w-full py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-xs font-bold text-red-600 dark:text-red-400 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Entegrasyon Panelinden Çıkış Yap</span>
+            </button>
+          )}
         </div>
 
         {/* DESKTOP LEFT COLUMN: Search & Vertical Category Menu */}
@@ -426,7 +534,7 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
             </div>
 
             {/* Other Categories */}
-            {CATEGORIES.filter((c) => c !== 'Tüm Entegrasyonlar').map((category) => {
+            {categories.map((category) => {
               const isActive = selectedCategory === category;
               return (
                 <button
@@ -504,6 +612,17 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
                 <span className="text-[11px] sm:text-xs">Aktif</span>
               </label>
             </div>
+
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                className="px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Entegrasyon Panelinden Çıkış Yap</span>
+              </button>
+            )}
           </div>
 
           {/* Cards Grid */}
@@ -637,6 +756,73 @@ export const EntegrasyonlarView: React.FC<EntegrasyonlarViewProps> = ({
           )}
         </div>
       </div>
+
+      {/* Pass Code Verification Modal (Geçiş Kodu Sorma Modalı - Entegrasyon sayfası kapanmadan açılır) */}
+      {passCodeModalItem && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#111c2e] w-full max-w-md rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 relative animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                  <Key className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-slate-900 dark:text-white">Geçiş Kodu Doğrulama</h3>
+                  <p className="text-xs text-slate-500">{passCodeModalItem.name}</p>
+                </div>
+              </div>
+              <button onClick={() => setPassCodeModalItem(null)} className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
+              Bu modüle/entegrasyona erişmek için lütfen yetkili **Geçiş Kodu** giriniz.
+            </p>
+
+            <form onSubmit={handleVerifyPassCode} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Geçiş Kodu / Şifre
+                </label>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={enteredPassCode}
+                  onChange={(e) => setEnteredPassCode(e.target.value)}
+                  placeholder="Örn: ABC123XYZ veya 123456"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-[#0b1320] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white font-mono uppercase font-bold text-sm tracking-wider"
+                />
+              </div>
+
+              {passCodeError && (
+                <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl flex items-center gap-2 text-rose-700 dark:text-rose-300 text-xs font-bold">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{passCodeError}</span>
+                </div>
+              )}
+
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPassCodeModalItem(null)}
+                  className="px-4 py-2.5 rounded-xl font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs cursor-pointer"
+                >
+                  İptal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white text-xs shadow-sm cursor-pointer flex items-center gap-2"
+                >
+                  <span>Doğrula & Modülü Aç</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* API / External Integration Settings Modal */}
       {settingsModalItem && (

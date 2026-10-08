@@ -215,6 +215,8 @@ export default function App() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    setIsIntegrationActive(false);
+    setSelectedIntegrationId(null);
     signOut(auth).catch(() => {});
     try {
       sessionStorage.setItem('sportsfly_auth_active', 'false');
@@ -226,6 +228,7 @@ export default function App() {
         ch.close();
       }
     } catch (e) {}
+    window.location.reload();
   };
 
   const mainScrollRef = useRef<HTMLElement | null>(null);
@@ -555,7 +558,7 @@ export default function App() {
     // Force integration page if integration active
     if (isIntegrationActive && currentPage !== 'entegrasyonlar') {
       setCurrentPage('entegrasyonlar');
-      return <EntegrasyonlarView onNavigate={handlePageSelect} onLogout={handleLogout} />;
+      return <EntegrasyonlarView onNavigate={handlePageSelect} onLogout={handleLogout} isReadOnly={!isAuthenticated} />;
     }
 
     // 0. Users registered/logged in via Google (except Super Admin selmanutkumarmara@gmail.com) can see Packages + Admin-enabled areas
@@ -665,7 +668,7 @@ export default function App() {
       case 'eposta-servis-yapilandirmasi':
         return <EpostaServisYapilandirmasiView />;
       case 'entegrasyonlar':
-        return <EntegrasyonlarView onNavigate={handlePageSelect} onLogout={handleLogout} />;
+        return <EntegrasyonlarView onNavigate={handlePageSelect} onLogout={handleLogout} isReadOnly={!isAuthenticated} />;
       case 'paketler':
       case 'paket-yonetimi':
         return <PaketlerView />;
@@ -687,11 +690,8 @@ export default function App() {
     return <LoginView onLoginSuccess={handleLoginSuccess} />;
   }
 
-  if (isIntegrationActive && !selectedIntegrationId) {
-    return <IntegrationSelectorView onSelect={(id) => {
-        setSelectedIntegrationId(id);
-        setCurrentPage('entegrasyonlar');
-    }} />;
+  if (isIntegrationActive) {
+    return <EntegrasyonlarView onNavigate={handlePageSelect} onLogout={handleLogout} isReadOnly={!isAuthenticated} />;
   }
 
   return (

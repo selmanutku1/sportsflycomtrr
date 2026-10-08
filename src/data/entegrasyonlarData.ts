@@ -53,6 +53,32 @@ export const INITIAL_INTEGRATIONS: EntegrasyonItem[] = [
     targetPage: 'referans-programi',
     connectedAt: '24.09.2024',
   },
+  {
+    id: 'int-iyzico',
+    name: 'İyzico & Sanal POS',
+    category: 'Ödeme & Finans',
+    description: 'Kredi kartı ile online aidat ve etkinlik ödemeleri, otomatik taksitlendirme ve güvenli ödeme altyapısı.',
+    logoUrl: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=200&auto=format&fit=crop&q=80',
+    iconName: 'CreditCard',
+    isRecommended: true,
+    isActive: true,
+    isInternalModule: false,
+    targetPage: 'muhasebe',
+    connectedAt: '10.02.2024',
+  },
+  {
+    id: 'int-whatsapp',
+    name: 'WhatsApp Business API & SMS',
+    category: 'İletişim & Bildirim',
+    description: 'Antrenman hatırlatıcıları, aidat gecikme bildirimleri ve veli bilgilendirme mesajlarının otomatik gönderimi.',
+    logoUrl: 'https://images.unsplash.com/photo-1611746872915-64382b5c76da?w=200&auto=format&fit=crop&q=80',
+    iconName: 'MessageSquare',
+    isRecommended: true,
+    isActive: true,
+    isInternalModule: false,
+    targetPage: 'destek',
+    connectedAt: '05.04.2024',
+  },
 ];
 
 const INTEGRATIONS_STORAGE_KEY = 'sportsfly_integrations_list_v2';
@@ -65,7 +91,7 @@ export function getStoredIntegrations(): EntegrasyonItem[] {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        items = parsed.filter((i: EntegrasyonItem) => i.category === 'Kulüp & Spor Modülleri');
+        items = parsed;
       }
     }
 

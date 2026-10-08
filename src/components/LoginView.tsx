@@ -38,6 +38,7 @@ import {
   Zap,
   Award,
   Fingerprint,
+  Package,
 } from 'lucide-react';
 import { signInWithPopup, GoogleAuthProvider, User, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase';
@@ -1306,14 +1307,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           </div>
         ) : loginType === 'integration' ? (
           <IntegrationLoginView
-            onSuccess={async () => {
-              if (auth.currentUser) {
-                sessionStorage.setItem('sportsfly_integration_active', 'true');
-                window.location.reload();
-              } else {
-                setLoginError('Entegrasyon girişini tamamlamak için lütfen önce sistem girişi yapınız.');
-              }
-            }}
+            onSuccess={() => window.location.reload()}
             onError={(err) => setLoginError(err)}
             setIsLoading={setIsLoading}
             onBack={() => setLoginType('standard')}
